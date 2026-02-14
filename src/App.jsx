@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React from 'react'
+import { Link, Routes, Route } from 'react-router-dom'
+import Site1 from './sites/site1/Page'
+import Site2 from './sites/site2/Page'
+import Site3 from './sites/site3/Page'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <h1>Main Page</h1>
+      <div className="buttons">
+        <Link to="/site1">
+          <button>Open Site 1</button>
+        </Link>
+        <Link to="/site2">
+          <button>Open Site 2</button>
+        </Link>
+        <Link to="/site3">
+          <button>Open Site 3</button>
+        </Link>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      <Routes>
+        <Route path="/" element={<div>Select a site above</div>} />
+        <Route path="/site1/*" element={<Site1 />} />
+        <Route path="/site2/*" element={<Site2 />} />
+        <Route path="/site3/*" element={<Site3 />} />
+      </Routes>
+    </div>
   )
 }
-
-export default App
