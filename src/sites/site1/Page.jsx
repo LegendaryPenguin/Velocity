@@ -11,25 +11,14 @@ export default function Site1() {
             <span style={{marginRight:10}} className="site-emoji">🩺</span>
             Doctor
           </h2>
-          <div className="subtitle">Provider dashboard — appointments, notes, and quick actions</div>
         </div>
-        <Link to="/" className="secondary">
+        <Link to="/">
           <button className="secondary">Back</button>
         </Link>
       </header>
 
-      <main style={{marginTop:20, display:'grid',gridTemplateColumns:'1fr 1fr', gap:18}}>
-        <section className="site-card">
-          <h3>Today's Schedule</h3>
-          <p className="center-note">You have 5 appointments. Tap to view details.</p>
-          <button>View schedule</button>
-        </section>
-
-        <section className="site-card">
-          <h3>Patient Notes</h3>
-          <p className="center-note">Create and access patient notes securely.</p>
-          <button>Open notes</button>
-        </section>
+      <main style={{marginTop:20}}>
+        <p>This is the Doctor mini-site. Generic placeholder content for now.</p>
       </main>
     </div>
   )

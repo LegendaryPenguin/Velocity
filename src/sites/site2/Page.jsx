@@ -11,25 +11,14 @@ export default function Site2() {
             <span style={{marginRight:10}} className="site-emoji">🏥</span>
             Clearing House
           </h2>
-          <div className="subtitle">Claims & routing center — manage incoming forms and transfers</div>
         </div>
         <Link to="/">
           <button className="secondary">Back</button>
         </Link>
       </header>
 
-      <main style={{marginTop:20, display:'grid',gridTemplateColumns:'1fr 1fr', gap:18}}>
-        <section className="site-card">
-          <h3>Pending Claims</h3>
-          <p className="center-note">3 pending — review and route to appropriate departments.</p>
-          <button>Review claims</button>
-        </section>
-
-        <section className="site-card">
-          <h3>Inbox</h3>
-          <p className="center-note">New messages and forms needing attention.</p>
-          <button>Open inbox</button>
-        </section>
+      <main style={{marginTop:20}}>
+        <p>This is the Clearing House mini-site. Generic placeholder content for now.</p>
       </main>
     </div>
   )
