@@ -1,11 +1,10 @@
-// App.jsx
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Site1 from "./sites/site1/Page";
 import Site2 from "./sites/site2/Page";
 import Site3 from "./sites/site3/Page";
 
-function App() {
+export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -15,5 +14,3 @@ function App() {
     </Routes>
   );
 }
-
-export default App;

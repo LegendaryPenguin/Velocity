@@ -1,25 +1,46 @@
-
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from "react";
+import PageGate from "../../components/PageGate";
+import { useAuth } from "../../auth/AuthProvider";
+import { loadViewData, saveViewData } from "../../db/userData";
 
 export default function Site3() {
-  return (
-    <div style={{padding:20, maxWidth:900, margin:'0 auto'}}>
-      <header style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <div>
-          <h2 style={{margin:0}}>
-            <span style={{marginRight:10}} className="site-emoji">🧑‍🤝‍🧑</span>
-            Patient
-          </h2>
-        </div>
-        <Link to="/">
-          <button className="secondary">Back</button>
-        </Link>
-      </header>
+  const { user } = useAuth();
+  const [patientMessage, setPatientMessage] = useState("");
+  const [status, setStatus] = useState("");
 
-      <main style={{marginTop:20}}>
-        <p>This is the Patient mini-site. Generic placeholder content for now.</p>
-      </main>
-    </div>
-  )
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const data = await loadViewData(user.uid, "site3");
+      if (data?.patientMessage) setPatientMessage(data.patientMessage);
+    })();
+  }, [user]);
+
+  const onSave = async () => {
+    setStatus("Saving...");
+    await saveViewData(user.uid, "site3", { patientMessage });
+    setStatus("Saved ✅");
+    setTimeout(() => setStatus(""), 1200);
+  };
+
+  return (
+    <PageGate title="Patient View">
+      <p>Saved per Google account.</p>
+
+      <textarea
+        value={patientMessage}
+        onChange={(e) => setPatientMessage(e.target.value)}
+        placeholder="Patient notes..."
+        rows={6}
+        style={{ width: "100%", padding: 10 }}
+      />
+
+      <div style={{ marginTop: 12 }}>
+        <button onClick={onSave} style={{ padding: "10px 14px", cursor: "pointer" }}>
+          Save
+        </button>
+        <span style={{ marginLeft: 12 }}>{status}</span>
+      </div>
+    </PageGate>
+  );
 }
