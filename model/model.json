@@ -1,0 +1,19 @@
+{
+    "version": 1,
+    "feature_order": [
+      "time_ms",
+      "mistakes",
+      "path_len_px",
+      "curvature",
+      "avg_speed_x100",
+      "speed_std_x100",
+      "avg_acc_x100",
+      "acc_std_x100",
+      "hesitations",
+      "blur_count"
+    ],
+    "bias": 1200,
+    "weights": [ -1, -900, 1, 2, 3, -15, 2, -10, 250, -400 ],
+    "threshold": 0
+  }
+  
