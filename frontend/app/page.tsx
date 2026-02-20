@@ -66,16 +66,28 @@ export default function Page() {
     setTimeout(() => setCopied(false), 1600);
   };
 
-  const handleRequestTokens = () => {
+  const handleRequestTokens = async () => {
     setRequestLoading(true);
     setToast(null);
-    const timer = setTimeout(() => {
+    try {
+      const res = await fetch("/api/mint", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to_address: walletAddress.trim() }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || `Mint failed (HTTP ${res.status})`);
+      }
+      setToast({ type: "success", message: "Tokens requested successfully!" });
+
+    } catch (e: any) {
+      setToast({ type: "info", message: `Error: ${e?.message ?? String(e)}` });
+    } finally {
       setRequestLoading(false);
-      setVerificationState("requested");
-      const requestId = `req_${Math.random().toString(16).slice(2, 10)}`;
-      setToast({ type: "success", message: `Faucet request sent (${requestId}).` });
-    }, 900);
-    return () => clearTimeout(timer);
+    }
   };
 
   useEffect(() => {
