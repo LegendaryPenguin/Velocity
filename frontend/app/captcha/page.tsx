@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { generateProof, submitProofForValidation } from "@/lib/zk/prove";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -516,6 +517,9 @@ export default function CaptchaPage() {
   const [mounted, setMounted] = useState(false);
   const [incorrectTiles, setIncorrectTiles] = useState<Set<number>>(new Set());
   const [missedTiles, setMissedTiles] = useState<Set<number>>(new Set());
+  const [zkProving, setZkProving] = useState(false);
+  const [zkVerified, setZkVerified] = useState<boolean | null>(null);
+  const [zkError, setZkError] = useState<string | null>(null);
 
   const [botCursorPos, setBotCursorPos] = useState<{ x: number; y: number } | null>(null);
   const [botCursorVisible, setBotCursorVisible] = useState(false);
@@ -739,9 +743,42 @@ export default function CaptchaPage() {
       setModelScore(model.score);
     } else {
       setModelLabel("HUMAN");
-      setStatusText("Correct selection — Verified as HUMAN.");
+      setStatusText("Generating ZK proof...");
       setFeatures(f);
       setModelScore(model.score);
+
+      // --- ZK proof generation + backend validation ---
+      setZkProving(true);
+      setZkVerified(null);
+      setZkError(null);
+
+      (async () => {
+        const proofResult = await generateProof(model.score);
+        if (!proofResult.success) {
+          setZkProving(false);
+          setZkError(proofResult.message);
+          setStatusText(`ZK proof failed: ${proofResult.message}`);
+          return;
+        }
+
+        setStatusText("ZK proof generated. Validating on server...");
+
+        const validation = await submitProofForValidation(
+          proofResult.proof,
+          proofResult.publicSignals,
+        );
+
+        setZkProving(false);
+
+        if (validation.ok && validation.verified) {
+          setZkVerified(true);
+          setStatusText("Verified as HUMAN — ZK proof validated on server.");
+        } else {
+          setZkVerified(false);
+          setZkError(validation.error ?? "Server rejected proof");
+          setStatusText("ZK proof rejected by server.");
+        }
+      })();
     }
   }, [selected, puzzle, solved, verified, refreshFeatures, simulateBot]);
 
