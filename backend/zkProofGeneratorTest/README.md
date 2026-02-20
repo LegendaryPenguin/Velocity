@@ -2,6 +2,24 @@
 
 This folder contains the setup to **generate a zk-proof** for the hackathon CAPTCHA circuit. It is a self-contained POC showing how private inputs can be turned into a proof whose output can be verified without exposing the secret.
 
+
+THE MOST IMPORTANT PART IS THAT runPipeline.js TAKES IN A SCORE AND RETURNS EITHER THAT THE SCORE WASNT PROCESSED BECAUSE ITS NOT IN THE HUMAN RANGE OR actually fucking returns the proof:
+
+Pipeline output: {
+  success: true,
+  message: 'ZK proof generated and verified successfully.',
+  verified: true,
+  proofPath: 'C:\\Users\\wolfi\\dev\\velocity\\Velocity\\backend\\zkProofValidator\\proof.json',
+  publicSignalsPath: 'C:\\Users\\wolfi\\dev\\velocity\\Velocity\\backend\\zkProofValidator\\publicSignals.json'
+}
+PS C:\Users\wolfi\dev\velocity\Velocity\backend\zkProofGeneratorTest> node .\testRun.js
+=== ZK Proof Pipeline Started ===
+⚠️ Test failed: score out of valid human rrange. Data not processed.
+Pipeline output: {
+  success: false,
+  message: 'Test failed: score out of valid human range. Data not processed.'       
+}
+
 ---
 
 ## Prerequisites
