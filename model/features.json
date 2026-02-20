@@ -1,0 +1,13 @@
+{
+    "time_ms": 8421,
+    "mistakes": 1,
+    "path_len_px": 18340,
+    "curvature": 9220,
+    "avg_speed_x100": 314,
+    "speed_std_x100": 88,
+    "avg_acc_x100": 510,
+    "acc_std_x100": 140,
+    "hesitations": 3,
+    "blur_count": 0
+  }
+  
