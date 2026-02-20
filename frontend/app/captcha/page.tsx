@@ -943,7 +943,8 @@ export default function CaptchaPage() {
 
   useEffect(() => {
     if (verified && solved && modelLabel === "HUMAN") {
-      redirectTimerRef.current = setTimeout(() => router.push("/"), 2500);
+      // redirectTimerRef.current = setTimeout(() => router.push("/"), 2500);
+      // Removing auto-redirect for easier testing and exploration of results
     }
   }, [verified, solved, modelLabel, router]);
 
