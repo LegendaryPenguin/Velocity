@@ -1,0 +1,9 @@
+{
+    "name": "zk-verifier",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "snarkjs": "^0.7.6"
+    }
+}
