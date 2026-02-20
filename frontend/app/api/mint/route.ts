@@ -19,7 +19,6 @@ const MIN_MS = 1000;
 
 export async function POST(req: Request) {
   try {
-    console.log(RELAYER_PK, TOKEN_ADDRESS);
     const ip = req.headers.get("x-forwarded-for") ?? "unknown";
     const now = Date.now();
     const last = lastByIp.get(ip) ?? 0;
