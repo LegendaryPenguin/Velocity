@@ -9,5 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "module",
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "fs": "^0.0.1-security"
+  }
 }
