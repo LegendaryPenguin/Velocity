@@ -19,7 +19,7 @@ export function LandingHero({ onContinue, animate }: Props) {
         <button
           type="button"
           onClick={onContinue}
-          className="btn-primary min-h-11 flex w-full items-center justify-center gap-3 px-6 py-3.5 text-[15px] font-semibold"
+          className="btn-primary min-h-11 flex w-full items-center justify-center gap-3 px-6 py-3.5 text-[15px] font-semibold hover:scale-[1.01]"
         >
           <svg className="h-5 w-5 text-purple-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

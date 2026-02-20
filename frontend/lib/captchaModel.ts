@@ -13,15 +13,7 @@ export type Features = Record<FeatureName, number>;
 export type MouseSample = { x: number; y: number; t: number };
 
 export type ExportedJson = {
-  time_ms: number;
-  click_count: number;
-  unique_tiles_clicked: number;
-  mistakes: number;
-  avg_click_delta_ms: number;
-  hesitations: number;
-  path_straightness: number;
-  movement_efficiency: number;
-  reset_count: number;
+  score: number;
 };
 
 export type Puzzle = {
@@ -265,16 +257,8 @@ export function generateBotPath(
   return path;
 }
 
-export function toExportJson(f: Features): ExportedJson {
+export function toExportJson(score: number): ExportedJson {
   return {
-    time_ms: f.time_ms,
-    click_count: f.click_count,
-    unique_tiles_clicked: f.unique_tiles_clicked,
-    mistakes: f.mistakes,
-    avg_click_delta_ms: f.avg_click_delta_ms,
-    hesitations: f.hesitations,
-    path_straightness: f.path_straightness,
-    movement_efficiency: f.movement_efficiency,
-    reset_count: f.reset_count,
+    score,
   };
 }

@@ -273,7 +273,7 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
         setModelLabel("BOT");
       } else {
         setModelLabel("HUMAN");
-        onVerifiedHuman(toExportJson(f), model.score);
+        onVerifiedHuman(toExportJson(model.score), model.score);
       }
       setFeatures(f);
       setModelScore(model.score);
@@ -426,13 +426,13 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
           </p>
           {incorrectTiles.size > 0 || missedTiles.size > 0 ? (
             <>
-              <h2 className="text-xl font-bold text-white">Incorrect</h2>
+              <h2 className="text-xl font-bold text-white">Try Again</h2>
               <p className="mt-1 text-[13px] text-white/80">Adjust your selection and verify again.</p>
             </>
           ) : verified && solved ? (
             <>
               <h2 className="text-xl font-bold text-white">
-                {modelLabel === "HUMAN" ? "Verified" : "Classified as Bot"}
+                {modelLabel === "HUMAN" ? "Access Granted" : "Classified as Bot"}
               </h2>
               <p className="mt-1 text-[13px] text-white/80">
                 {modelLabel === "HUMAN"
@@ -544,7 +544,7 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
             disabled={simulateBot || verifyLoading}
             className="btn-primary min-h-10 rounded-lg px-5 py-1.5 text-sm font-semibold"
           >
-            {verifyLoading ? "Verifying..." : "Verify"}
+            {verifyLoading ? "Verifying..." : "Verify Access"}
           </button>
         </div>
       </div>

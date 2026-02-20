@@ -22,7 +22,7 @@ function isValidEvmAddress(value: string): boolean {
 export default function Page() {
   const reducedMotion = useReducedMotionPref();
   const [step, setStep] = useState<Step>("landing");
-  const [animateIn, setAnimateIn] = useState(false);
+  const [animateIn, setAnimateIn] = useState(true);
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [verificationState, setVerificationState] = useState<VerificationState>("unverified");
   const [walletAddress, setWalletAddress] = useState("");
@@ -35,9 +35,10 @@ export default function Page() {
   const isWalletValid = useMemo(() => isValidEvmAddress(walletAddress), [walletAddress]);
 
   useEffect(() => {
+    if (animateIn) return;
     const t = setTimeout(() => setAnimateIn(true), 30);
     return () => clearTimeout(t);
-  }, []);
+  }, [animateIn]);
 
   const handleContinueToFaucet = () => {
     setStep("faucet");
@@ -84,7 +85,7 @@ export default function Page() {
   }, [toast]);
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
+    <main className="relative isolate flex min-h-screen flex-col items-center justify-center overflow-hidden">
       <BackgroundScene />
 
       {step === "landing" ? (
@@ -95,6 +96,9 @@ export default function Page() {
             animateIn || reducedMotion ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
+          <p className="mb-3 text-center text-xs font-medium uppercase tracking-[0.14em] text-white/70">
+            Connect • Verify • Claim
+          </p>
           <FaucetCard
             verificationState={verificationState}
             walletAddress={walletAddress}
@@ -106,11 +110,8 @@ export default function Page() {
             copied={copied}
             requestLoading={requestLoading}
             isWalletValid={isWalletValid}
+            latestScore={latestScore}
           />
-          <p className="mt-3 text-center text-xs text-white/55">
-            Privacy note: only behavior metrics and score are used to gate faucet access.
-            {latestScore !== null ? ` Last score: ${latestScore}.` : ""}
-          </p>
         </div>
       )}
 
@@ -120,7 +121,10 @@ export default function Page() {
         isOpen={showCaptcha}
         onClose={() => {
           setShowCaptcha(false);
-          if (verificationState === "verifying") setVerificationState("unverified");
+          if (verificationState === "verifying") {
+            setVerificationState("unverified");
+            setToast({ type: "info", message: "Try Again" });
+          }
         }}
         onVerifiedHuman={(payload, score) => {
           handleVerifiedHuman(payload, score);

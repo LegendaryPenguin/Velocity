@@ -14,6 +14,7 @@ type Props = {
   copied: boolean;
   requestLoading: boolean;
   isWalletValid: boolean;
+  latestScore: number | null;
 };
 
 export function FaucetCard({
@@ -27,6 +28,7 @@ export function FaucetCard({
   copied,
   requestLoading,
   isWalletValid,
+  latestScore,
 }: Props) {
   const humanVerified = verificationState === "verified" || verificationState === "requested";
   const canRequest = humanVerified && walletAddress.trim().length > 0 && isWalletValid && !requestLoading;
@@ -62,7 +64,7 @@ export function FaucetCard({
           )}
           {!humanVerified && (
             <p className="mt-2 text-xs text-[var(--text-muted)]">
-              Prove humanity first to unlock wallet entry.
+              One-time verification to unlock faucet access.
             </p>
           )}
         </div>
@@ -74,18 +76,24 @@ export function FaucetCard({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               <div>
-                <p className="text-sm font-semibold text-emerald-200">Verified Human</p>
-                <p className="text-xs text-emerald-100/70">Behavioral signal accepted</p>
+                <p className="text-sm font-semibold text-emerald-200">Access Granted</p>
+                <p className="text-xs text-emerald-100/70">Verification complete</p>
               </div>
             </div>
           ) : (
             <button
               type="button"
               onClick={onOpenCaptcha}
-              className="btn-secondary min-h-11 flex flex-1 items-center gap-3 px-4 py-3 text-sm"
+              className={`btn-secondary min-h-11 flex flex-1 items-center gap-3 px-4 py-3 text-sm ${
+                verificationState === "verifying" ? "animate-pulse border-purple-300/50 bg-purple-300/10" : ""
+              }`}
             >
-              <span className="flex h-5 w-5 items-center justify-center rounded border border-white/30" />
-              {verificationState === "verifying" ? "Verifying..." : "I am human"}
+              <span className="relative flex h-5 w-5 items-center justify-center rounded border border-white/30">
+                {verificationState === "verifying" && (
+                  <span className="absolute inline-flex h-5 w-5 animate-ping rounded border border-purple-200/60" />
+                )}
+              </span>
+              {verificationState === "verifying" ? "Verifying..." : "Verify Access"}
             </button>
           )}
 
@@ -102,8 +110,8 @@ export function FaucetCard({
         </div>
 
         {verificationState === "requested" ? (
-          <div className="rounded-xl border border-emerald-400/25 bg-emerald-500/12 px-4 py-4 text-center">
-            <p className="text-sm font-semibold text-emerald-200">Tokens requested successfully!</p>
+          <div className="rounded-xl border border-emerald-400/25 bg-emerald-500/12 px-4 py-4 text-center shadow-[0_0_36px_rgba(50,209,149,0.22)] animate-pulse">
+            <p className="text-sm font-semibold text-emerald-200">✓ Tokens Sent</p>
             <p className="mt-1 text-xs text-emerald-100/75">
               Your request is queued and processing.
             </p>
@@ -113,7 +121,7 @@ export function FaucetCard({
             type="button"
             onClick={onRequestTokens}
             disabled={!canRequest}
-            className="btn-primary min-h-11 w-full px-6 py-3 text-[15px] font-semibold"
+            className="btn-primary min-h-11 w-full px-6 py-3 text-[15px] font-semibold hover:scale-[1.01]"
           >
             {requestLoading ? "Requesting..." : "Request Testnet Tokens"}
           </button>
@@ -125,6 +133,22 @@ export function FaucetCard({
             Social tasks are easy to game. We use interaction behavior to estimate human intent instead.
           </p>
         </div>
+
+        <p className="text-center text-xs text-[var(--text-muted)]">
+          Privacy: interaction data never leaves your device.
+        </p>
+
+        {exportedJson && (
+          <details className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs">
+            <summary className="cursor-pointer font-medium text-white/80">Developer Details</summary>
+            <div className="mt-2 space-y-2">
+              {latestScore !== null && <p className="text-white/70">Score: {latestScore}</p>}
+              <pre className="max-h-36 overflow-auto rounded-lg bg-black/20 p-2 text-[11px] text-white/75">
+                {JSON.stringify(exportedJson, null, 2)}
+              </pre>
+            </div>
+          </details>
+        )}
       </div>
     </div>
   );
