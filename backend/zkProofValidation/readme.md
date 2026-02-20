@@ -15,3 +15,9 @@ const isHuman = await verifyProof({
   publicSignalsPath: "./publicSignals.json",
   verificationKeyPath: "./verification_key.json"
 });
+
+## Testing
+
+- `test.js` verifies that invalid proofs are rejected
+- Successful verification requires a valid Groth16 proof
+  generated from the same circuit and verification key
