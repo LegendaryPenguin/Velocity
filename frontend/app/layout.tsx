@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Sora } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,9 +12,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const sora = Sora({
+  variable: "--font-display",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "VeloCart — Shop Everything",
-  description: "VeloCart is your one-stop online store for electronics, home, fashion, and more. Fast delivery, great deals.",
+  title: "Proof of Human Faucet",
+  description: "Request testnet tokens by proving you are human through behavioral analysis — no social accounts required.",
 };
 
 export default function RootLayout({
@@ -24,9 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} antialiased`}>
         {children}
       </body>
     </html>
