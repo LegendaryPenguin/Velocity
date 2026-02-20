@@ -1,19 +1,38 @@
 {
-    "version": 1,
-    "feature_order": [
-      "time_ms",
-      "mistakes",
-      "path_len_px",
-      "curvature",
-      "avg_speed_x100",
-      "speed_std_x100",
-      "avg_acc_x100",
-      "acc_std_x100",
-      "hesitations",
-      "blur_count"
-    ],
-    "bias": 1200,
-    "weights": [ -1, -900, 1, 2, 3, -15, 2, -10, 250, -400 ],
-    "threshold": 0
-  }
-  
+  "version": 2,
+  "feature_order": [
+    "time_ms",
+    "click_count",
+    "unique_tiles_clicked",
+    "verify_attempts",
+    "mistakes",
+    "avg_click_delta_ms",
+    "std_click_delta_ms",
+    "hesitations",
+    "blur_count",
+    "reset_count",
+    "path_len_px",
+    "avg_speed",
+    "speed_std",
+    "avg_acceleration",
+    "acc_std",
+    "curvature",
+    "direction_changes",
+    "click_precision_px",
+    "path_straightness",
+    "movement_efficiency",
+    "micro_corrections",
+    "velocity_consistency",
+    "pause_before_click_ms",
+    "angular_velocity_std"
+  ],
+  "bias": -3500,
+  "weights": [
+    1, -10, 60, -300, -80,
+    2, 8, 150, -500, -200,
+    0.3, -0.5, 5, 0.1, 8,
+    3, 15, -2, -800, 600,
+    20, -1200, 3, 10
+  ],
+  "threshold": 0
+}
