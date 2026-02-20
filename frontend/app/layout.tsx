@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VeloCart — Shop Everything",
-  description: "VeloCart is your one-stop online store for electronics, home, fashion, and more. Fast delivery, great deals.",
+  title: "Proof of Human Faucet",
+  description: "Request testnet tokens by proving you are human through behavioral analysis — no social accounts required.",
 };
 
 export default function RootLayout({
@@ -24,9 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
