@@ -37,6 +37,21 @@ export default function DashboardPage() {
       </section>
 
       <section>
+        <div className="glass-card rounded-xl p-5">
+          <p className="text-xs font-medium text-white/60">0G Scaffold Wizard (Premium TUI)</p>
+          <p className="mt-1 font-mono text-sm text-white/90">better_tool.sh</p>
+          <a
+            href="/better_tool.sh"
+            download="better_tool.sh"
+            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#3b82f6] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#2563eb]"
+          >
+            <span aria-hidden>↓</span>
+            Download executable
+          </a>
+        </div>
+      </section>
+
+      <section>
         <Link
           href="/faucet"
           className="glass-card flex items-center justify-between rounded-xl px-5 py-4 transition hover:border-purple-400/40"
