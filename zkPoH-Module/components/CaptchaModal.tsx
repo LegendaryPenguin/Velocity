@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { PatternIcon } from "@/components/faucet/PatternIcon";
-import { useReducedMotionPref } from "@/hooks/useReducedMotionPref";
+import { PatternIcon } from "./PatternIcon";
+import { useReducedMotionPref } from "../hooks/useReducedMotionPref";
 import {
   BOT_STEP_INTERVAL_MS,
   ExportedJson,
@@ -17,18 +17,20 @@ import {
   computeFeatures,
   toExportJson,
   ZERO_FEATURES,
-} from "@/lib/captchaModel";
-import { generateProof, submitProofForValidation } from "@/lib/zk/prove";
+} from "../lib/captchaModel";
+import { generateProof, submitProofForValidation, ZKProveOptions } from "../lib/zk/prove";
+
+const SUCCESS_DELAY_MS = 1200;
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onVerifiedHuman: (payload: ExportedJson, score: number) => void;
+  onVerified: (payload: ExportedJson, score: number) => void;
+  zkOptions?: ZKProveOptions;
 };
 
-export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
+export function CaptchaModal({ isOpen, onClose, onVerified, zkOptions }: Props) {
   const reducedMotion = useReducedMotionPref();
-
 
   const [zkProving, setZkProving] = useState(false);
   const [zkError, setZkError] = useState<string | null>(null);
@@ -64,6 +66,7 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
   const lastMoveRef = useRef<number | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const verifiedPayloadRef = useRef<{ payload: ExportedJson; score: number } | null>(null);
 
   const tileClickRef = useRef<(index: number, cx?: number, cy?: number) => void>(() => {});
   const verifyRef = useRef<() => void>(() => {});
@@ -123,6 +126,9 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
     setVerifyLoading(false);
     setIncorrectTiles(new Set());
     setMissedTiles(new Set());
+    setZkVerified(false);
+    setZkError(null);
+    verifiedPayloadRef.current = null;
     resetCountRef.current += 1;
     resetTelemetry();
     refreshFeatures(null);
@@ -140,7 +146,6 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
     };
   }, []);
 
-  // Reset and autofocus whenever modal opens
   useEffect(() => {
     if (!isOpen) return;
     newPuzzle();
@@ -148,7 +153,17 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
     return () => clearTimeout(t);
   }, [isOpen, newPuzzle]);
 
-  // Focus trap + escape
+  // When ZK proof is verified: show success message, then after delay close and notify
+  useEffect(() => {
+    if (!zkVerified || !verifiedPayloadRef.current) return;
+    const id = setTimeout(() => {
+      const { payload, score } = verifiedPayloadRef.current!;
+      onVerified(payload, score);
+      onClose();
+    }, SUCCESS_DELAY_MS);
+    return () => clearTimeout(id);
+  }, [zkVerified, onVerified, onClose]);
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -158,10 +173,10 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
       if (!root) return;
       const focusables = Array.from(
         root.querySelectorAll<HTMLElement>("button,input,[tabindex]:not([tabindex='-1'])"),
-      ).filter((el) => !el.hasAttribute("disabled"));
+      ).filter((el: HTMLElement) => !el.hasAttribute("disabled"));
       if (focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
+      const first = focusables[0] as HTMLElement;
+      const last = focusables[focusables.length - 1] as HTMLElement;
       if (!e.shiftKey && document.activeElement === last) {
         e.preventDefault();
         first.focus();
@@ -174,7 +189,6 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose, simulateBot]);
 
-  // Mouse tracking
   useEffect(() => {
     if (!isOpen) return;
     const grid = gridRef.current;
@@ -276,44 +290,40 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
       const { features: f, model } = refreshFeatures(now);
       if (simulateBot) {
         setModelLabel("BOT");
-      } else {
-        setModelLabel("HUMAN");
-        setZkProving(true);
-        console.log("Generating ZK proof for score:", model.score);
-        const proofResult = await generateProof(model.score);
-        if (!proofResult.success) {
-          setZkProving(false);
-          setZkError(proofResult.message);
-          console.error("Proof generation failed:", proofResult.message);
-          return;
-        }
-        console.log("Proof generated, submitting for validation...");
-        const validation = await submitProofForValidation(
-          proofResult.proof,
-          proofResult.publicSignals,
-        );
-
-        setZkProving(false);
-        console.log("Proof validation result:", validation);
-        if (validation.ok && validation.verified) {
-          setZkVerified(true);
-          console.log("Proof verified by server. Unlocking faucet.");
-          // Keep modal open briefly so user sees "Verified" message, then notify parent
-          setTimeout(() => {
-            onVerifiedHuman(toExportJson(model.score), model.score);
-          }, 1200);
-        } else {
-          setZkVerified(false);
-          setZkError(validation.error ?? "Server rejected proof");
-        }
+        setFeatures(f);
+        setModelScore(model.score);
+        setVerifyLoading(false);
+        return;
       }
-      console.log("Verification complete. Features:", f, "Model:", model);
+
+      setModelLabel("HUMAN");
+      setZkProving(true);
+      const proofResult = await generateProof(model.score, zkOptions);
+      if (!proofResult.success) {
+        setZkProving(false);
+        setZkError(proofResult.message);
+        setVerifyLoading(false);
+        return;
+      }
+      const validation = await submitProofForValidation(
+        proofResult.proof,
+        proofResult.publicSignals,
+        zkOptions,
+      );
+      setZkProving(false);
+
+      if (validation.ok && validation.verified) {
+        setZkVerified(true);
+        verifiedPayloadRef.current = { payload: toExportJson(model.score), score: model.score };
+      } else {
+        setZkError(validation.error ?? "Verification failed");
+      }
       setFeatures(f);
       setModelScore(model.score);
       setVerifyLoading(false);
     }, 450);
     botTimersRef.current.push(timer);
-  }, [solved, verified, selected, puzzle, simulateBot, onVerifiedHuman, refreshFeatures]);
+  }, [solved, verified, selected, puzzle, simulateBot, onVerified, refreshFeatures, zkOptions]);
 
   useEffect(() => {
     tileClickRef.current = handleTileClick;
@@ -456,34 +466,39 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
 
         <div className={`px-5 pb-4 pt-5 transition-colors duration-300 ${modalTone}`}>
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/70">
-            {zkVerified ? "Verification complete" : "Step 1: Prove humanity"}
+            {zkVerified ? "Complete" : "Verification"}
           </p>
           {zkVerified ? (
             <>
-              <h2 className="text-xl font-bold text-white">Verified</h2>
-              <p className="mt-1 text-[13px] text-white/90">Proof accepted. You’re in.</p>
+              <h2 className="text-xl font-bold text-white">ZK proof completed</h2>
+              <p className="mt-1 text-[13px] text-white/90">Verification successful. Closing…</p>
+            </>
+          ) : zkError ? (
+            <>
+              <h2 className="text-xl font-bold text-white">Verification failed</h2>
+              <p className="mt-1 text-[13px] text-white/80">{zkError}</p>
             </>
           ) : incorrectTiles.size > 0 || missedTiles.size > 0 ? (
             <>
-              <h2 className="text-xl font-bold text-white">Try Again</h2>
+              <h2 className="text-xl font-bold text-white">Try again</h2>
               <p className="mt-1 text-[13px] text-white/80">Adjust your selection and verify again.</p>
             </>
           ) : verified && solved ? (
             <>
               <h2 className="text-xl font-bold text-white">
-                {modelLabel === "HUMAN" ? "Access Granted" : "Classified as Bot"}
+                {modelLabel === "HUMAN" ? "Generating proof…" : "Not verified"}
               </h2>
               <p className="mt-1 text-[13px] text-white/80">
                 {modelLabel === "HUMAN"
-                  ? `Behavioral score ${modelScore} accepted.`
-                  : "Behavior did not meet the human threshold."}
+                  ? "Please wait."
+                  : "Behavior did not meet the threshold. Please try again."}
               </p>
             </>
           ) : (
             <>
               <p className="text-[13px] text-white/65">Select all squares with</p>
               <h2 className="mt-0.5 text-2xl font-bold capitalize text-white">{puzzle.target}s</h2>
-              <p className="mt-1 text-[13px] text-white/55">If there are none, click skip</p>
+              <p className="mt-1 text-[13px] text-white/55">If there are none, click Verify.</p>
             </>
           )}
         </div>
@@ -581,9 +596,9 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
             type="button"
             onClick={handleVerify}
             disabled={simulateBot || verifyLoading || zkVerified}
-            className="btn-primary min-h-10 rounded-lg px-5 py-1.5 text-sm font-semibold"
+            className="min-h-10 rounded-lg bg-purple-600 px-5 py-1.5 text-sm font-semibold text-white shadow hover:bg-purple-500 disabled:opacity-70"
           >
-            {zkVerified ? "Verified ✓" : verifyLoading ? "Verifying..." : "Verify Access"}
+            {zkVerified ? "Verified" : verifyLoading || zkProving ? "Verifying…" : "Verify"}
           </button>
         </div>
       </div>

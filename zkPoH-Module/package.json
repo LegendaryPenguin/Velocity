@@ -1,0 +1,23 @@
+{
+  "name": "zkpoh-module",
+  "version": "1.0.0",
+  "description": "Drop-in ZK-proof captcha: one button, telemetry-scored challenge, proof generation and verification.",
+  "type": "module",
+  "main": "index.tsx",
+  "exports": {
+    ".": "./index.tsx",
+    "./index.js": "./index.tsx"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "snarkjs": ">=0.7.0"
+  },
+  "files": [
+    "index.tsx",
+    "zkCaptcha.tsx",
+    "components",
+    "lib",
+    "hooks"
+  ]
+}

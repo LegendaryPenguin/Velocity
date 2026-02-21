@@ -3,7 +3,8 @@ import * as snarkjs from "snarkjs";
 
 export const runtime = "nodejs";
 
-// Must match the zkey used in the browser (same pipeline run).
+// Inline the verification key so there is no fs dependency at runtime.
+// Must match the verification key produced by the ZK pipeline (same circuit + same pot12_final.ptau + same zkey contribution).
 const VERIFICATION_KEY = {
   protocol: "groth16",
   curve: "bn128",
