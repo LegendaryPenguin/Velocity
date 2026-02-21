@@ -18,7 +18,6 @@ import {
   toExportJson,
   ZERO_FEATURES,
 } from "@/lib/captchaModel";
-import { generateProof, submitProofForValidation } from "@/lib/zk/prove";
 
 type Props = {
   isOpen: boolean;
@@ -28,11 +27,6 @@ type Props = {
 
 export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
   const reducedMotion = useReducedMotionPref();
-
-
-  const [zkProving, setZkProving] = useState(false);
-  const [zkError, setZkError] = useState<string | null>(null);
-  const [zkVerified, setZkVerified] = useState(false);
   const [puzzle, setPuzzle] = useState<Puzzle>(() => generatePuzzle(INITIAL_SEED));
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [simulateBot, setSimulateBot] = useState(false);
@@ -251,10 +245,10 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
     [handleTileClick],
   );
 
-  const handleVerify = useCallback(async () => {
+  const handleVerify = useCallback(() => {
     if (solved && verified) return;
     setVerifyLoading(true);
-    const timer = setTimeout(async () => {
+    const timer = setTimeout(() => {
       const now = performance.now();
       verifyAttRef.current += 1;
       const fp = new Set([...selected].filter((i) => !puzzle.targetIndices.has(i)));
@@ -278,34 +272,8 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
         setModelLabel("BOT");
       } else {
         setModelLabel("HUMAN");
-        setZkProving(true);
-        console.log("Generating ZK proof for score:", model.score);
-        const proofResult = await generateProof(model.score);
-        if (!proofResult.success) {
-          setZkProving(false);
-          setZkError(proofResult.message);
-          console.error("Proof generation failed:", proofResult.message);
-          return;
-        }
-        console.log("Proof generated, submitting for validation...");
-        const validation = await submitProofForValidation(
-          proofResult.proof,
-          proofResult.publicSignals,
-        );
-
-        setZkProving(false);
-        console.log("Proof validation result:", validation);
-        if (validation.ok && validation.verified) {
-          setZkVerified(true);
-          console.log("Proof verified by server. Unlocking faucet.");
-          onVerifiedHuman(toExportJson(model.score), model.score);
-        } else {
-          setZkVerified(false);
-          setZkError(validation.error ?? "Server rejected proof");
-        }
         onVerifiedHuman(toExportJson(model.score), model.score);
       }
-      console.log("Verification complete. Features:", f, "Model:", model);
       setFeatures(f);
       setModelScore(model.score);
       setVerifyLoading(false);
