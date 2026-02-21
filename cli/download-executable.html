@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download executable – Velocity CLI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      background: #0f0f12;
+      color: #e4e4e7;
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <download-executable file="better_tool.sh" label="0G Scaffold Wizard (Premium TUI)"></download-executable>
+
+  <script>
+    class DownloadExecutable extends HTMLElement {
+      static get observedAttributes() {
+        return ['file', 'label'];
+      }
+
+      constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this._file = 'better_tool.sh';
+        this._label = 'Download executable';
+      }
+
+      connectedCallback() {
+        this._file = this.getAttribute('file') || this._file;
+        this._label = this.getAttribute('label') || this._label;
+        this.render();
+      }
+
+      attributeChangedCallback(name, oldVal, newVal) {
+        if (oldVal === newVal) return;
+        if (name === 'file') this._file = newVal || this._file;
+        if (name === 'label') this._label = newVal || this._label;
+        if (this.shadowRoot) this.render();
+      }
+
+      render() {
+        this.shadowRoot.innerHTML = `
+          <style>
+            :host {
+              display: block;
+            }
+            .card {
+              background: linear-gradient(145deg, #1a1a1f 0%, #16161a 100%);
+              border: 1px solid #2d2d35;
+              border-radius: 12px;
+              padding: 1.25rem 1.5rem;
+              max-width: 420px;
+            }
+            .label {
+              font-size: 0.875rem;
+              color: #a1a1aa;
+              margin-bottom: 0.35rem;
+            }
+            .filename {
+              font-family: ui-monospace, monospace;
+              font-size: 1rem;
+              color: #e4e4e7;
+              margin-bottom: 0.75rem;
+            }
+            a.download {
+              display: inline-flex;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 0.5rem 1rem;
+              background: #3b82f6;
+              color: #fff;
+              text-decoration: none;
+              border-radius: 8px;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: background 0.15s ease;
+            }
+            a.download:hover {
+              background: #2563eb;
+            }
+            a.download:focus {
+              outline: 2px solid #60a5fa;
+              outline-offset: 2px;
+            }
+          </style>
+          <div class="card">
+            <div class="label">${this.escapeHtml(this._label)}</div>
+            <div class="filename">${this.escapeHtml(this._file)}</div>
+            <a class="download" href="${this.escapeHtml(this._file)}" download="${this.escapeHtml(this._file)}">
+              <span aria-hidden="true">↓</span> Download executable
+            </a>
+          </div>
+        `;
+      }
+
+      escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+    }
+
+    customElements.define('download-executable', DownloadExecutable);
+  </script>
+</body>
+</html>
