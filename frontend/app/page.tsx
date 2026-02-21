@@ -54,8 +54,8 @@ export default function Page() {
   const handleVerifiedHuman = async (payload: ExportedJson, score: number) => {
     setExportedJson(payload);
     setLatestScore(score);
-    setVerificationState("verified");
-    setToast({ type: "success", message: "Human verification passed. Wallet entry unlocked." });
+    setVerificationState("verifying");
+    setToast({ type: "info", message: "Human verification passed. Validating ZK proof..." });
 
     try {
       const res = await fetch("/api/zk-proof", {
@@ -77,6 +77,9 @@ export default function Page() {
         }
         throw new Error(data?.error || `ZK pipeline failed (HTTP ${res.status})`);
       }
+      if (!data?.verified) {
+        throw new Error("ZK proof verification did not pass.");
+      }
       if (Array.isArray(data?.pipelineLogs)) {
         console.group("ZK Pipeline Logs");
         data.pipelineLogs.forEach((line: string) => console.log(line));
@@ -92,9 +95,12 @@ export default function Page() {
         });
         console.groupEnd();
       }
+      console.log("zk proof validation passed to frontend");
+      setVerificationState("verified");
       setToast({ type: "success", message: "ZK proof generated and verified." });
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
+      setVerificationState("unverified");
       setToast({ type: "info", message: `ZK pipeline error: ${message}` });
     }
   };
