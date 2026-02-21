@@ -17,15 +17,15 @@ template Captcha() {
     signal input score;
     signal output isHuman;
 
-    // Shift range [-4000, 6000] → [0, 10000]
+    // Shift range [-6000, 6000] -> [0, 12000]
     signal shifted;
-    shifted <== score + 4000;
+    shifted <== score + 6000;
 
     component low = NumToBits(14);
     low.in <== shifted;
 
     signal slack;
-    slack <== 10000 - shifted;
+    slack <== 12000 - shifted;
 
     component high = NumToBits(14);
     high.in <== slack;

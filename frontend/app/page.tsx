@@ -51,11 +51,52 @@ export default function Page() {
     setShowCaptcha(true);
   };
 
-  const handleVerifiedHuman = (payload: ExportedJson, score: number) => {
+  const handleVerifiedHuman = async (payload: ExportedJson, score: number) => {
     setExportedJson(payload);
     setLatestScore(score);
     setVerificationState("verified");
     setToast({ type: "success", message: "Human verification passed. Wallet entry unlocked." });
+
+    try {
+      const res = await fetch("/api/zk-proof", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        if (Array.isArray(data?.pipelineLogs)) {
+          console.group("ZK Pipeline Logs");
+          data.pipelineLogs.forEach((line: string) => console.log(line));
+          if (Array.isArray(data?.stderrLogs) && data.stderrLogs.length > 0) {
+            console.group("ZK Pipeline stderr");
+            data.stderrLogs.forEach((line: string) => console.error(line));
+            console.groupEnd();
+          }
+          console.groupEnd();
+        }
+        throw new Error(data?.error || `ZK pipeline failed (HTTP ${res.status})`);
+      }
+      if (Array.isArray(data?.pipelineLogs)) {
+        console.group("ZK Pipeline Logs");
+        data.pipelineLogs.forEach((line: string) => console.log(line));
+        if (Array.isArray(data?.stderrLogs) && data.stderrLogs.length > 0) {
+          console.group("ZK Pipeline stderr");
+          data.stderrLogs.forEach((line: string) => console.error(line));
+          console.groupEnd();
+        }
+        console.log("Result:", {
+          verified: data?.verified,
+          proofPath: data?.proofPath,
+          publicSignalsPath: data?.publicSignalsPath,
+        });
+        console.groupEnd();
+      }
+      setToast({ type: "success", message: "ZK proof generated and verified." });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      setToast({ type: "info", message: `ZK pipeline error: ${message}` });
+    }
   };
 
   const handleCopyJson = async () => {
@@ -83,8 +124,9 @@ export default function Page() {
       }
       setToast({ type: "success", message: "Tokens requested successfully!" });
 
-    } catch (e: any) {
-      setToast({ type: "info", message: `Error: ${e?.message ?? String(e)}` });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      setToast({ type: "info", message: `Error: ${message}` });
     } finally {
       setRequestLoading(false);
     }
@@ -139,7 +181,7 @@ export default function Page() {
           }
         }}
         onVerifiedHuman={(payload, score) => {
-          handleVerifiedHuman(payload, score);
+          void handleVerifiedHuman(payload, score);
           setShowCaptcha(false);
         }}
       />
