@@ -1,144 +1,208 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Contract, JsonRpcProvider, isAddress } from "ethers";
+import { useEffect, useMemo, useState } from "react";
 
-import { HUMAN_AGENT_INFT_ABI } from "@/lib/inftAbi";
+import { BackgroundScene } from "@/components/faucet/BackgroundScene";
+import { BottomBranding } from "@/components/faucet/BottomBranding";
+import { CaptchaModal } from "@/components/faucet/CaptchaModal";
+import { FaucetCard } from "@/components/faucet/FaucetCard";
+import { LandingHero } from "@/components/faucet/LandingHero";
+import { useReducedMotionPref } from "@/hooks/useReducedMotionPref";
+import { ExportedJson } from "@/lib/captchaModel";
+import { motion, zIndex } from "@/lib/designSystem";
 
-type MintResponse = {
-  ok: boolean;
-  txHash?: string;
-  tokenId?: string | null;
-  encryptedURI?: string;
-  metadataHash?: string;
-  error?: string;
-};
+type Step = "landing" | "faucet";
+type VerificationState = "unverified" | "verifying" | "verified" | "requested";
+type ToastState = { type: "success" | "info"; message: string } | null;
 
-type Readback = {
-  encryptedURI: string;
-  metadataHash: string;
-} | null;
+function isValidEvmAddress(value: string): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(value.trim());
+}
 
 export default function Page() {
+  const reducedMotion = useReducedMotionPref();
+  const [step, setStep] = useState<Step>("landing");
+  const [animateIn, setAnimateIn] = useState(true);
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [verificationState, setVerificationState] = useState<VerificationState>("unverified");
   const [walletAddress, setWalletAddress] = useState("");
-  const [verificationPassed, setVerificationPassed] = useState(false);
-  const [isMinting, setIsMinting] = useState(false);
-  const [result, setResult] = useState<MintResponse | null>(null);
-  const [readback, setReadback] = useState<Readback>(null);
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [exportedJson, setExportedJson] = useState<ExportedJson | null>(null);
+  const [latestScore, setLatestScore] = useState<number | null>(null);
+  const [toast, setToast] = useState<ToastState>(null);
 
-  const validWallet = useMemo(() => isAddress(walletAddress.trim()), [walletAddress]);
+  const isWalletValid = useMemo(() => isValidEvmAddress(walletAddress), [walletAddress]);
 
-  const canMint = verificationPassed && validWallet && !isMinting;
+  useEffect(() => {
+    if (animateIn) return;
+    const t = setTimeout(() => setAnimateIn(true), 30);
+    return () => clearTimeout(t);
+  }, [animateIn]);
 
-  const fetchTokenReadback = async (tokenId: string) => {
-    const rpc = process.env.NEXT_PUBLIC_OG_RPC_URL ?? "https://evmrpc-testnet.0g.ai";
-    const address = process.env.NEXT_PUBLIC_INFT_ADDRESS;
-    if (!address || !isAddress(address)) return;
-
-    const provider = new JsonRpcProvider(rpc);
-    const contract = new Contract(address, HUMAN_AGENT_INFT_ABI, provider);
-    const [encryptedURI, metadataHash] = await Promise.all([
-      contract.getEncryptedURI(tokenId),
-      contract.getMetadataHash(tokenId),
-    ]);
-
-    setReadback({
-      encryptedURI: String(encryptedURI),
-      metadataHash: String(metadataHash),
-    });
+  const handleContinueToFaucet = () => {
+    setStep("faucet");
+    setAnimateIn(false);
+    setTimeout(() => setAnimateIn(true), reducedMotion ? 0 : motion.fast);
   };
 
-  const handleMint = async () => {
-    setIsMinting(true);
-    setResult(null);
-    setReadback(null);
+  const handleOpenCaptcha = () => {
+    setVerificationState("verifying");
+    setShowCaptcha(true);
+  };
+
+  const handleVerifiedHuman = async (payload: ExportedJson, score: number) => {
+    setExportedJson(payload);
+    setLatestScore(score);
+    setVerificationState("verifying");
+    setToast({ type: "info", message: "Human verification passed. Validating ZK proof..." });
+
+    try {
+      const res = await fetch("/api/zk-proof", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        if (Array.isArray(data?.pipelineLogs)) {
+          console.group("ZK Pipeline Logs");
+          data.pipelineLogs.forEach((line: string) => console.log(line));
+          if (Array.isArray(data?.stderrLogs) && data.stderrLogs.length > 0) {
+            console.group("ZK Pipeline stderr");
+            data.stderrLogs.forEach((line: string) => console.error(line));
+            console.groupEnd();
+          }
+          console.groupEnd();
+        }
+        throw new Error(data?.error || `ZK pipeline failed (HTTP ${res.status})`);
+      }
+      if (!data?.verified) {
+        throw new Error("ZK proof verification did not pass.");
+      }
+      if (Array.isArray(data?.pipelineLogs)) {
+        console.group("ZK Pipeline Logs");
+        data.pipelineLogs.forEach((line: string) => console.log(line));
+        if (Array.isArray(data?.stderrLogs) && data.stderrLogs.length > 0) {
+          console.group("ZK Pipeline stderr");
+          data.stderrLogs.forEach((line: string) => console.error(line));
+          console.groupEnd();
+        }
+        console.log("Result:", {
+          verified: data?.verified,
+          proofPath: data?.proofPath,
+          publicSignalsPath: data?.publicSignalsPath,
+        });
+        console.groupEnd();
+      }
+      console.log("zk proof validation passed to frontend");
+      setVerificationState("verified");
+      setToast({ type: "success", message: "ZK proof generated and verified." });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      setVerificationState("unverified");
+      setToast({ type: "info", message: `ZK pipeline error: ${message}` });
+    }
+  };
+
+  const handleCopyJson = async () => {
+    if (!exportedJson) return;
+    await navigator.clipboard.writeText(JSON.stringify(exportedJson, null, 2));
+    setCopied(true);
+    setToast({ type: "info", message: "Behavioral JSON copied." });
+    setTimeout(() => setCopied(false), 1600);
+  };
+
+  const handleRequestTokens = async () => {
+    setRequestLoading(true);
+    setToast(null);
     try {
       const res = await fetch("/api/mint", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to_address: walletAddress.trim(),
-          verificationPassed,
-        }),
+        body: JSON.stringify({ to_address: walletAddress.trim() }),
       });
-      const data = (await res.json().catch(() => ({}))) as MintResponse;
-      if (!res.ok || !data.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
-      setResult(data);
 
-      if (data.tokenId) {
-        await fetchTokenReadback(data.tokenId);
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || `Mint failed (HTTP ${res.status})`);
       }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      setResult({ ok: false, error: message });
+      setToast({ type: "success", message: "Tokens requested successfully!" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      setToast({ type: "info", message: `Error: ${message}` });
     } finally {
-      setIsMinting(false);
+      setRequestLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 2600);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-6 px-6 py-12 text-white">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Faucet Portal</h1>
-        <p className="text-sm text-white/70">Mint a Human Agent iNFT after verification.</p>
-        <p className="text-xs text-white/50">Privacy: encrypted credential stored decentralized.</p>
-      </header>
+    <main className="relative isolate flex min-h-screen flex-col items-center justify-center overflow-hidden">
+      <BackgroundScene />
 
-      <section className="space-y-4 rounded-2xl border border-white/15 bg-white/5 p-5">
-        <label className="block text-sm">
-          Wallet address
-          <input
-            type="text"
-            value={walletAddress}
-            onChange={(e) => setWalletAddress(e.target.value)}
-            placeholder="0x..."
-            className="mt-2 w-full rounded-lg border border-white/20 bg-black/20 px-3 py-2 text-sm outline-none"
-          />
-        </label>
-
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={verificationPassed}
-            onChange={(e) => setVerificationPassed(e.target.checked)}
-          />
-          Verification passed (demo toggle)
-        </label>
-
-        <button
-          type="button"
-          onClick={handleMint}
-          disabled={!canMint}
-          className="rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+      {step === "landing" ? (
+        <LandingHero onContinue={handleContinueToFaucet} animate={animateIn || reducedMotion} />
+      ) : (
+        <div
+          className={`relative z-10 transition-all duration-500 ${
+            animateIn || reducedMotion ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+          }`}
         >
-          {isMinting ? "Minting Human Agent iNFT..." : "Mint Human Agent iNFT"}
-        </button>
-      </section>
+          <p className="mb-3 text-center text-xs font-medium uppercase tracking-[0.14em] text-white/70">
+            Connect • Verify • Claim
+          </p>
+          <FaucetCard
+            verificationState={verificationState}
+            walletAddress={walletAddress}
+            onWalletAddressChange={setWalletAddress}
+            onOpenCaptcha={handleOpenCaptcha}
+            onCopyJson={handleCopyJson}
+            onRequestTokens={handleRequestTokens}
+            exportedJson={exportedJson}
+            copied={copied}
+            requestLoading={requestLoading}
+            isWalletValid={isWalletValid}
+            latestScore={latestScore}
+          />
+        </div>
+      )}
 
-      <section className="space-y-2 rounded-2xl border border-white/15 bg-white/5 p-5 text-sm">
-        <h2 className="font-medium">Result</h2>
-        {!result && <p className="text-white/60">No mint yet.</p>}
-        {result && !result.ok && <p className="text-red-300">Error: {result.error}</p>}
-        {result?.ok && (
-          <>
-            <p>Token ID: {result.tokenId ?? "N/A"}</p>
-            <p>Tx Hash: {result.txHash}</p>
-            <p>Encrypted URI: {result.encryptedURI}</p>
-            <p>Metadata Hash: {result.metadataHash}</p>
-          </>
-        )}
-      </section>
+      <BottomBranding />
 
-      <section className="space-y-2 rounded-2xl border border-white/15 bg-white/5 p-5 text-sm">
-        <h2 className="font-medium">Onchain Readback</h2>
-        {!readback && <p className="text-white/60">No onchain readback yet.</p>}
-        {readback && (
-          <>
-            <p>Encrypted URI (contract): {readback.encryptedURI}</p>
-            <p>Metadata Hash (contract): {readback.metadataHash}</p>
-          </>
-        )}
-      </section>
+      <CaptchaModal
+        isOpen={showCaptcha}
+        onClose={() => {
+          setShowCaptcha(false);
+          if (verificationState === "verifying") {
+            setVerificationState("unverified");
+            setToast({ type: "info", message: "Try Again" });
+          }
+        }}
+        onVerifiedHuman={(payload, score) => {
+          void handleVerifiedHuman(payload, score);
+          setShowCaptcha(false);
+        }}
+      />
+
+      {toast && (
+        <div
+          className="fixed left-1/2 top-5 -translate-x-1/2 rounded-xl border border-white/15 bg-[#2a1846]/90 px-4 py-2.5 text-sm text-white shadow-xl backdrop-blur-md"
+          style={{ zIndex: zIndex.toast }}
+          role="status"
+          aria-live="polite"
+        >
+          <span className={toast.type === "success" ? "text-emerald-300" : "text-purple-200"}>
+            {toast.message}
+          </span>
+        </div>
+      )}
     </main>
   );
 }
