@@ -1,8 +1,7 @@
 {
   "/api/claim/route": "app/api/claim/route.js",
-  "/api/mint/route": "app/api/mint/route.js",
   "/api/zk-proof/route": "app/api/zk-proof/route.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/faucet/page": "app/faucet/page.js",
-  "/page": "app/page.js"
+  "/modules/page": "app/modules/page.js"
 }
