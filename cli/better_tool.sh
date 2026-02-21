@@ -47,6 +47,22 @@ trap quit INT
 # ── Geometry ──────────────────────────────────────────────────────────────────
 term_width() { tput cols 2>/dev/null || echo 80; }
 
+info_msg() {
+  printf "  ${BLUE}${BOLD}ℹ${RESET}  ${WHITE}%s${RESET}\n" "$1"
+}
+
+hint_msg() {
+  printf "  ${DIM}${CYAN}↳${RESET} ${DIM}%s${RESET}\n" "$1"
+}
+
+success_msg() {
+  printf "  ${GREEN}${BOLD}✔${RESET}  ${WHITE}%s${RESET}\n" "$1"
+}
+
+warn_msg() {
+  printf "  ${YELLOW}${BOLD}⚠${RESET}  ${YELLOW}%s${RESET}\n" "$1"
+}
+
 center_text() {
   local text="$1" w
   w=$(term_width)
@@ -338,6 +354,12 @@ USE_REACT_COMPILER=false
 # ── Feature Selection (interactive multi-select) ─────────────────────────────
 section "Feature Selection"
 
+info_msg "Use arrow keys to navigate, space to toggle features, and enter to confirm."
+echo
+info_msg "Agentic materials include example agents and tools for 0G development."
+echo
+
+
 feature_sel=()
 multi_select feature_sel "Select features to include" \
   "Include agentic materials for developing on 0G" \
@@ -421,19 +443,21 @@ spinner_run "Downloading modules" git clone --depth 1 https://github.com/Vegito2
   fi
 
   if $INCLUDE_0G_COMPUTE; then
-    printf "${CYAN}↳${RESET} Setting up 0G compute scaffolding...\n"
+    section "Integrating 0G Compute module into Next.js app"
 
     mkdir -p "$APP_NAME/app/api/0gcompute" && mv 0g-modules/0Gcompute/api/* $APP_NAME/app/api/
     mkdir -p "$APP_NAME/components" && mv 0g-modules/0Gcompute/components/* "$APP_NAME/components/"
     mv 0g-modules/0Gcompute/frontend/* "$APP_NAME/app/"
 
-    echo "0G compute module files moved to project."
-    echo "You can now import compute components from '@/components' and API routes are set up under /api/0gcompute."
-    echo "There is a demo page at route /0gcompute."
+    info_msg "0G compute module files moved to project."
+    info_msg "You can now import compute components from '@/components' and API routes are set up under /api/0gcompute."
+    info_msg "There is a demo page at route /0gcompute."
+
+    success_msg "0G Compute module integrated into Next.js app."
   fi
   cd "$APP_NAME"
   echo "Changed directory to $APP_NAME"
-  npm add @0glabs/0g-serving-broker ethers
+  npm add @0glabs/0g-serving-broker ethers snarkjs
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
