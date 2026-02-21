@@ -13,7 +13,7 @@ export function LandingHero({ onContinue, animate }: Props) {
       } transition-all duration-500`}
     >
       <Logo size="text-display" />
-      <p className="mt-1 text-body text-[var(--text-muted)]">Faucet</p>
+      <p className="mt-1 text-body text-[var(--text-muted)]">0G Faucet</p>
 
       <div className="mt-10 w-full">
         <button
