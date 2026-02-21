@@ -101,8 +101,8 @@ const broker = await createBroker({
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>
-        <Link href="/modules" className="text-sm text-white/60 hover:text-white/90">
-          ← Modules
+        <Link href="/dashboard" className="text-sm text-white/60 hover:text-white/90">
+          ← Dashboard
         </Link>
         <h1 className="mt-2 text-2xl font-semibold">0G Compute Inference</h1>
         <p className="mt-1 text-sm text-white/60">

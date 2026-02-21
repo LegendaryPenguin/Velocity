@@ -1,7 +1,6 @@
 {
-  "/api/claim/route": "app/api/claim/route.js",
-  "/api/zk-proof/route": "app/api/zk-proof/route.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/faucet/page": "app/faucet/page.js",
-  "/modules/page": "app/modules/page.js"
+  "/modules/inference-builder/page": "app/modules/inference-builder/page.js",
+  "/modules/inft-builder/page": "app/modules/inft-builder/page.js"
 }

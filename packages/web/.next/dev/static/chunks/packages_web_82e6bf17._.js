@@ -2086,7 +2086,7 @@ function LandingHero({ onContinue, animate }) {
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 className: "mt-1 text-body text-[var(--text-muted)]",
-                children: "Faucet"
+                children: "0G Faucet"
             }, void 0, false, {
                 fileName: "[project]/packages/web/components/faucet/LandingHero.tsx",
                 lineNumber: 16,
@@ -2188,6 +2188,7 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$address$2f$checks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/address/checks.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$components$2f$faucet$2f$BackgroundScene$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/components/faucet/BackgroundScene.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$components$2f$faucet$2f$CaptchaModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/components/faucet/CaptchaModal.tsx [app-client] (ecmascript)");
@@ -2197,6 +2198,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$lib$2f$de
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
+;
 ;
 ;
 ;
@@ -2390,9 +2392,18 @@ function FaucetPage() {
         "data-faucet": true,
         className: "relative z-10 min-h-[calc(100vh-56px)] flex flex-col items-center justify-center overflow-hidden",
         children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                href: "/dashboard",
+                className: "absolute left-6 top-4 z-20 text-sm text-white/60 hover:text-white/90",
+                children: "← Dashboard"
+            }, void 0, false, {
+                fileName: "[project]/packages/web/app/faucet/page.tsx",
+                lineNumber: 162,
+                columnNumber: 7
+            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$components$2f$faucet$2f$BackgroundScene$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BackgroundScene"], {}, void 0, false, {
                 fileName: "[project]/packages/web/app/faucet/page.tsx",
-                lineNumber: 161,
+                lineNumber: 168,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2402,7 +2413,7 @@ function FaucetPage() {
                     animate: true
                 }, void 0, false, {
                     fileName: "[project]/packages/web/app/faucet/page.tsx",
-                    lineNumber: 164,
+                    lineNumber: 171,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$components$2f$faucet$2f$FaucetCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FaucetCard"], {
                     verificationState: verificationState,
@@ -2418,12 +2429,12 @@ function FaucetPage() {
                     latestScore: latestScore
                 }, void 0, false, {
                     fileName: "[project]/packages/web/app/faucet/page.tsx",
-                    lineNumber: 169,
+                    lineNumber: 176,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/packages/web/app/faucet/page.tsx",
-                lineNumber: 162,
+                lineNumber: 169,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$components$2f$faucet$2f$CaptchaModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CaptchaModal"], {
@@ -2432,7 +2443,7 @@ function FaucetPage() {
                 onVerifiedHuman: handleVerifiedHuman
             }, void 0, false, {
                 fileName: "[project]/packages/web/app/faucet/page.tsx",
-                lineNumber: 184,
+                lineNumber: 191,
                 columnNumber: 7
             }, this),
             toast && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2447,18 +2458,18 @@ function FaucetPage() {
                     children: toast.message
                 }, void 0, false, {
                     fileName: "[project]/packages/web/app/faucet/page.tsx",
-                    lineNumber: 197,
+                    lineNumber: 204,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/packages/web/app/faucet/page.tsx",
-                lineNumber: 191,
+                lineNumber: 198,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/packages/web/app/faucet/page.tsx",
-        lineNumber: 160,
+        lineNumber: 161,
         columnNumber: 5
     }, this);
 }

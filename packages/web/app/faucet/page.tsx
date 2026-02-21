@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { isAddress } from "ethers";
 
 import { BackgroundScene } from "@/components/faucet/BackgroundScene";
@@ -158,6 +159,12 @@ export default function FaucetPage() {
 
   return (
     <div data-faucet className="relative z-10 min-h-[calc(100vh-56px)] flex flex-col items-center justify-center overflow-hidden">
+      <Link
+        href="/dashboard"
+        className="absolute left-6 top-4 z-20 text-sm text-white/60 hover:text-white/90"
+      >
+        ← Dashboard
+      </Link>
       <BackgroundScene />
       <div className="relative z-10 flex min-h-[60vh] flex-col items-center justify-center py-12">
         {!showFaucet ? (

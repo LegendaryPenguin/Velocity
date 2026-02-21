@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/modules", label: "Modules" },
-  { href: "/faucet", label: "Faucet" },
+  { href: "/faucet", label: "0G Faucet" },
 ];
 
 export function TopNav() {
@@ -15,11 +14,11 @@ export function TopNav() {
     <header className="sticky top-0 z-20 border-b border-white/10 bg-black/25 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <Link href="/dashboard" className="text-sm font-semibold tracking-wide title-gradient">
-          0G Trust Studio
+          0G Velocity Studio
         </Link>
         <nav className="flex gap-2">
           {links.map((link) => {
-            const active = pathname === link.href;
+            const active = pathname === link.href || (link.href === "/dashboard" && pathname.startsWith("/modules"));
             return (
               <Link
                 key={link.href}
