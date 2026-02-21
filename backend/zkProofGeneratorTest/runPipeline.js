@@ -15,7 +15,7 @@ export function runZKProofPipeline(inputScore) {
 
   const score = Math.round(inputScore);
 
-  if (score < -4000 || score > 6000) {
+  if (score < -6000 || score > 6000) {
     console.warn(
       "⚠️ Test failed: score out of valid human range. Data not processed."
     );
@@ -58,7 +58,7 @@ export function runZKProofPipeline(inputScore) {
     // Step 2: Compile circuit
     // -------------------------------
     console.log("Step 2: Compiling circuit...");
-    execSync(`circom captcha.circom --r1cs --wasm --sym`, { stdio: "inherit" });
+    execSync(`circom2 captcha.circom --r1cs --wasm --sym`, { stdio: "inherit" });
 
     const captchaJsDir = path.join(GENERATOR, "captcha_js");
     fs.writeFileSync(
