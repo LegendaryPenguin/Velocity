@@ -1,0 +1,9001 @@
+module.exports = [
+"[project]/packages/web/node_modules/ethers/lib.esm/_version.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/* Do NOT modify this file; see /src.ts/_admin/update-version.ts */ /**
+ *  The current version of Ethers.
+ */ __turbopack_context__.s([
+    "version",
+    ()=>version
+]);
+const version = "6.13.1"; //# sourceMappingURL=_version.js.map
+}),
+"[project]/packages/web/node_modules/ethers/lib.esm/utils/properties.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "defineProperties",
+    ()=>defineProperties,
+    "resolveProperties",
+    ()=>resolveProperties
+]);
+/**
+ *  Property helper functions.
+ *
+ *  @_subsection api/utils:Properties  [about-properties]
+ */ function checkType(value, type, name) {
+    const types = type.split("|").map((t)=>t.trim());
+    for(let i = 0; i < types.length; i++){
+        switch(type){
+            case "any":
+                return;
+            case "bigint":
+            case "boolean":
+            case "number":
+            case "string":
+                if (typeof value === type) {
+                    return;
+                }
+        }
+    }
+    const error = new Error(`invalid value for type ${type}`);
+    error.code = "INVALID_ARGUMENT";
+    error.argument = `value.${name}`;
+    error.value = value;
+    throw error;
+}
+async function resolveProperties(value) {
+    const keys = Object.keys(value);
+    const results = await Promise.all(keys.map((k)=>Promise.resolve(value[k])));
+    return results.reduce((accum, v, index)=>{
+        accum[keys[index]] = v;
+        return accum;
+    }, {});
+}
+function defineProperties(target, values, types) {
+    for(let key in values){
+        let value = values[key];
+        const type = types ? types[key] : null;
+        if (type) {
+            checkType(value, type, key);
+        }
+        Object.defineProperty(target, key, {
+            enumerable: true,
+            value,
+            writable: false
+        });
+    }
+} //# sourceMappingURL=properties.js.map
+}),
+"[project]/packages/web/node_modules/ethers/lib.esm/utils/errors.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "assert",
+    ()=>assert,
+    "assertArgument",
+    ()=>assertArgument,
+    "assertArgumentCount",
+    ()=>assertArgumentCount,
+    "assertNormalize",
+    ()=>assertNormalize,
+    "assertPrivate",
+    ()=>assertPrivate,
+    "isCallException",
+    ()=>isCallException,
+    "isError",
+    ()=>isError,
+    "makeError",
+    ()=>makeError
+]);
+/**
+ *  All errors in ethers include properties to ensure they are both
+ *  human-readable (i.e. ``.message``) and machine-readable (i.e. ``.code``).
+ *
+ *  The [[isError]] function can be used to check the error ``code`` and
+ *  provide a type guard for the properties present on that error interface.
+ *
+ *  @_section: api/utils/errors:Errors  [about-errors]
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$_version$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/_version.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$properties$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/utils/properties.js [app-ssr] (ecmascript)");
+;
+;
+function stringify(value) {
+    if (value == null) {
+        return "null";
+    }
+    if (Array.isArray(value)) {
+        return "[ " + value.map(stringify).join(", ") + " ]";
+    }
+    if (value instanceof Uint8Array) {
+        const HEX = "0123456789abcdef";
+        let result = "0x";
+        for(let i = 0; i < value.length; i++){
+            result += HEX[value[i] >> 4];
+            result += HEX[value[i] & 0xf];
+        }
+        return result;
+    }
+    if (typeof value === "object" && typeof value.toJSON === "function") {
+        return stringify(value.toJSON());
+    }
+    switch(typeof value){
+        case "boolean":
+        case "symbol":
+            return value.toString();
+        case "bigint":
+            return BigInt(value).toString();
+        case "number":
+            return value.toString();
+        case "string":
+            return JSON.stringify(value);
+        case "object":
+            {
+                const keys = Object.keys(value);
+                keys.sort();
+                return "{ " + keys.map((k)=>`${stringify(k)}: ${stringify(value[k])}`).join(", ") + " }";
+            }
+    }
+    return `[ COULD NOT SERIALIZE ]`;
+}
+function isError(error, code) {
+    return error && error.code === code;
+}
+function isCallException(error) {
+    return isError(error, "CALL_EXCEPTION");
+}
+function makeError(message, code, info) {
+    let shortMessage = message;
+    {
+        const details = [];
+        if (info) {
+            if ("message" in info || "code" in info || "name" in info) {
+                throw new Error(`value will overwrite populated values: ${stringify(info)}`);
+            }
+            for(const key in info){
+                if (key === "shortMessage") {
+                    continue;
+                }
+                const value = info[key];
+                //                try {
+                details.push(key + "=" + stringify(value));
+            //                } catch (error: any) {
+            //                console.log("MMM", error.message);
+            //                    details.push(key + "=[could not serialize object]");
+            //                }
+            }
+        }
+        details.push(`code=${code}`);
+        details.push(`version=${__TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$_version$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["version"]}`);
+        if (details.length) {
+            message += " (" + details.join(", ") + ")";
+        }
+    }
+    let error;
+    switch(code){
+        case "INVALID_ARGUMENT":
+            error = new TypeError(message);
+            break;
+        case "NUMERIC_FAULT":
+        case "BUFFER_OVERRUN":
+            error = new RangeError(message);
+            break;
+        default:
+            error = new Error(message);
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$properties$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["defineProperties"])(error, {
+        code
+    });
+    if (info) {
+        Object.assign(error, info);
+    }
+    if (error.shortMessage == null) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$properties$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["defineProperties"])(error, {
+            shortMessage
+        });
+    }
+    return error;
+}
+function assert(check, message, code, info) {
+    if (!check) {
+        throw makeError(message, code, info);
+    }
+}
+function assertArgument(check, message, name, value) {
+    assert(check, message, "INVALID_ARGUMENT", {
+        argument: name,
+        value: value
+    });
+}
+function assertArgumentCount(count, expectedCount, message) {
+    if (message == null) {
+        message = "";
+    }
+    if (message) {
+        message = ": " + message;
+    }
+    assert(count >= expectedCount, "missing arguemnt" + message, "MISSING_ARGUMENT", {
+        count: count,
+        expectedCount: expectedCount
+    });
+    assert(count <= expectedCount, "too many arguments" + message, "UNEXPECTED_ARGUMENT", {
+        count: count,
+        expectedCount: expectedCount
+    });
+}
+const _normalizeForms = [
+    "NFD",
+    "NFC",
+    "NFKD",
+    "NFKC"
+].reduce((accum, form)=>{
+    try {
+        // General test for normalize
+        /* c8 ignore start */ if ("test".normalize(form) !== "test") {
+            throw new Error("bad");
+        }
+        ;
+        /* c8 ignore stop */ if (form === "NFD") {
+            const check = String.fromCharCode(0xe9).normalize("NFD");
+            const expected = String.fromCharCode(0x65, 0x0301);
+            /* c8 ignore start */ if (check !== expected) {
+                throw new Error("broken");
+            }
+        /* c8 ignore stop */ }
+        accum.push(form);
+    } catch (error) {}
+    return accum;
+}, []);
+function assertNormalize(form) {
+    assert(_normalizeForms.indexOf(form) >= 0, "platform missing String.prototype.normalize", "UNSUPPORTED_OPERATION", {
+        operation: "String.prototype.normalize",
+        info: {
+            form
+        }
+    });
+}
+function assertPrivate(givenGuard, guard, className) {
+    if (className == null) {
+        className = "";
+    }
+    if (givenGuard !== guard) {
+        let method = className, operation = "new";
+        if (className) {
+            method += ".";
+            operation += " " + className;
+        }
+        assert(false, `private constructor; use ${method}from* methods`, "UNSUPPORTED_OPERATION", {
+            operation
+        });
+    }
+} //# sourceMappingURL=errors.js.map
+}),
+"[project]/packages/web/node_modules/ethers/lib.esm/utils/data.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "concat",
+    ()=>concat,
+    "dataLength",
+    ()=>dataLength,
+    "dataSlice",
+    ()=>dataSlice,
+    "getBytes",
+    ()=>getBytes,
+    "getBytesCopy",
+    ()=>getBytesCopy,
+    "hexlify",
+    ()=>hexlify,
+    "isBytesLike",
+    ()=>isBytesLike,
+    "isHexString",
+    ()=>isHexString,
+    "stripZerosLeft",
+    ()=>stripZerosLeft,
+    "zeroPadBytes",
+    ()=>zeroPadBytes,
+    "zeroPadValue",
+    ()=>zeroPadValue
+]);
+/**
+ *  Some data helpers.
+ *
+ *
+ *  @_subsection api/utils:Data Helpers  [about-data]
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/utils/errors.js [app-ssr] (ecmascript)");
+;
+function _getBytes(value, name, copy) {
+    if (value instanceof Uint8Array) {
+        if (copy) {
+            return new Uint8Array(value);
+        }
+        return value;
+    }
+    if (typeof value === "string" && value.match(/^0x(?:[0-9a-f][0-9a-f])*$/i)) {
+        const result = new Uint8Array((value.length - 2) / 2);
+        let offset = 2;
+        for(let i = 0; i < result.length; i++){
+            result[i] = parseInt(value.substring(offset, offset + 2), 16);
+            offset += 2;
+        }
+        return result;
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assertArgument"])(false, "invalid BytesLike value", name || "value", value);
+}
+function getBytes(value, name) {
+    return _getBytes(value, name, false);
+}
+function getBytesCopy(value, name) {
+    return _getBytes(value, name, true);
+}
+function isHexString(value, length) {
+    if (typeof value !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
+        return false;
+    }
+    if (typeof length === "number" && value.length !== 2 + 2 * length) {
+        return false;
+    }
+    if (length === true && value.length % 2 !== 0) {
+        return false;
+    }
+    return true;
+}
+function isBytesLike(value) {
+    return isHexString(value, true) || value instanceof Uint8Array;
+}
+const HexCharacters = "0123456789abcdef";
+function hexlify(data) {
+    const bytes = getBytes(data);
+    let result = "0x";
+    for(let i = 0; i < bytes.length; i++){
+        const v = bytes[i];
+        result += HexCharacters[(v & 0xf0) >> 4] + HexCharacters[v & 0x0f];
+    }
+    return result;
+}
+function concat(datas) {
+    return "0x" + datas.map((d)=>hexlify(d).substring(2)).join("");
+}
+function dataLength(data) {
+    if (isHexString(data, true)) {
+        return (data.length - 2) / 2;
+    }
+    return getBytes(data).length;
+}
+function dataSlice(data, start, end) {
+    const bytes = getBytes(data);
+    if (end != null && end > bytes.length) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assert"])(false, "cannot slice beyond data bounds", "BUFFER_OVERRUN", {
+            buffer: bytes,
+            length: bytes.length,
+            offset: end
+        });
+    }
+    return hexlify(bytes.slice(start == null ? 0 : start, end == null ? bytes.length : end));
+}
+function stripZerosLeft(data) {
+    let bytes = hexlify(data).substring(2);
+    while(bytes.startsWith("00")){
+        bytes = bytes.substring(2);
+    }
+    return "0x" + bytes;
+}
+function zeroPad(data, length, left) {
+    const bytes = getBytes(data);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assert"])(length >= bytes.length, "padding exceeds data length", "BUFFER_OVERRUN", {
+        buffer: new Uint8Array(bytes),
+        length: length,
+        offset: length + 1
+    });
+    const result = new Uint8Array(length);
+    result.fill(0);
+    if (left) {
+        result.set(bytes, length - bytes.length);
+    } else {
+        result.set(bytes, 0);
+    }
+    return hexlify(result);
+}
+function zeroPadValue(data, length) {
+    return zeroPad(data, length, true);
+}
+function zeroPadBytes(data, length) {
+    return zeroPad(data, length, false);
+} //# sourceMappingURL=data.js.map
+}),
+"[project]/packages/web/node_modules/ethers/lib.esm/crypto/keccak.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "keccak256",
+    ()=>keccak256
+]);
+/**
+ *  Cryptographic hashing functions
+ *
+ *  @_subsection: api/crypto:Hash Functions [about-crypto-hashing]
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$sha3$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@noble/hashes/esm/sha3.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$data$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/utils/data.js [app-ssr] (ecmascript)");
+;
+;
+let locked = false;
+const _keccak256 = function(data) {
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$sha3$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["keccak_256"])(data);
+};
+let __keccak256 = _keccak256;
+function keccak256(_data) {
+    const data = (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$data$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getBytes"])(_data, "data");
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$data$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["hexlify"])(__keccak256(data));
+}
+keccak256._ = _keccak256;
+keccak256.lock = function() {
+    locked = true;
+};
+keccak256.register = function(func) {
+    if (locked) {
+        throw new TypeError("keccak256 is locked");
+    }
+    __keccak256 = func;
+};
+Object.freeze(keccak256); //# sourceMappingURL=keccak.js.map
+}),
+"[project]/packages/web/node_modules/ethers/lib.esm/address/address.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "getAddress",
+    ()=>getAddress,
+    "getIcapAddress",
+    ()=>getIcapAddress
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$crypto$2f$keccak$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/crypto/keccak.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$data$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/utils/data.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/utils/errors.js [app-ssr] (ecmascript)");
+;
+;
+const BN_0 = BigInt(0);
+const BN_36 = BigInt(36);
+function getChecksumAddress(address) {
+    //    if (!isHexString(address, 20)) {
+    //        logger.throwArgumentError("invalid address", "address", address);
+    //    }
+    address = address.toLowerCase();
+    const chars = address.substring(2).split("");
+    const expanded = new Uint8Array(40);
+    for(let i = 0; i < 40; i++){
+        expanded[i] = chars[i].charCodeAt(0);
+    }
+    const hashed = (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$data$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getBytes"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$crypto$2f$keccak$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["keccak256"])(expanded));
+    for(let i = 0; i < 40; i += 2){
+        if (hashed[i >> 1] >> 4 >= 8) {
+            chars[i] = chars[i].toUpperCase();
+        }
+        if ((hashed[i >> 1] & 0x0f) >= 8) {
+            chars[i + 1] = chars[i + 1].toUpperCase();
+        }
+    }
+    return "0x" + chars.join("");
+}
+// See: https://en.wikipedia.org/wiki/International_Bank_Account_Number
+// Create lookup table
+const ibanLookup = {};
+for(let i = 0; i < 10; i++){
+    ibanLookup[String(i)] = String(i);
+}
+for(let i = 0; i < 26; i++){
+    ibanLookup[String.fromCharCode(65 + i)] = String(10 + i);
+}
+// How many decimal digits can we process? (for 64-bit float, this is 15)
+// i.e. Math.floor(Math.log10(Number.MAX_SAFE_INTEGER));
+const safeDigits = 15;
+function ibanChecksum(address) {
+    address = address.toUpperCase();
+    address = address.substring(4) + address.substring(0, 2) + "00";
+    let expanded = address.split("").map((c)=>{
+        return ibanLookup[c];
+    }).join("");
+    // Javascript can handle integers safely up to 15 (decimal) digits
+    while(expanded.length >= safeDigits){
+        let block = expanded.substring(0, safeDigits);
+        expanded = parseInt(block, 10) % 97 + expanded.substring(block.length);
+    }
+    let checksum = String(98 - parseInt(expanded, 10) % 97);
+    while(checksum.length < 2){
+        checksum = "0" + checksum;
+    }
+    return checksum;
+}
+;
+const Base36 = function() {
+    ;
+    const result = {};
+    for(let i = 0; i < 36; i++){
+        const key = "0123456789abcdefghijklmnopqrstuvwxyz"[i];
+        result[key] = BigInt(i);
+    }
+    return result;
+}();
+function fromBase36(value) {
+    value = value.toLowerCase();
+    let result = BN_0;
+    for(let i = 0; i < value.length; i++){
+        result = result * BN_36 + Base36[value[i]];
+    }
+    return result;
+}
+function getAddress(address) {
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assertArgument"])(typeof address === "string", "invalid address", "address", address);
+    if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
+        // Missing the 0x prefix
+        if (!address.startsWith("0x")) {
+            address = "0x" + address;
+        }
+        const result = getChecksumAddress(address);
+        // It is a checksummed address with a bad checksum
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assertArgument"])(!address.match(/([A-F].*[a-f])|([a-f].*[A-F])/) || result === address, "bad address checksum", "address", address);
+        return result;
+    }
+    // Maybe ICAP? (we only support direct mode)
+    if (address.match(/^XE[0-9]{2}[0-9A-Za-z]{30,31}$/)) {
+        // It is an ICAP address with a bad checksum
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assertArgument"])(address.substring(2, 4) === ibanChecksum(address), "bad icap checksum", "address", address);
+        let result = fromBase36(address.substring(4)).toString(16);
+        while(result.length < 40){
+            result = "0" + result;
+        }
+        return getChecksumAddress("0x" + result);
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assertArgument"])(false, "invalid address", "address", address);
+}
+function getIcapAddress(address) {
+    //let base36 = _base16To36(getAddress(address).substring(2)).toUpperCase();
+    let base36 = BigInt(getAddress(address)).toString(36).toUpperCase();
+    while(base36.length < 30){
+        base36 = "0" + base36;
+    }
+    return "XE" + ibanChecksum("XE00" + base36) + base36;
+} //# sourceMappingURL=address.js.map
+}),
+"[project]/packages/web/node_modules/ethers/lib.esm/address/checks.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "isAddress",
+    ()=>isAddress,
+    "isAddressable",
+    ()=>isAddressable,
+    "resolveAddress",
+    ()=>resolveAddress
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/utils/errors.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$address$2f$address$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/packages/web/node_modules/ethers/lib.esm/address/address.js [app-ssr] (ecmascript)");
+;
+;
+function isAddressable(value) {
+    return value && typeof value.getAddress === "function";
+}
+function isAddress(value) {
+    try {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$address$2f$address$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAddress"])(value);
+        return true;
+    } catch (error) {}
+    return false;
+}
+async function checkAddress(target, promise) {
+    const result = await promise;
+    if (result == null || result === "0x0000000000000000000000000000000000000000") {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assert"])(typeof target !== "string", "unconfigured name", "UNCONFIGURED_NAME", {
+            value: target
+        });
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assertArgument"])(false, "invalid AddressLike value; did not resolve to a value address", "target", target);
+    }
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$address$2f$address$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAddress"])(result);
+}
+function resolveAddress(target, resolver) {
+    if (typeof target === "string") {
+        if (target.match(/^0x[0-9a-f]{40}$/i)) {
+            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$address$2f$address$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAddress"])(target);
+        }
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assert"])(resolver != null, "ENS resolution requires a provider", "UNSUPPORTED_OPERATION", {
+            operation: "resolveName"
+        });
+        return checkAddress(target, resolver.resolveName(target));
+    } else if (isAddressable(target)) {
+        return checkAddress(target, target.getAddress());
+    } else if (target && typeof target.then === "function") {
+        return checkAddress(target, target);
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$packages$2f$web$2f$node_modules$2f$ethers$2f$lib$2e$esm$2f$utils$2f$errors$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["assertArgument"])(false, "unsupported addressable value", "target", target);
+} //# sourceMappingURL=checks.js.map
+}),
+"[project]/node_modules/@noble/hashes/esm/_assert.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "bool",
+    ()=>bool,
+    "bytes",
+    ()=>bytes,
+    "default",
+    ()=>__TURBOPACK__default__export__,
+    "exists",
+    ()=>exists,
+    "hash",
+    ()=>hash,
+    "number",
+    ()=>number,
+    "output",
+    ()=>output
+]);
+function number(n) {
+    if (!Number.isSafeInteger(n) || n < 0) throw new Error(`Wrong positive integer: ${n}`);
+}
+function bool(b) {
+    if (typeof b !== 'boolean') throw new Error(`Expected boolean, not ${b}`);
+}
+function bytes(b, ...lengths) {
+    if (!(b instanceof Uint8Array)) throw new Error('Expected Uint8Array');
+    if (lengths.length > 0 && !lengths.includes(b.length)) throw new Error(`Expected Uint8Array of length ${lengths}, not of length=${b.length}`);
+}
+function hash(hash) {
+    if (typeof hash !== 'function' || typeof hash.create !== 'function') throw new Error('Hash should be wrapped by utils.wrapConstructor');
+    number(hash.outputLen);
+    number(hash.blockLen);
+}
+function exists(instance, checkFinished = true) {
+    if (instance.destroyed) throw new Error('Hash instance has been destroyed');
+    if (checkFinished && instance.finished) throw new Error('Hash#digest() has already been called');
+}
+function output(out, instance) {
+    bytes(out);
+    const min = instance.outputLen;
+    if (out.length < min) {
+        throw new Error(`digestInto() expects output buffer of length at least ${min}`);
+    }
+}
+;
+const assert = {
+    number,
+    bool,
+    bytes,
+    hash,
+    exists,
+    output
+};
+const __TURBOPACK__default__export__ = assert;
+ //# sourceMappingURL=_assert.js.map
+}),
+"[project]/node_modules/@noble/hashes/esm/_u64.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "add",
+    ()=>add,
+    "add3H",
+    ()=>add3H,
+    "add3L",
+    ()=>add3L,
+    "add4H",
+    ()=>add4H,
+    "add4L",
+    ()=>add4L,
+    "add5H",
+    ()=>add5H,
+    "add5L",
+    ()=>add5L,
+    "default",
+    ()=>__TURBOPACK__default__export__,
+    "fromBig",
+    ()=>fromBig,
+    "rotlBH",
+    ()=>rotlBH,
+    "rotlBL",
+    ()=>rotlBL,
+    "rotlSH",
+    ()=>rotlSH,
+    "rotlSL",
+    ()=>rotlSL,
+    "rotr32H",
+    ()=>rotr32H,
+    "rotr32L",
+    ()=>rotr32L,
+    "rotrBH",
+    ()=>rotrBH,
+    "rotrBL",
+    ()=>rotrBL,
+    "rotrSH",
+    ()=>rotrSH,
+    "rotrSL",
+    ()=>rotrSL,
+    "shrSH",
+    ()=>shrSH,
+    "shrSL",
+    ()=>shrSL,
+    "split",
+    ()=>split,
+    "toBig",
+    ()=>toBig
+]);
+const U32_MASK64 = /* @__PURE__ */ BigInt(2 ** 32 - 1);
+const _32n = /* @__PURE__ */ BigInt(32);
+// We are not using BigUint64Array, because they are extremely slow as per 2022
+function fromBig(n, le = false) {
+    if (le) return {
+        h: Number(n & U32_MASK64),
+        l: Number(n >> _32n & U32_MASK64)
+    };
+    return {
+        h: Number(n >> _32n & U32_MASK64) | 0,
+        l: Number(n & U32_MASK64) | 0
+    };
+}
+function split(lst, le = false) {
+    let Ah = new Uint32Array(lst.length);
+    let Al = new Uint32Array(lst.length);
+    for(let i = 0; i < lst.length; i++){
+        const { h, l } = fromBig(lst[i], le);
+        [Ah[i], Al[i]] = [
+            h,
+            l
+        ];
+    }
+    return [
+        Ah,
+        Al
+    ];
+}
+const toBig = (h, l)=>BigInt(h >>> 0) << _32n | BigInt(l >>> 0);
+// for Shift in [0, 32)
+const shrSH = (h, _l, s)=>h >>> s;
+const shrSL = (h, l, s)=>h << 32 - s | l >>> s;
+// Right rotate for Shift in [1, 32)
+const rotrSH = (h, l, s)=>h >>> s | l << 32 - s;
+const rotrSL = (h, l, s)=>h << 32 - s | l >>> s;
+// Right rotate for Shift in (32, 64), NOTE: 32 is special case.
+const rotrBH = (h, l, s)=>h << 64 - s | l >>> s - 32;
+const rotrBL = (h, l, s)=>h >>> s - 32 | l << 64 - s;
+// Right rotate for shift===32 (just swaps l&h)
+const rotr32H = (_h, l)=>l;
+const rotr32L = (h, _l)=>h;
+// Left rotate for Shift in [1, 32)
+const rotlSH = (h, l, s)=>h << s | l >>> 32 - s;
+const rotlSL = (h, l, s)=>l << s | h >>> 32 - s;
+// Left rotate for Shift in (32, 64), NOTE: 32 is special case.
+const rotlBH = (h, l, s)=>l << s - 32 | h >>> 64 - s;
+const rotlBL = (h, l, s)=>h << s - 32 | l >>> 64 - s;
+// JS uses 32-bit signed integers for bitwise operations which means we cannot
+// simple take carry out of low bit sum by shift, we need to use division.
+function add(Ah, Al, Bh, Bl) {
+    const l = (Al >>> 0) + (Bl >>> 0);
+    return {
+        h: Ah + Bh + (l / 2 ** 32 | 0) | 0,
+        l: l | 0
+    };
+}
+// Addition with more than 2 elements
+const add3L = (Al, Bl, Cl)=>(Al >>> 0) + (Bl >>> 0) + (Cl >>> 0);
+const add3H = (low, Ah, Bh, Ch)=>Ah + Bh + Ch + (low / 2 ** 32 | 0) | 0;
+const add4L = (Al, Bl, Cl, Dl)=>(Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0);
+const add4H = (low, Ah, Bh, Ch, Dh)=>Ah + Bh + Ch + Dh + (low / 2 ** 32 | 0) | 0;
+const add5L = (Al, Bl, Cl, Dl, El)=>(Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0) + (El >>> 0);
+const add5H = (low, Ah, Bh, Ch, Dh, Eh)=>Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
+;
+// prettier-ignore
+const u64 = {
+    fromBig,
+    split,
+    toBig,
+    shrSH,
+    shrSL,
+    rotrSH,
+    rotrSL,
+    rotrBH,
+    rotrBL,
+    rotr32H,
+    rotr32L,
+    rotlSH,
+    rotlSL,
+    rotlBH,
+    rotlBL,
+    add,
+    add3L,
+    add3H,
+    add4L,
+    add4H,
+    add5H,
+    add5L
+};
+const __TURBOPACK__default__export__ = u64;
+ //# sourceMappingURL=_u64.js.map
+}),
+"[project]/node_modules/@noble/hashes/esm/cryptoNode.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "crypto",
+    ()=>crypto
+]);
+// We use WebCrypto aka globalThis.crypto, which exists in browsers and node.js 16+.
+// See utils.ts for details.
+// The file will throw on node.js 14 and earlier.
+// @ts-ignore
+var __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/node:crypto [external] (node:crypto, cjs)");
+;
+const crypto = __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ && typeof __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ === 'object' && 'webcrypto' in __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ ? __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__.webcrypto : undefined; //# sourceMappingURL=cryptoNode.js.map
+}),
+"[project]/node_modules/@noble/hashes/esm/utils.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "Hash",
+    ()=>Hash,
+    "asyncLoop",
+    ()=>asyncLoop,
+    "bytesToHex",
+    ()=>bytesToHex,
+    "checkOpts",
+    ()=>checkOpts,
+    "concatBytes",
+    ()=>concatBytes,
+    "createView",
+    ()=>createView,
+    "hexToBytes",
+    ()=>hexToBytes,
+    "isLE",
+    ()=>isLE,
+    "nextTick",
+    ()=>nextTick,
+    "randomBytes",
+    ()=>randomBytes,
+    "rotr",
+    ()=>rotr,
+    "toBytes",
+    ()=>toBytes,
+    "u32",
+    ()=>u32,
+    "u8",
+    ()=>u8,
+    "utf8ToBytes",
+    ()=>utf8ToBytes,
+    "wrapConstructor",
+    ()=>wrapConstructor,
+    "wrapConstructorWithOpts",
+    ()=>wrapConstructorWithOpts,
+    "wrapXOFConstructorWithOpts",
+    ()=>wrapXOFConstructorWithOpts
+]);
+/*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */ // We use WebCrypto aka globalThis.crypto, which exists in browsers and node.js 16+.
+// node.js versions earlier than v19 don't declare it in global scope.
+// For node.js, package.json#exports field mapping rewrites import
+// from `crypto` to `cryptoNode`, which imports native module.
+// Makes the utils un-importable in browsers without a bundler.
+// Once node.js 18 is deprecated, we can just drop the import.
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@noble/hashes/esm/cryptoNode.js [app-ssr] (ecmascript)");
+;
+const u8a = (a)=>a instanceof Uint8Array;
+const u8 = (arr)=>new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
+const u32 = (arr)=>new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
+const createView = (arr)=>new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
+const rotr = (word, shift)=>word << 32 - shift | word >>> shift;
+const isLE = new Uint8Array(new Uint32Array([
+    0x11223344
+]).buffer)[0] === 0x44;
+if (!isLE) throw new Error('Non little-endian hardware is not supported');
+const hexes = /* @__PURE__ */ Array.from({
+    length: 256
+}, (_, i)=>i.toString(16).padStart(2, '0'));
+function bytesToHex(bytes) {
+    if (!u8a(bytes)) throw new Error('Uint8Array expected');
+    // pre-caching improves the speed 6x
+    let hex = '';
+    for(let i = 0; i < bytes.length; i++){
+        hex += hexes[bytes[i]];
+    }
+    return hex;
+}
+function hexToBytes(hex) {
+    if (typeof hex !== 'string') throw new Error('hex string expected, got ' + typeof hex);
+    const len = hex.length;
+    if (len % 2) throw new Error('padded hex string expected, got unpadded hex of length ' + len);
+    const array = new Uint8Array(len / 2);
+    for(let i = 0; i < array.length; i++){
+        const j = i * 2;
+        const hexByte = hex.slice(j, j + 2);
+        const byte = Number.parseInt(hexByte, 16);
+        if (Number.isNaN(byte) || byte < 0) throw new Error('Invalid byte sequence');
+        array[i] = byte;
+    }
+    return array;
+}
+const nextTick = async ()=>{};
+async function asyncLoop(iters, tick, cb) {
+    let ts = Date.now();
+    for(let i = 0; i < iters; i++){
+        cb(i);
+        // Date.now() is not monotonic, so in case if clock goes backwards we return return control too
+        const diff = Date.now() - ts;
+        if (diff >= 0 && diff < tick) continue;
+        await nextTick();
+        ts += diff;
+    }
+}
+function utf8ToBytes(str) {
+    if (typeof str !== 'string') throw new Error(`utf8ToBytes expected string, got ${typeof str}`);
+    return new Uint8Array(new TextEncoder().encode(str)); // https://bugzil.la/1681809
+}
+function toBytes(data) {
+    if (typeof data === 'string') data = utf8ToBytes(data);
+    if (!u8a(data)) throw new Error(`expected Uint8Array, got ${typeof data}`);
+    return data;
+}
+function concatBytes(...arrays) {
+    const r = new Uint8Array(arrays.reduce((sum, a)=>sum + a.length, 0));
+    let pad = 0; // walk through each item, ensure they have proper type
+    arrays.forEach((a)=>{
+        if (!u8a(a)) throw new Error('Uint8Array expected');
+        r.set(a, pad);
+        pad += a.length;
+    });
+    return r;
+}
+class Hash {
+    // Safe version that clones internal state
+    clone() {
+        return this._cloneInto();
+    }
+}
+const toStr = {}.toString;
+function checkOpts(defaults, opts) {
+    if (opts !== undefined && toStr.call(opts) !== '[object Object]') throw new Error('Options should be object or undefined');
+    const merged = Object.assign(defaults, opts);
+    return merged;
+}
+function wrapConstructor(hashCons) {
+    const hashC = (msg)=>hashCons().update(toBytes(msg)).digest();
+    const tmp = hashCons();
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = ()=>hashCons();
+    return hashC;
+}
+function wrapConstructorWithOpts(hashCons) {
+    const hashC = (msg, opts)=>hashCons(opts).update(toBytes(msg)).digest();
+    const tmp = hashCons({});
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = (opts)=>hashCons(opts);
+    return hashC;
+}
+function wrapXOFConstructorWithOpts(hashCons) {
+    const hashC = (msg, opts)=>hashCons(opts).update(toBytes(msg)).digest();
+    const tmp = hashCons({});
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = (opts)=>hashCons(opts);
+    return hashC;
+}
+function randomBytes(bytesLength = 32) {
+    if (__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"] && typeof __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"].getRandomValues === 'function') {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"].getRandomValues(new Uint8Array(bytesLength));
+    }
+    throw new Error('crypto.getRandomValues must be defined');
+} //# sourceMappingURL=utils.js.map
+}),
+"[project]/node_modules/@noble/hashes/esm/sha3.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "Keccak",
+    ()=>Keccak,
+    "keccakP",
+    ()=>keccakP,
+    "keccak_224",
+    ()=>keccak_224,
+    "keccak_256",
+    ()=>keccak_256,
+    "keccak_384",
+    ()=>keccak_384,
+    "keccak_512",
+    ()=>keccak_512,
+    "sha3_224",
+    ()=>sha3_224,
+    "sha3_256",
+    ()=>sha3_256,
+    "sha3_384",
+    ()=>sha3_384,
+    "sha3_512",
+    ()=>sha3_512,
+    "shake128",
+    ()=>shake128,
+    "shake256",
+    ()=>shake256
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_assert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@noble/hashes/esm/_assert.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@noble/hashes/esm/_u64.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@noble/hashes/esm/utils.js [app-ssr] (ecmascript)");
+;
+;
+;
+// SHA3 (keccak) is based on a new design: basically, the internal state is bigger than output size.
+// It's called a sponge function.
+// Various per round constants calculations
+const [SHA3_PI, SHA3_ROTL, _SHA3_IOTA] = [
+    [],
+    [],
+    []
+];
+const _0n = /* @__PURE__ */ BigInt(0);
+const _1n = /* @__PURE__ */ BigInt(1);
+const _2n = /* @__PURE__ */ BigInt(2);
+const _7n = /* @__PURE__ */ BigInt(7);
+const _256n = /* @__PURE__ */ BigInt(256);
+const _0x71n = /* @__PURE__ */ BigInt(0x71);
+for(let round = 0, R = _1n, x = 1, y = 0; round < 24; round++){
+    // Pi
+    [x, y] = [
+        y,
+        (2 * x + 3 * y) % 5
+    ];
+    SHA3_PI.push(2 * (5 * y + x));
+    // Rotational
+    SHA3_ROTL.push((round + 1) * (round + 2) / 2 % 64);
+    // Iota
+    let t = _0n;
+    for(let j = 0; j < 7; j++){
+        R = (R << _1n ^ (R >> _7n) * _0x71n) % _256n;
+        if (R & _2n) t ^= _1n << (_1n << /* @__PURE__ */ BigInt(j)) - _1n;
+    }
+    _SHA3_IOTA.push(t);
+}
+const [SHA3_IOTA_H, SHA3_IOTA_L] = /* @__PURE__ */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["split"])(_SHA3_IOTA, true);
+// Left rotation (without 0, 32, 64)
+const rotlH = (h, l, s)=>s > 32 ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotlBH"])(h, l, s) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotlSH"])(h, l, s);
+const rotlL = (h, l, s)=>s > 32 ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotlBL"])(h, l, s) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotlSL"])(h, l, s);
+function keccakP(s, rounds = 24) {
+    const B = new Uint32Array(5 * 2);
+    // NOTE: all indices are x2 since we store state as u32 instead of u64 (bigints to slow in js)
+    for(let round = 24 - rounds; round < 24; round++){
+        // Theta θ
+        for(let x = 0; x < 10; x++)B[x] = s[x] ^ s[x + 10] ^ s[x + 20] ^ s[x + 30] ^ s[x + 40];
+        for(let x = 0; x < 10; x += 2){
+            const idx1 = (x + 8) % 10;
+            const idx0 = (x + 2) % 10;
+            const B0 = B[idx0];
+            const B1 = B[idx0 + 1];
+            const Th = rotlH(B0, B1, 1) ^ B[idx1];
+            const Tl = rotlL(B0, B1, 1) ^ B[idx1 + 1];
+            for(let y = 0; y < 50; y += 10){
+                s[x + y] ^= Th;
+                s[x + y + 1] ^= Tl;
+            }
+        }
+        // Rho (ρ) and Pi (π)
+        let curH = s[2];
+        let curL = s[3];
+        for(let t = 0; t < 24; t++){
+            const shift = SHA3_ROTL[t];
+            const Th = rotlH(curH, curL, shift);
+            const Tl = rotlL(curH, curL, shift);
+            const PI = SHA3_PI[t];
+            curH = s[PI];
+            curL = s[PI + 1];
+            s[PI] = Th;
+            s[PI + 1] = Tl;
+        }
+        // Chi (χ)
+        for(let y = 0; y < 50; y += 10){
+            for(let x = 0; x < 10; x++)B[x] = s[y + x];
+            for(let x = 0; x < 10; x++)s[y + x] ^= ~B[(x + 2) % 10] & B[(x + 4) % 10];
+        }
+        // Iota (ι)
+        s[0] ^= SHA3_IOTA_H[round];
+        s[1] ^= SHA3_IOTA_L[round];
+    }
+    B.fill(0);
+}
+class Keccak extends __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Hash"] {
+    // NOTE: we accept arguments in bytes instead of bits here.
+    constructor(blockLen, suffix, outputLen, enableXOF = false, rounds = 24){
+        super();
+        this.blockLen = blockLen;
+        this.suffix = suffix;
+        this.outputLen = outputLen;
+        this.enableXOF = enableXOF;
+        this.rounds = rounds;
+        this.pos = 0;
+        this.posOut = 0;
+        this.finished = false;
+        this.destroyed = false;
+        // Can be passed from user as dkLen
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_assert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["number"])(outputLen);
+        // 1600 = 5x5 matrix of 64bit.  1600 bits === 200 bytes
+        if (0 >= this.blockLen || this.blockLen >= 200) throw new Error('Sha3 supports only keccak-f1600 function');
+        this.state = new Uint8Array(200);
+        this.state32 = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"])(this.state);
+    }
+    keccak() {
+        keccakP(this.state32, this.rounds);
+        this.posOut = 0;
+        this.pos = 0;
+    }
+    update(data) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_assert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["exists"])(this);
+        const { blockLen, state } = this;
+        data = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(data);
+        const len = data.length;
+        for(let pos = 0; pos < len;){
+            const take = Math.min(blockLen - this.pos, len - pos);
+            for(let i = 0; i < take; i++)state[this.pos++] ^= data[pos++];
+            if (this.pos === blockLen) this.keccak();
+        }
+        return this;
+    }
+    finish() {
+        if (this.finished) return;
+        this.finished = true;
+        const { state, suffix, pos, blockLen } = this;
+        // Do the padding
+        state[pos] ^= suffix;
+        if ((suffix & 0x80) !== 0 && pos === blockLen - 1) this.keccak();
+        state[blockLen - 1] ^= 0x80;
+        this.keccak();
+    }
+    writeInto(out) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_assert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["exists"])(this, false);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_assert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["bytes"])(out);
+        this.finish();
+        const bufferOut = this.state;
+        const { blockLen } = this;
+        for(let pos = 0, len = out.length; pos < len;){
+            if (this.posOut >= blockLen) this.keccak();
+            const take = Math.min(blockLen - this.posOut, len - pos);
+            out.set(bufferOut.subarray(this.posOut, this.posOut + take), pos);
+            this.posOut += take;
+            pos += take;
+        }
+        return out;
+    }
+    xofInto(out) {
+        // Sha3/Keccak usage with XOF is probably mistake, only SHAKE instances can do XOF
+        if (!this.enableXOF) throw new Error('XOF is not possible for this instance');
+        return this.writeInto(out);
+    }
+    xof(bytes) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_assert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["number"])(bytes);
+        return this.xofInto(new Uint8Array(bytes));
+    }
+    digestInto(out) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_assert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["output"])(out, this);
+        if (this.finished) throw new Error('digest() was already called');
+        this.writeInto(out);
+        this.destroy();
+        return out;
+    }
+    digest() {
+        return this.digestInto(new Uint8Array(this.outputLen));
+    }
+    destroy() {
+        this.destroyed = true;
+        this.state.fill(0);
+    }
+    _cloneInto(to) {
+        const { blockLen, suffix, outputLen, rounds, enableXOF } = this;
+        to || (to = new Keccak(blockLen, suffix, outputLen, enableXOF, rounds));
+        to.state32.set(this.state32);
+        to.pos = this.pos;
+        to.posOut = this.posOut;
+        to.finished = this.finished;
+        to.rounds = rounds;
+        // Suffix can change in cSHAKE
+        to.suffix = suffix;
+        to.outputLen = outputLen;
+        to.enableXOF = enableXOF;
+        to.destroyed = this.destroyed;
+        return to;
+    }
+}
+const gen = (suffix, blockLen, outputLen)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["wrapConstructor"])(()=>new Keccak(blockLen, suffix, outputLen));
+const sha3_224 = /* @__PURE__ */ gen(0x06, 144, 224 / 8);
+const sha3_256 = /* @__PURE__ */ gen(0x06, 136, 256 / 8);
+const sha3_384 = /* @__PURE__ */ gen(0x06, 104, 384 / 8);
+const sha3_512 = /* @__PURE__ */ gen(0x06, 72, 512 / 8);
+const keccak_224 = /* @__PURE__ */ gen(0x01, 144, 224 / 8);
+const keccak_256 = /* @__PURE__ */ gen(0x01, 136, 256 / 8);
+const keccak_384 = /* @__PURE__ */ gen(0x01, 104, 384 / 8);
+const keccak_512 = /* @__PURE__ */ gen(0x01, 72, 512 / 8);
+const genShake = (suffix, blockLen, outputLen)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["wrapXOFConstructorWithOpts"])((opts = {})=>new Keccak(blockLen, suffix, opts.dkLen === undefined ? outputLen : opts.dkLen, true));
+const shake128 = /* @__PURE__ */ genShake(0x1f, 168, 128 / 8);
+const shake256 = /* @__PURE__ */ genShake(0x1f, 136, 256 / 8); //# sourceMappingURL=sha3.js.map
+}),
+"[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/cryptoNode.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "crypto",
+    ()=>crypto
+]);
+/**
+ * Internal webcrypto alias.
+ * We prefer WebCrypto aka globalThis.crypto, which exists in node.js 16+.
+ * Falls back to Node.js built-in crypto for Node.js <=v14.
+ * See utils.ts for details.
+ * @module
+ */ // @ts-ignore
+var __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/node:crypto [external] (node:crypto, cjs)");
+;
+const crypto = __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ && typeof __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ === 'object' && 'webcrypto' in __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ ? __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__.webcrypto : __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ && typeof __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ === 'object' && 'randomBytes' in __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ ? __TURBOPACK__imported__module__$5b$externals$5d2f$node$3a$crypto__$5b$external$5d$__$28$node$3a$crypto$2c$__cjs$29$__ : undefined; //# sourceMappingURL=cryptoNode.js.map
+}),
+"[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/utils.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "Hash",
+    ()=>Hash,
+    "abytes",
+    ()=>abytes,
+    "aexists",
+    ()=>aexists,
+    "ahash",
+    ()=>ahash,
+    "anumber",
+    ()=>anumber,
+    "aoutput",
+    ()=>aoutput,
+    "asyncLoop",
+    ()=>asyncLoop,
+    "byteSwap",
+    ()=>byteSwap,
+    "byteSwap32",
+    ()=>byteSwap32,
+    "byteSwapIfBE",
+    ()=>byteSwapIfBE,
+    "bytesToHex",
+    ()=>bytesToHex,
+    "bytesToUtf8",
+    ()=>bytesToUtf8,
+    "checkOpts",
+    ()=>checkOpts,
+    "clean",
+    ()=>clean,
+    "concatBytes",
+    ()=>concatBytes,
+    "createHasher",
+    ()=>createHasher,
+    "createOptHasher",
+    ()=>createOptHasher,
+    "createView",
+    ()=>createView,
+    "createXOFer",
+    ()=>createXOFer,
+    "hexToBytes",
+    ()=>hexToBytes,
+    "isBytes",
+    ()=>isBytes,
+    "isLE",
+    ()=>isLE,
+    "kdfInputToBytes",
+    ()=>kdfInputToBytes,
+    "nextTick",
+    ()=>nextTick,
+    "randomBytes",
+    ()=>randomBytes,
+    "rotl",
+    ()=>rotl,
+    "rotr",
+    ()=>rotr,
+    "swap32IfBE",
+    ()=>swap32IfBE,
+    "swap8IfBE",
+    ()=>swap8IfBE,
+    "toBytes",
+    ()=>toBytes,
+    "u32",
+    ()=>u32,
+    "u8",
+    ()=>u8,
+    "utf8ToBytes",
+    ()=>utf8ToBytes,
+    "wrapConstructor",
+    ()=>wrapConstructor,
+    "wrapConstructorWithOpts",
+    ()=>wrapConstructorWithOpts,
+    "wrapXOFConstructorWithOpts",
+    ()=>wrapXOFConstructorWithOpts
+]);
+/**
+ * Utilities for hex, bytes, CSPRNG.
+ * @module
+ */ /*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */ // We use WebCrypto aka globalThis.crypto, which exists in browsers and node.js 16+.
+// node.js versions earlier than v19 don't declare it in global scope.
+// For node.js, package.json#exports field mapping rewrites import
+// from `crypto` to `cryptoNode`, which imports native module.
+// Makes the utils un-importable in browsers without a bundler.
+// Once node.js 18 is deprecated (2025-04-30), we can just drop the import.
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/cryptoNode.js [app-ssr] (ecmascript)");
+;
+function isBytes(a) {
+    return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === 'Uint8Array';
+}
+function anumber(n) {
+    if (!Number.isSafeInteger(n) || n < 0) throw new Error('positive integer expected, got ' + n);
+}
+function abytes(b, ...lengths) {
+    if (!isBytes(b)) throw new Error('Uint8Array expected');
+    if (lengths.length > 0 && !lengths.includes(b.length)) throw new Error('Uint8Array expected of length ' + lengths + ', got length=' + b.length);
+}
+function ahash(h) {
+    if (typeof h !== 'function' || typeof h.create !== 'function') throw new Error('Hash should be wrapped by utils.createHasher');
+    anumber(h.outputLen);
+    anumber(h.blockLen);
+}
+function aexists(instance, checkFinished = true) {
+    if (instance.destroyed) throw new Error('Hash instance has been destroyed');
+    if (checkFinished && instance.finished) throw new Error('Hash#digest() has already been called');
+}
+function aoutput(out, instance) {
+    abytes(out);
+    const min = instance.outputLen;
+    if (out.length < min) {
+        throw new Error('digestInto() expects output buffer of length at least ' + min);
+    }
+}
+function u8(arr) {
+    return new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
+}
+function u32(arr) {
+    return new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
+}
+function clean(...arrays) {
+    for(let i = 0; i < arrays.length; i++){
+        arrays[i].fill(0);
+    }
+}
+function createView(arr) {
+    return new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
+}
+function rotr(word, shift) {
+    return word << 32 - shift | word >>> shift;
+}
+function rotl(word, shift) {
+    return word << shift | word >>> 32 - shift >>> 0;
+}
+const isLE = /* @__PURE__ */ (()=>new Uint8Array(new Uint32Array([
+        0x11223344
+    ]).buffer)[0] === 0x44)();
+function byteSwap(word) {
+    return word << 24 & 0xff000000 | word << 8 & 0xff0000 | word >>> 8 & 0xff00 | word >>> 24 & 0xff;
+}
+const swap8IfBE = isLE ? (n)=>n : (n)=>byteSwap(n);
+const byteSwapIfBE = swap8IfBE;
+function byteSwap32(arr) {
+    for(let i = 0; i < arr.length; i++){
+        arr[i] = byteSwap(arr[i]);
+    }
+    return arr;
+}
+const swap32IfBE = isLE ? (u)=>u : byteSwap32;
+// Built-in hex conversion https://caniuse.com/mdn-javascript_builtins_uint8array_fromhex
+const hasHexBuiltin = /* @__PURE__ */ (()=>// @ts-ignore
+    typeof Uint8Array.from([]).toHex === 'function' && typeof Uint8Array.fromHex === 'function')();
+// Array where index 0xf0 (240) is mapped to string 'f0'
+const hexes = /* @__PURE__ */ Array.from({
+    length: 256
+}, (_, i)=>i.toString(16).padStart(2, '0'));
+function bytesToHex(bytes) {
+    abytes(bytes);
+    // @ts-ignore
+    if (hasHexBuiltin) return bytes.toHex();
+    // pre-caching improves the speed 6x
+    let hex = '';
+    for(let i = 0; i < bytes.length; i++){
+        hex += hexes[bytes[i]];
+    }
+    return hex;
+}
+// We use optimized technique to convert hex string to byte array
+const asciis = {
+    _0: 48,
+    _9: 57,
+    A: 65,
+    F: 70,
+    a: 97,
+    f: 102
+};
+function asciiToBase16(ch) {
+    if (ch >= asciis._0 && ch <= asciis._9) return ch - asciis._0; // '2' => 50-48
+    if (ch >= asciis.A && ch <= asciis.F) return ch - (asciis.A - 10); // 'B' => 66-(65-10)
+    if (ch >= asciis.a && ch <= asciis.f) return ch - (asciis.a - 10); // 'b' => 98-(97-10)
+    return;
+}
+function hexToBytes(hex) {
+    if (typeof hex !== 'string') throw new Error('hex string expected, got ' + typeof hex);
+    // @ts-ignore
+    if (hasHexBuiltin) return Uint8Array.fromHex(hex);
+    const hl = hex.length;
+    const al = hl / 2;
+    if (hl % 2) throw new Error('hex string expected, got unpadded hex of length ' + hl);
+    const array = new Uint8Array(al);
+    for(let ai = 0, hi = 0; ai < al; ai++, hi += 2){
+        const n1 = asciiToBase16(hex.charCodeAt(hi));
+        const n2 = asciiToBase16(hex.charCodeAt(hi + 1));
+        if (n1 === undefined || n2 === undefined) {
+            const char = hex[hi] + hex[hi + 1];
+            throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
+        }
+        array[ai] = n1 * 16 + n2; // multiply first octet, e.g. 'a3' => 10*16+3 => 160 + 3 => 163
+    }
+    return array;
+}
+const nextTick = async ()=>{};
+async function asyncLoop(iters, tick, cb) {
+    let ts = Date.now();
+    for(let i = 0; i < iters; i++){
+        cb(i);
+        // Date.now() is not monotonic, so in case if clock goes backwards we return return control too
+        const diff = Date.now() - ts;
+        if (diff >= 0 && diff < tick) continue;
+        await nextTick();
+        ts += diff;
+    }
+}
+function utf8ToBytes(str) {
+    if (typeof str !== 'string') throw new Error('string expected');
+    return new Uint8Array(new TextEncoder().encode(str)); // https://bugzil.la/1681809
+}
+function bytesToUtf8(bytes) {
+    return new TextDecoder().decode(bytes);
+}
+function toBytes(data) {
+    if (typeof data === 'string') data = utf8ToBytes(data);
+    abytes(data);
+    return data;
+}
+function kdfInputToBytes(data) {
+    if (typeof data === 'string') data = utf8ToBytes(data);
+    abytes(data);
+    return data;
+}
+function concatBytes(...arrays) {
+    let sum = 0;
+    for(let i = 0; i < arrays.length; i++){
+        const a = arrays[i];
+        abytes(a);
+        sum += a.length;
+    }
+    const res = new Uint8Array(sum);
+    for(let i = 0, pad = 0; i < arrays.length; i++){
+        const a = arrays[i];
+        res.set(a, pad);
+        pad += a.length;
+    }
+    return res;
+}
+function checkOpts(defaults, opts) {
+    if (opts !== undefined && ({}).toString.call(opts) !== '[object Object]') throw new Error('options should be object or undefined');
+    const merged = Object.assign(defaults, opts);
+    return merged;
+}
+class Hash {
+}
+function createHasher(hashCons) {
+    const hashC = (msg)=>hashCons().update(toBytes(msg)).digest();
+    const tmp = hashCons();
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = ()=>hashCons();
+    return hashC;
+}
+function createOptHasher(hashCons) {
+    const hashC = (msg, opts)=>hashCons(opts).update(toBytes(msg)).digest();
+    const tmp = hashCons({});
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = (opts)=>hashCons(opts);
+    return hashC;
+}
+function createXOFer(hashCons) {
+    const hashC = (msg, opts)=>hashCons(opts).update(toBytes(msg)).digest();
+    const tmp = hashCons({});
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = (opts)=>hashCons(opts);
+    return hashC;
+}
+const wrapConstructor = createHasher;
+const wrapConstructorWithOpts = createOptHasher;
+const wrapXOFConstructorWithOpts = createXOFer;
+function randomBytes(bytesLength = 32) {
+    if (__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"] && typeof __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"].getRandomValues === 'function') {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"].getRandomValues(new Uint8Array(bytesLength));
+    }
+    // Legacy Node.js compatibility
+    if (__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"] && typeof __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"].randomBytes === 'function') {
+        return Uint8Array.from(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$cryptoNode$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["crypto"].randomBytes(bytesLength));
+    }
+    throw new Error('crypto.getRandomValues must be defined');
+} //# sourceMappingURL=utils.js.map
+}),
+"[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/_blake.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "BSIGMA",
+    ()=>BSIGMA,
+    "G1s",
+    ()=>G1s,
+    "G2s",
+    ()=>G2s
+]);
+/**
+ * Internal helpers for blake hash.
+ * @module
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/utils.js [app-ssr] (ecmascript)");
+;
+const BSIGMA = /* @__PURE__ */ Uint8Array.from([
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    14,
+    10,
+    4,
+    8,
+    9,
+    15,
+    13,
+    6,
+    1,
+    12,
+    0,
+    2,
+    11,
+    7,
+    5,
+    3,
+    11,
+    8,
+    12,
+    0,
+    5,
+    2,
+    15,
+    13,
+    10,
+    14,
+    3,
+    6,
+    7,
+    1,
+    9,
+    4,
+    7,
+    9,
+    3,
+    1,
+    13,
+    12,
+    11,
+    14,
+    2,
+    6,
+    5,
+    10,
+    4,
+    0,
+    15,
+    8,
+    9,
+    0,
+    5,
+    7,
+    2,
+    4,
+    10,
+    15,
+    14,
+    1,
+    11,
+    12,
+    6,
+    8,
+    3,
+    13,
+    2,
+    12,
+    6,
+    10,
+    0,
+    11,
+    8,
+    3,
+    4,
+    13,
+    7,
+    5,
+    15,
+    14,
+    1,
+    9,
+    12,
+    5,
+    1,
+    15,
+    14,
+    13,
+    4,
+    10,
+    0,
+    7,
+    6,
+    3,
+    9,
+    2,
+    8,
+    11,
+    13,
+    11,
+    7,
+    14,
+    12,
+    1,
+    3,
+    9,
+    5,
+    0,
+    15,
+    4,
+    8,
+    6,
+    2,
+    10,
+    6,
+    15,
+    14,
+    9,
+    11,
+    3,
+    0,
+    8,
+    12,
+    2,
+    13,
+    7,
+    1,
+    4,
+    10,
+    5,
+    10,
+    2,
+    8,
+    4,
+    7,
+    6,
+    1,
+    5,
+    15,
+    11,
+    9,
+    14,
+    3,
+    12,
+    13,
+    0,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    14,
+    10,
+    4,
+    8,
+    9,
+    15,
+    13,
+    6,
+    1,
+    12,
+    0,
+    2,
+    11,
+    7,
+    5,
+    3,
+    // Blake1, unused in others
+    11,
+    8,
+    12,
+    0,
+    5,
+    2,
+    15,
+    13,
+    10,
+    14,
+    3,
+    6,
+    7,
+    1,
+    9,
+    4,
+    7,
+    9,
+    3,
+    1,
+    13,
+    12,
+    11,
+    14,
+    2,
+    6,
+    5,
+    10,
+    4,
+    0,
+    15,
+    8,
+    9,
+    0,
+    5,
+    7,
+    2,
+    4,
+    10,
+    15,
+    14,
+    1,
+    11,
+    12,
+    6,
+    8,
+    3,
+    13,
+    2,
+    12,
+    6,
+    10,
+    0,
+    11,
+    8,
+    3,
+    4,
+    13,
+    7,
+    5,
+    15,
+    14,
+    1,
+    9
+]);
+function G1s(a, b, c, d, x) {
+    a = a + b + x | 0;
+    d = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotr"])(d ^ a, 16);
+    c = c + d | 0;
+    b = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotr"])(b ^ c, 12);
+    return {
+        a,
+        b,
+        c,
+        d
+    };
+}
+function G2s(a, b, c, d, x) {
+    a = a + b + x | 0;
+    d = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotr"])(d ^ a, 8);
+    c = c + d | 0;
+    b = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotr"])(b ^ c, 7);
+    return {
+        a,
+        b,
+        c,
+        d
+    };
+} //# sourceMappingURL=_blake.js.map
+}),
+"[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/_md.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "Chi",
+    ()=>Chi,
+    "HashMD",
+    ()=>HashMD,
+    "Maj",
+    ()=>Maj,
+    "SHA224_IV",
+    ()=>SHA224_IV,
+    "SHA256_IV",
+    ()=>SHA256_IV,
+    "SHA384_IV",
+    ()=>SHA384_IV,
+    "SHA512_IV",
+    ()=>SHA512_IV,
+    "setBigUint64",
+    ()=>setBigUint64
+]);
+/**
+ * Internal Merkle-Damgard hash utils.
+ * @module
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/utils.js [app-ssr] (ecmascript)");
+;
+function setBigUint64(view, byteOffset, value, isLE) {
+    if (typeof view.setBigUint64 === 'function') return view.setBigUint64(byteOffset, value, isLE);
+    const _32n = BigInt(32);
+    const _u32_max = BigInt(0xffffffff);
+    const wh = Number(value >> _32n & _u32_max);
+    const wl = Number(value & _u32_max);
+    const h = isLE ? 4 : 0;
+    const l = isLE ? 0 : 4;
+    view.setUint32(byteOffset + h, wh, isLE);
+    view.setUint32(byteOffset + l, wl, isLE);
+}
+function Chi(a, b, c) {
+    return a & b ^ ~a & c;
+}
+function Maj(a, b, c) {
+    return a & b ^ a & c ^ b & c;
+}
+class HashMD extends __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Hash"] {
+    constructor(blockLen, outputLen, padOffset, isLE){
+        super();
+        this.finished = false;
+        this.length = 0;
+        this.pos = 0;
+        this.destroyed = false;
+        this.blockLen = blockLen;
+        this.outputLen = outputLen;
+        this.padOffset = padOffset;
+        this.isLE = isLE;
+        this.buffer = new Uint8Array(blockLen);
+        this.view = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createView"])(this.buffer);
+    }
+    update(data) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aexists"])(this);
+        data = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(data);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["abytes"])(data);
+        const { view, buffer, blockLen } = this;
+        const len = data.length;
+        for(let pos = 0; pos < len;){
+            const take = Math.min(blockLen - this.pos, len - pos);
+            // Fast path: we have at least one block in input, cast it to view and process
+            if (take === blockLen) {
+                const dataView = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createView"])(data);
+                for(; blockLen <= len - pos; pos += blockLen)this.process(dataView, pos);
+                continue;
+            }
+            buffer.set(data.subarray(pos, pos + take), this.pos);
+            this.pos += take;
+            pos += take;
+            if (this.pos === blockLen) {
+                this.process(view, 0);
+                this.pos = 0;
+            }
+        }
+        this.length += data.length;
+        this.roundClean();
+        return this;
+    }
+    digestInto(out) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aexists"])(this);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aoutput"])(out, this);
+        this.finished = true;
+        // Padding
+        // We can avoid allocation of buffer for padding completely if it
+        // was previously not allocated here. But it won't change performance.
+        const { buffer, view, blockLen, isLE } = this;
+        let { pos } = this;
+        // append the bit '1' to the message
+        buffer[pos++] = 0b10000000;
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clean"])(this.buffer.subarray(pos));
+        // we have less than padOffset left in buffer, so we cannot put length in
+        // current block, need process it and pad again
+        if (this.padOffset > blockLen - pos) {
+            this.process(view, 0);
+            pos = 0;
+        }
+        // Pad until full block byte with zeros
+        for(let i = pos; i < blockLen; i++)buffer[i] = 0;
+        // Note: sha512 requires length to be 128bit integer, but length in JS will overflow before that
+        // You need to write around 2 exabytes (u64_max / 8 / (1024**6)) for this to happen.
+        // So we just write lowest 64 bits of that value.
+        setBigUint64(view, blockLen - 8, BigInt(this.length * 8), isLE);
+        this.process(view, 0);
+        const oview = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createView"])(out);
+        const len = this.outputLen;
+        // NOTE: we do division by 4 later, which should be fused in single op with modulo by JIT
+        if (len % 4) throw new Error('_sha2: outputLen should be aligned to 32bit');
+        const outLen = len / 4;
+        const state = this.get();
+        if (outLen > state.length) throw new Error('_sha2: outputLen bigger than state');
+        for(let i = 0; i < outLen; i++)oview.setUint32(4 * i, state[i], isLE);
+    }
+    digest() {
+        const { buffer, outputLen } = this;
+        this.digestInto(buffer);
+        const res = buffer.slice(0, outputLen);
+        this.destroy();
+        return res;
+    }
+    _cloneInto(to) {
+        to || (to = new this.constructor());
+        to.set(...this.get());
+        const { blockLen, buffer, length, finished, destroyed, pos } = this;
+        to.destroyed = destroyed;
+        to.finished = finished;
+        to.length = length;
+        to.pos = pos;
+        if (length % blockLen) to.buffer.set(buffer);
+        return to;
+    }
+    clone() {
+        return this._cloneInto();
+    }
+}
+const SHA256_IV = /* @__PURE__ */ Uint32Array.from([
+    0x6a09e667,
+    0xbb67ae85,
+    0x3c6ef372,
+    0xa54ff53a,
+    0x510e527f,
+    0x9b05688c,
+    0x1f83d9ab,
+    0x5be0cd19
+]);
+const SHA224_IV = /* @__PURE__ */ Uint32Array.from([
+    0xc1059ed8,
+    0x367cd507,
+    0x3070dd17,
+    0xf70e5939,
+    0xffc00b31,
+    0x68581511,
+    0x64f98fa7,
+    0xbefa4fa4
+]);
+const SHA384_IV = /* @__PURE__ */ Uint32Array.from([
+    0xcbbb9d5d,
+    0xc1059ed8,
+    0x629a292a,
+    0x367cd507,
+    0x9159015a,
+    0x3070dd17,
+    0x152fecd8,
+    0xf70e5939,
+    0x67332667,
+    0xffc00b31,
+    0x8eb44a87,
+    0x68581511,
+    0xdb0c2e0d,
+    0x64f98fa7,
+    0x47b5481d,
+    0xbefa4fa4
+]);
+const SHA512_IV = /* @__PURE__ */ Uint32Array.from([
+    0x6a09e667,
+    0xf3bcc908,
+    0xbb67ae85,
+    0x84caa73b,
+    0x3c6ef372,
+    0xfe94f82b,
+    0xa54ff53a,
+    0x5f1d36f1,
+    0x510e527f,
+    0xade682d1,
+    0x9b05688c,
+    0x2b3e6c1f,
+    0x1f83d9ab,
+    0xfb41bd6b,
+    0x5be0cd19,
+    0x137e2179
+]); //# sourceMappingURL=_md.js.map
+}),
+"[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/_u64.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "add",
+    ()=>add,
+    "add3H",
+    ()=>add3H,
+    "add3L",
+    ()=>add3L,
+    "add4H",
+    ()=>add4H,
+    "add4L",
+    ()=>add4L,
+    "add5H",
+    ()=>add5H,
+    "add5L",
+    ()=>add5L,
+    "default",
+    ()=>__TURBOPACK__default__export__,
+    "fromBig",
+    ()=>fromBig,
+    "rotlBH",
+    ()=>rotlBH,
+    "rotlBL",
+    ()=>rotlBL,
+    "rotlSH",
+    ()=>rotlSH,
+    "rotlSL",
+    ()=>rotlSL,
+    "rotr32H",
+    ()=>rotr32H,
+    "rotr32L",
+    ()=>rotr32L,
+    "rotrBH",
+    ()=>rotrBH,
+    "rotrBL",
+    ()=>rotrBL,
+    "rotrSH",
+    ()=>rotrSH,
+    "rotrSL",
+    ()=>rotrSL,
+    "shrSH",
+    ()=>shrSH,
+    "shrSL",
+    ()=>shrSL,
+    "split",
+    ()=>split,
+    "toBig",
+    ()=>toBig
+]);
+/**
+ * Internal helpers for u64. BigUint64Array is too slow as per 2025, so we implement it using Uint32Array.
+ * @todo re-check https://issues.chromium.org/issues/42212588
+ * @module
+ */ const U32_MASK64 = /* @__PURE__ */ BigInt(2 ** 32 - 1);
+const _32n = /* @__PURE__ */ BigInt(32);
+function fromBig(n, le = false) {
+    if (le) return {
+        h: Number(n & U32_MASK64),
+        l: Number(n >> _32n & U32_MASK64)
+    };
+    return {
+        h: Number(n >> _32n & U32_MASK64) | 0,
+        l: Number(n & U32_MASK64) | 0
+    };
+}
+function split(lst, le = false) {
+    const len = lst.length;
+    let Ah = new Uint32Array(len);
+    let Al = new Uint32Array(len);
+    for(let i = 0; i < len; i++){
+        const { h, l } = fromBig(lst[i], le);
+        [Ah[i], Al[i]] = [
+            h,
+            l
+        ];
+    }
+    return [
+        Ah,
+        Al
+    ];
+}
+const toBig = (h, l)=>BigInt(h >>> 0) << _32n | BigInt(l >>> 0);
+// for Shift in [0, 32)
+const shrSH = (h, _l, s)=>h >>> s;
+const shrSL = (h, l, s)=>h << 32 - s | l >>> s;
+// Right rotate for Shift in [1, 32)
+const rotrSH = (h, l, s)=>h >>> s | l << 32 - s;
+const rotrSL = (h, l, s)=>h << 32 - s | l >>> s;
+// Right rotate for Shift in (32, 64), NOTE: 32 is special case.
+const rotrBH = (h, l, s)=>h << 64 - s | l >>> s - 32;
+const rotrBL = (h, l, s)=>h >>> s - 32 | l << 64 - s;
+// Right rotate for shift===32 (just swaps l&h)
+const rotr32H = (_h, l)=>l;
+const rotr32L = (h, _l)=>h;
+// Left rotate for Shift in [1, 32)
+const rotlSH = (h, l, s)=>h << s | l >>> 32 - s;
+const rotlSL = (h, l, s)=>l << s | h >>> 32 - s;
+// Left rotate for Shift in (32, 64), NOTE: 32 is special case.
+const rotlBH = (h, l, s)=>l << s - 32 | h >>> 64 - s;
+const rotlBL = (h, l, s)=>h << s - 32 | l >>> 64 - s;
+// JS uses 32-bit signed integers for bitwise operations which means we cannot
+// simple take carry out of low bit sum by shift, we need to use division.
+function add(Ah, Al, Bh, Bl) {
+    const l = (Al >>> 0) + (Bl >>> 0);
+    return {
+        h: Ah + Bh + (l / 2 ** 32 | 0) | 0,
+        l: l | 0
+    };
+}
+// Addition with more than 2 elements
+const add3L = (Al, Bl, Cl)=>(Al >>> 0) + (Bl >>> 0) + (Cl >>> 0);
+const add3H = (low, Ah, Bh, Ch)=>Ah + Bh + Ch + (low / 2 ** 32 | 0) | 0;
+const add4L = (Al, Bl, Cl, Dl)=>(Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0);
+const add4H = (low, Ah, Bh, Ch, Dh)=>Ah + Bh + Ch + Dh + (low / 2 ** 32 | 0) | 0;
+const add5L = (Al, Bl, Cl, Dl, El)=>(Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0) + (El >>> 0);
+const add5H = (low, Ah, Bh, Ch, Dh, Eh)=>Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
+;
+// prettier-ignore
+const u64 = {
+    fromBig,
+    split,
+    toBig,
+    shrSH,
+    shrSL,
+    rotrSH,
+    rotrSL,
+    rotrBH,
+    rotrBL,
+    rotr32H,
+    rotr32L,
+    rotlSH,
+    rotlSL,
+    rotlBH,
+    rotlBL,
+    add,
+    add3L,
+    add3H,
+    add4L,
+    add4H,
+    add5H,
+    add5L
+};
+const __TURBOPACK__default__export__ = u64;
+ //# sourceMappingURL=_u64.js.map
+}),
+"[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/blake2.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "BLAKE2",
+    ()=>BLAKE2,
+    "BLAKE2b",
+    ()=>BLAKE2b,
+    "BLAKE2s",
+    ()=>BLAKE2s,
+    "blake2b",
+    ()=>blake2b,
+    "blake2s",
+    ()=>blake2s,
+    "compress",
+    ()=>compress
+]);
+/**
+ * blake2b (64-bit) & blake2s (8 to 32-bit) hash functions.
+ * b could have been faster, but there is no fast u64 in js, so s is 1.5x faster.
+ * @module
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/_blake.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_md$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/_md.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/_u64.js [app-ssr] (ecmascript)");
+// prettier-ignore
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/utils.js [app-ssr] (ecmascript)");
+;
+;
+;
+;
+// Same as SHA512_IV, but swapped endianness: LE instead of BE. iv[1] is iv[0], etc.
+const B2B_IV = /* @__PURE__ */ Uint32Array.from([
+    0xf3bcc908,
+    0x6a09e667,
+    0x84caa73b,
+    0xbb67ae85,
+    0xfe94f82b,
+    0x3c6ef372,
+    0x5f1d36f1,
+    0xa54ff53a,
+    0xade682d1,
+    0x510e527f,
+    0x2b3e6c1f,
+    0x9b05688c,
+    0xfb41bd6b,
+    0x1f83d9ab,
+    0x137e2179,
+    0x5be0cd19
+]);
+// Temporary buffer
+const BBUF = /* @__PURE__ */ new Uint32Array(32);
+// Mixing function G splitted in two halfs
+function G1b(a, b, c, d, msg, x) {
+    // NOTE: V is LE here
+    const Xl = msg[x], Xh = msg[x + 1]; // prettier-ignore
+    let Al = BBUF[2 * a], Ah = BBUF[2 * a + 1]; // prettier-ignore
+    let Bl = BBUF[2 * b], Bh = BBUF[2 * b + 1]; // prettier-ignore
+    let Cl = BBUF[2 * c], Ch = BBUF[2 * c + 1]; // prettier-ignore
+    let Dl = BBUF[2 * d], Dh = BBUF[2 * d + 1]; // prettier-ignore
+    // v[a] = (v[a] + v[b] + x) | 0;
+    let ll = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["add3L"](Al, Bl, Xl);
+    Ah = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["add3H"](ll, Ah, Bh, Xh);
+    Al = ll | 0;
+    // v[d] = rotr(v[d] ^ v[a], 32)
+    ({ Dh, Dl } = {
+        Dh: Dh ^ Ah,
+        Dl: Dl ^ Al
+    });
+    ({ Dh, Dl } = {
+        Dh: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotr32H"](Dh, Dl),
+        Dl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotr32L"](Dh, Dl)
+    });
+    // v[c] = (v[c] + v[d]) | 0;
+    ({ h: Ch, l: Cl } = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["add"](Ch, Cl, Dh, Dl));
+    // v[b] = rotr(v[b] ^ v[c], 24)
+    ({ Bh, Bl } = {
+        Bh: Bh ^ Ch,
+        Bl: Bl ^ Cl
+    });
+    ({ Bh, Bl } = {
+        Bh: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotrSH"](Bh, Bl, 24),
+        Bl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotrSL"](Bh, Bl, 24)
+    });
+    BBUF[2 * a] = Al, BBUF[2 * a + 1] = Ah;
+    BBUF[2 * b] = Bl, BBUF[2 * b + 1] = Bh;
+    BBUF[2 * c] = Cl, BBUF[2 * c + 1] = Ch;
+    BBUF[2 * d] = Dl, BBUF[2 * d + 1] = Dh;
+}
+function G2b(a, b, c, d, msg, x) {
+    // NOTE: V is LE here
+    const Xl = msg[x], Xh = msg[x + 1]; // prettier-ignore
+    let Al = BBUF[2 * a], Ah = BBUF[2 * a + 1]; // prettier-ignore
+    let Bl = BBUF[2 * b], Bh = BBUF[2 * b + 1]; // prettier-ignore
+    let Cl = BBUF[2 * c], Ch = BBUF[2 * c + 1]; // prettier-ignore
+    let Dl = BBUF[2 * d], Dh = BBUF[2 * d + 1]; // prettier-ignore
+    // v[a] = (v[a] + v[b] + x) | 0;
+    let ll = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["add3L"](Al, Bl, Xl);
+    Ah = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["add3H"](ll, Ah, Bh, Xh);
+    Al = ll | 0;
+    // v[d] = rotr(v[d] ^ v[a], 16)
+    ({ Dh, Dl } = {
+        Dh: Dh ^ Ah,
+        Dl: Dl ^ Al
+    });
+    ({ Dh, Dl } = {
+        Dh: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotrSH"](Dh, Dl, 16),
+        Dl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotrSL"](Dh, Dl, 16)
+    });
+    // v[c] = (v[c] + v[d]) | 0;
+    ({ h: Ch, l: Cl } = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["add"](Ch, Cl, Dh, Dl));
+    // v[b] = rotr(v[b] ^ v[c], 63)
+    ({ Bh, Bl } = {
+        Bh: Bh ^ Ch,
+        Bl: Bl ^ Cl
+    });
+    ({ Bh, Bl } = {
+        Bh: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotrBH"](Bh, Bl, 63),
+        Bl: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotrBL"](Bh, Bl, 63)
+    });
+    BBUF[2 * a] = Al, BBUF[2 * a + 1] = Ah;
+    BBUF[2 * b] = Bl, BBUF[2 * b + 1] = Bh;
+    BBUF[2 * c] = Cl, BBUF[2 * c + 1] = Ch;
+    BBUF[2 * d] = Dl, BBUF[2 * d + 1] = Dh;
+}
+function checkBlake2Opts(outputLen, opts = {}, keyLen, saltLen, persLen) {
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["anumber"])(keyLen);
+    if (outputLen < 0 || outputLen > keyLen) throw new Error('outputLen bigger than keyLen');
+    const { key, salt, personalization } = opts;
+    if (key !== undefined && (key.length < 1 || key.length > keyLen)) throw new Error('key length must be undefined or 1..' + keyLen);
+    if (salt !== undefined && salt.length !== saltLen) throw new Error('salt must be undefined or ' + saltLen);
+    if (personalization !== undefined && personalization.length !== persLen) throw new Error('personalization must be undefined or ' + persLen);
+}
+class BLAKE2 extends __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Hash"] {
+    constructor(blockLen, outputLen){
+        super();
+        this.finished = false;
+        this.destroyed = false;
+        this.length = 0;
+        this.pos = 0;
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["anumber"])(blockLen);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["anumber"])(outputLen);
+        this.blockLen = blockLen;
+        this.outputLen = outputLen;
+        this.buffer = new Uint8Array(blockLen);
+        this.buffer32 = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"])(this.buffer);
+    }
+    update(data) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aexists"])(this);
+        data = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(data);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["abytes"])(data);
+        // Main difference with other hashes: there is flag for last block,
+        // so we cannot process current block before we know that there
+        // is the next one. This significantly complicates logic and reduces ability
+        // to do zero-copy processing
+        const { blockLen, buffer, buffer32 } = this;
+        const len = data.length;
+        const offset = data.byteOffset;
+        const buf = data.buffer;
+        for(let pos = 0; pos < len;){
+            // If buffer is full and we still have input (don't process last block, same as blake2s)
+            if (this.pos === blockLen) {
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap32IfBE"])(buffer32);
+                this.compress(buffer32, 0, false);
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap32IfBE"])(buffer32);
+                this.pos = 0;
+            }
+            const take = Math.min(blockLen - this.pos, len - pos);
+            const dataOffset = offset + pos;
+            // full block && aligned to 4 bytes && not last in input
+            if (take === blockLen && !(dataOffset % 4) && pos + take < len) {
+                const data32 = new Uint32Array(buf, dataOffset, Math.floor((len - pos) / 4));
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap32IfBE"])(data32);
+                for(let pos32 = 0; pos + blockLen < len; pos32 += buffer32.length, pos += blockLen){
+                    this.length += blockLen;
+                    this.compress(data32, pos32, false);
+                }
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap32IfBE"])(data32);
+                continue;
+            }
+            buffer.set(data.subarray(pos, pos + take), this.pos);
+            this.pos += take;
+            this.length += take;
+            pos += take;
+        }
+        return this;
+    }
+    digestInto(out) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aexists"])(this);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aoutput"])(out, this);
+        const { pos, buffer32 } = this;
+        this.finished = true;
+        // Padding
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clean"])(this.buffer.subarray(pos));
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap32IfBE"])(buffer32);
+        this.compress(buffer32, 0, true);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap32IfBE"])(buffer32);
+        const out32 = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"])(out);
+        this.get().forEach((v, i)=>out32[i] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(v));
+    }
+    digest() {
+        const { buffer, outputLen } = this;
+        this.digestInto(buffer);
+        const res = buffer.slice(0, outputLen);
+        this.destroy();
+        return res;
+    }
+    _cloneInto(to) {
+        const { buffer, length, finished, destroyed, outputLen, pos } = this;
+        to || (to = new this.constructor({
+            dkLen: outputLen
+        }));
+        to.set(...this.get());
+        to.buffer.set(buffer);
+        to.destroyed = destroyed;
+        to.finished = finished;
+        to.length = length;
+        to.pos = pos;
+        // @ts-ignore
+        to.outputLen = outputLen;
+        return to;
+    }
+    clone() {
+        return this._cloneInto();
+    }
+}
+class BLAKE2b extends BLAKE2 {
+    constructor(opts = {}){
+        const olen = opts.dkLen === undefined ? 64 : opts.dkLen;
+        super(128, olen);
+        // Same as SHA-512, but LE
+        this.v0l = B2B_IV[0] | 0;
+        this.v0h = B2B_IV[1] | 0;
+        this.v1l = B2B_IV[2] | 0;
+        this.v1h = B2B_IV[3] | 0;
+        this.v2l = B2B_IV[4] | 0;
+        this.v2h = B2B_IV[5] | 0;
+        this.v3l = B2B_IV[6] | 0;
+        this.v3h = B2B_IV[7] | 0;
+        this.v4l = B2B_IV[8] | 0;
+        this.v4h = B2B_IV[9] | 0;
+        this.v5l = B2B_IV[10] | 0;
+        this.v5h = B2B_IV[11] | 0;
+        this.v6l = B2B_IV[12] | 0;
+        this.v6h = B2B_IV[13] | 0;
+        this.v7l = B2B_IV[14] | 0;
+        this.v7h = B2B_IV[15] | 0;
+        checkBlake2Opts(olen, opts, 64, 16, 16);
+        let { key, personalization, salt } = opts;
+        let keyLength = 0;
+        if (key !== undefined) {
+            key = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(key);
+            keyLength = key.length;
+        }
+        this.v0l ^= this.outputLen | keyLength << 8 | 0x01 << 16 | 0x01 << 24;
+        if (salt !== undefined) {
+            salt = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(salt);
+            const slt = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"])(salt);
+            this.v4l ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(slt[0]);
+            this.v4h ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(slt[1]);
+            this.v5l ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(slt[2]);
+            this.v5h ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(slt[3]);
+        }
+        if (personalization !== undefined) {
+            personalization = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(personalization);
+            const pers = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"])(personalization);
+            this.v6l ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(pers[0]);
+            this.v6h ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(pers[1]);
+            this.v7l ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(pers[2]);
+            this.v7h ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(pers[3]);
+        }
+        if (key !== undefined) {
+            // Pad to blockLen and update
+            const tmp = new Uint8Array(this.blockLen);
+            tmp.set(key);
+            this.update(tmp);
+        }
+    }
+    // prettier-ignore
+    get() {
+        let { v0l, v0h, v1l, v1h, v2l, v2h, v3l, v3h, v4l, v4h, v5l, v5h, v6l, v6h, v7l, v7h } = this;
+        return [
+            v0l,
+            v0h,
+            v1l,
+            v1h,
+            v2l,
+            v2h,
+            v3l,
+            v3h,
+            v4l,
+            v4h,
+            v5l,
+            v5h,
+            v6l,
+            v6h,
+            v7l,
+            v7h
+        ];
+    }
+    // prettier-ignore
+    set(v0l, v0h, v1l, v1h, v2l, v2h, v3l, v3h, v4l, v4h, v5l, v5h, v6l, v6h, v7l, v7h) {
+        this.v0l = v0l | 0;
+        this.v0h = v0h | 0;
+        this.v1l = v1l | 0;
+        this.v1h = v1h | 0;
+        this.v2l = v2l | 0;
+        this.v2h = v2h | 0;
+        this.v3l = v3l | 0;
+        this.v3h = v3h | 0;
+        this.v4l = v4l | 0;
+        this.v4h = v4h | 0;
+        this.v5l = v5l | 0;
+        this.v5h = v5h | 0;
+        this.v6l = v6l | 0;
+        this.v6h = v6h | 0;
+        this.v7l = v7l | 0;
+        this.v7h = v7h | 0;
+    }
+    compress(msg, offset, isLast) {
+        this.get().forEach((v, i)=>BBUF[i] = v); // First half from state.
+        BBUF.set(B2B_IV, 16); // Second half from IV.
+        let { h, l } = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fromBig"](BigInt(this.length));
+        BBUF[24] = B2B_IV[8] ^ l; // Low word of the offset.
+        BBUF[25] = B2B_IV[9] ^ h; // High word.
+        // Invert all bits for last block
+        if (isLast) {
+            BBUF[28] = ~BBUF[28];
+            BBUF[29] = ~BBUF[29];
+        }
+        let j = 0;
+        const s = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["BSIGMA"];
+        for(let i = 0; i < 12; i++){
+            G1b(0, 4, 8, 12, msg, offset + 2 * s[j++]);
+            G2b(0, 4, 8, 12, msg, offset + 2 * s[j++]);
+            G1b(1, 5, 9, 13, msg, offset + 2 * s[j++]);
+            G2b(1, 5, 9, 13, msg, offset + 2 * s[j++]);
+            G1b(2, 6, 10, 14, msg, offset + 2 * s[j++]);
+            G2b(2, 6, 10, 14, msg, offset + 2 * s[j++]);
+            G1b(3, 7, 11, 15, msg, offset + 2 * s[j++]);
+            G2b(3, 7, 11, 15, msg, offset + 2 * s[j++]);
+            G1b(0, 5, 10, 15, msg, offset + 2 * s[j++]);
+            G2b(0, 5, 10, 15, msg, offset + 2 * s[j++]);
+            G1b(1, 6, 11, 12, msg, offset + 2 * s[j++]);
+            G2b(1, 6, 11, 12, msg, offset + 2 * s[j++]);
+            G1b(2, 7, 8, 13, msg, offset + 2 * s[j++]);
+            G2b(2, 7, 8, 13, msg, offset + 2 * s[j++]);
+            G1b(3, 4, 9, 14, msg, offset + 2 * s[j++]);
+            G2b(3, 4, 9, 14, msg, offset + 2 * s[j++]);
+        }
+        this.v0l ^= BBUF[0] ^ BBUF[16];
+        this.v0h ^= BBUF[1] ^ BBUF[17];
+        this.v1l ^= BBUF[2] ^ BBUF[18];
+        this.v1h ^= BBUF[3] ^ BBUF[19];
+        this.v2l ^= BBUF[4] ^ BBUF[20];
+        this.v2h ^= BBUF[5] ^ BBUF[21];
+        this.v3l ^= BBUF[6] ^ BBUF[22];
+        this.v3h ^= BBUF[7] ^ BBUF[23];
+        this.v4l ^= BBUF[8] ^ BBUF[24];
+        this.v4h ^= BBUF[9] ^ BBUF[25];
+        this.v5l ^= BBUF[10] ^ BBUF[26];
+        this.v5h ^= BBUF[11] ^ BBUF[27];
+        this.v6l ^= BBUF[12] ^ BBUF[28];
+        this.v6h ^= BBUF[13] ^ BBUF[29];
+        this.v7l ^= BBUF[14] ^ BBUF[30];
+        this.v7h ^= BBUF[15] ^ BBUF[31];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clean"])(BBUF);
+    }
+    destroy() {
+        this.destroyed = true;
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clean"])(this.buffer32);
+        this.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+}
+const blake2b = /* @__PURE__ */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createOptHasher"])((opts)=>new BLAKE2b(opts));
+function compress(s, offset, msg, rounds, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) {
+    let j = 0;
+    for(let i = 0; i < rounds; i++){
+        ({ a: v0, b: v4, c: v8, d: v12 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G1s"])(v0, v4, v8, v12, msg[offset + s[j++]]));
+        ({ a: v0, b: v4, c: v8, d: v12 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G2s"])(v0, v4, v8, v12, msg[offset + s[j++]]));
+        ({ a: v1, b: v5, c: v9, d: v13 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G1s"])(v1, v5, v9, v13, msg[offset + s[j++]]));
+        ({ a: v1, b: v5, c: v9, d: v13 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G2s"])(v1, v5, v9, v13, msg[offset + s[j++]]));
+        ({ a: v2, b: v6, c: v10, d: v14 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G1s"])(v2, v6, v10, v14, msg[offset + s[j++]]));
+        ({ a: v2, b: v6, c: v10, d: v14 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G2s"])(v2, v6, v10, v14, msg[offset + s[j++]]));
+        ({ a: v3, b: v7, c: v11, d: v15 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G1s"])(v3, v7, v11, v15, msg[offset + s[j++]]));
+        ({ a: v3, b: v7, c: v11, d: v15 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G2s"])(v3, v7, v11, v15, msg[offset + s[j++]]));
+        ({ a: v0, b: v5, c: v10, d: v15 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G1s"])(v0, v5, v10, v15, msg[offset + s[j++]]));
+        ({ a: v0, b: v5, c: v10, d: v15 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G2s"])(v0, v5, v10, v15, msg[offset + s[j++]]));
+        ({ a: v1, b: v6, c: v11, d: v12 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G1s"])(v1, v6, v11, v12, msg[offset + s[j++]]));
+        ({ a: v1, b: v6, c: v11, d: v12 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G2s"])(v1, v6, v11, v12, msg[offset + s[j++]]));
+        ({ a: v2, b: v7, c: v8, d: v13 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G1s"])(v2, v7, v8, v13, msg[offset + s[j++]]));
+        ({ a: v2, b: v7, c: v8, d: v13 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G2s"])(v2, v7, v8, v13, msg[offset + s[j++]]));
+        ({ a: v3, b: v4, c: v9, d: v14 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G1s"])(v3, v4, v9, v14, msg[offset + s[j++]]));
+        ({ a: v3, b: v4, c: v9, d: v14 } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["G2s"])(v3, v4, v9, v14, msg[offset + s[j++]]));
+    }
+    return {
+        v0,
+        v1,
+        v2,
+        v3,
+        v4,
+        v5,
+        v6,
+        v7,
+        v8,
+        v9,
+        v10,
+        v11,
+        v12,
+        v13,
+        v14,
+        v15
+    };
+}
+const B2S_IV = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_md$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SHA256_IV"];
+class BLAKE2s extends BLAKE2 {
+    constructor(opts = {}){
+        const olen = opts.dkLen === undefined ? 32 : opts.dkLen;
+        super(64, olen);
+        // Internal state, same as SHA-256
+        this.v0 = B2S_IV[0] | 0;
+        this.v1 = B2S_IV[1] | 0;
+        this.v2 = B2S_IV[2] | 0;
+        this.v3 = B2S_IV[3] | 0;
+        this.v4 = B2S_IV[4] | 0;
+        this.v5 = B2S_IV[5] | 0;
+        this.v6 = B2S_IV[6] | 0;
+        this.v7 = B2S_IV[7] | 0;
+        checkBlake2Opts(olen, opts, 32, 8, 8);
+        let { key, personalization, salt } = opts;
+        let keyLength = 0;
+        if (key !== undefined) {
+            key = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(key);
+            keyLength = key.length;
+        }
+        this.v0 ^= this.outputLen | keyLength << 8 | 0x01 << 16 | 0x01 << 24;
+        if (salt !== undefined) {
+            salt = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(salt);
+            const slt = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"])(salt);
+            this.v4 ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(slt[0]);
+            this.v5 ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(slt[1]);
+        }
+        if (personalization !== undefined) {
+            personalization = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(personalization);
+            const pers = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"])(personalization);
+            this.v6 ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(pers[0]);
+            this.v7 ^= (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap8IfBE"])(pers[1]);
+        }
+        if (key !== undefined) {
+            // Pad to blockLen and update
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["abytes"])(key);
+            const tmp = new Uint8Array(this.blockLen);
+            tmp.set(key);
+            this.update(tmp);
+        }
+    }
+    get() {
+        const { v0, v1, v2, v3, v4, v5, v6, v7 } = this;
+        return [
+            v0,
+            v1,
+            v2,
+            v3,
+            v4,
+            v5,
+            v6,
+            v7
+        ];
+    }
+    // prettier-ignore
+    set(v0, v1, v2, v3, v4, v5, v6, v7) {
+        this.v0 = v0 | 0;
+        this.v1 = v1 | 0;
+        this.v2 = v2 | 0;
+        this.v3 = v3 | 0;
+        this.v4 = v4 | 0;
+        this.v5 = v5 | 0;
+        this.v6 = v6 | 0;
+        this.v7 = v7 | 0;
+    }
+    compress(msg, offset, isLast) {
+        const { h, l } = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fromBig"](BigInt(this.length));
+        // prettier-ignore
+        const { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 } = compress(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_blake$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["BSIGMA"], offset, msg, 10, this.v0, this.v1, this.v2, this.v3, this.v4, this.v5, this.v6, this.v7, B2S_IV[0], B2S_IV[1], B2S_IV[2], B2S_IV[3], l ^ B2S_IV[4], h ^ B2S_IV[5], isLast ? ~B2S_IV[6] : B2S_IV[6], B2S_IV[7]);
+        this.v0 ^= v0 ^ v8;
+        this.v1 ^= v1 ^ v9;
+        this.v2 ^= v2 ^ v10;
+        this.v3 ^= v3 ^ v11;
+        this.v4 ^= v4 ^ v12;
+        this.v5 ^= v5 ^ v13;
+        this.v6 ^= v6 ^ v14;
+        this.v7 ^= v7 ^ v15;
+    }
+    destroy() {
+        this.destroyed = true;
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clean"])(this.buffer32);
+        this.set(0, 0, 0, 0, 0, 0, 0, 0);
+    }
+}
+const blake2s = /* @__PURE__ */ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createOptHasher"])((opts)=>new BLAKE2s(opts)); //# sourceMappingURL=blake2.js.map
+}),
+"[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/blake2b.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "BLAKE2b",
+    ()=>BLAKE2b,
+    "blake2b",
+    ()=>blake2b
+]);
+/**
+ * Blake2b hash function. Focuses on 64-bit platforms, but in JS speed different from Blake2s is negligible.
+ * @module
+ * @deprecated
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$blake2$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/blake2.js [app-ssr] (ecmascript)");
+;
+const BLAKE2b = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$blake2$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["BLAKE2b"];
+const blake2b = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$blake2$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["blake2b"]; //# sourceMappingURL=blake2b.js.map
+}),
+"[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/sha3.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "Keccak",
+    ()=>Keccak,
+    "keccakP",
+    ()=>keccakP,
+    "keccak_224",
+    ()=>keccak_224,
+    "keccak_256",
+    ()=>keccak_256,
+    "keccak_384",
+    ()=>keccak_384,
+    "keccak_512",
+    ()=>keccak_512,
+    "sha3_224",
+    ()=>sha3_224,
+    "sha3_256",
+    ()=>sha3_256,
+    "sha3_384",
+    ()=>sha3_384,
+    "sha3_512",
+    ()=>sha3_512,
+    "shake128",
+    ()=>shake128,
+    "shake256",
+    ()=>shake256
+]);
+/**
+ * SHA3 (keccak) hash function, based on a new "Sponge function" design.
+ * Different from older hashes, the internal state is bigger than output size.
+ *
+ * Check out [FIPS-202](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf),
+ * [Website](https://keccak.team/keccak.html),
+ * [the differences between SHA-3 and Keccak](https://crypto.stackexchange.com/questions/15727/what-are-the-key-differences-between-the-draft-sha-3-standard-and-the-keccak-sub).
+ *
+ * Check out `sha3-addons` module for cSHAKE, k12, and others.
+ * @module
+ */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/_u64.js [app-ssr] (ecmascript)");
+// prettier-ignore
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/snarkjs/node_modules/@noble/hashes/esm/utils.js [app-ssr] (ecmascript)");
+;
+;
+// No __PURE__ annotations in sha3 header:
+// EVERYTHING is in fact used on every export.
+// Various per round constants calculations
+const _0n = BigInt(0);
+const _1n = BigInt(1);
+const _2n = BigInt(2);
+const _7n = BigInt(7);
+const _256n = BigInt(256);
+const _0x71n = BigInt(0x71);
+const SHA3_PI = [];
+const SHA3_ROTL = [];
+const _SHA3_IOTA = [];
+for(let round = 0, R = _1n, x = 1, y = 0; round < 24; round++){
+    // Pi
+    [x, y] = [
+        y,
+        (2 * x + 3 * y) % 5
+    ];
+    SHA3_PI.push(2 * (5 * y + x));
+    // Rotational
+    SHA3_ROTL.push((round + 1) * (round + 2) / 2 % 64);
+    // Iota
+    let t = _0n;
+    for(let j = 0; j < 7; j++){
+        R = (R << _1n ^ (R >> _7n) * _0x71n) % _256n;
+        if (R & _2n) t ^= _1n << (_1n << /* @__PURE__ */ BigInt(j)) - _1n;
+    }
+    _SHA3_IOTA.push(t);
+}
+const IOTAS = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["split"])(_SHA3_IOTA, true);
+const SHA3_IOTA_H = IOTAS[0];
+const SHA3_IOTA_L = IOTAS[1];
+// Left rotation (without 0, 32, 64)
+const rotlH = (h, l, s)=>s > 32 ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotlBH"])(h, l, s) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotlSH"])(h, l, s);
+const rotlL = (h, l, s)=>s > 32 ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotlBL"])(h, l, s) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$_u64$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["rotlSL"])(h, l, s);
+function keccakP(s, rounds = 24) {
+    const B = new Uint32Array(5 * 2);
+    // NOTE: all indices are x2 since we store state as u32 instead of u64 (bigints to slow in js)
+    for(let round = 24 - rounds; round < 24; round++){
+        // Theta θ
+        for(let x = 0; x < 10; x++)B[x] = s[x] ^ s[x + 10] ^ s[x + 20] ^ s[x + 30] ^ s[x + 40];
+        for(let x = 0; x < 10; x += 2){
+            const idx1 = (x + 8) % 10;
+            const idx0 = (x + 2) % 10;
+            const B0 = B[idx0];
+            const B1 = B[idx0 + 1];
+            const Th = rotlH(B0, B1, 1) ^ B[idx1];
+            const Tl = rotlL(B0, B1, 1) ^ B[idx1 + 1];
+            for(let y = 0; y < 50; y += 10){
+                s[x + y] ^= Th;
+                s[x + y + 1] ^= Tl;
+            }
+        }
+        // Rho (ρ) and Pi (π)
+        let curH = s[2];
+        let curL = s[3];
+        for(let t = 0; t < 24; t++){
+            const shift = SHA3_ROTL[t];
+            const Th = rotlH(curH, curL, shift);
+            const Tl = rotlL(curH, curL, shift);
+            const PI = SHA3_PI[t];
+            curH = s[PI];
+            curL = s[PI + 1];
+            s[PI] = Th;
+            s[PI + 1] = Tl;
+        }
+        // Chi (χ)
+        for(let y = 0; y < 50; y += 10){
+            for(let x = 0; x < 10; x++)B[x] = s[y + x];
+            for(let x = 0; x < 10; x++)s[y + x] ^= ~B[(x + 2) % 10] & B[(x + 4) % 10];
+        }
+        // Iota (ι)
+        s[0] ^= SHA3_IOTA_H[round];
+        s[1] ^= SHA3_IOTA_L[round];
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clean"])(B);
+}
+class Keccak extends __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Hash"] {
+    // NOTE: we accept arguments in bytes instead of bits here.
+    constructor(blockLen, suffix, outputLen, enableXOF = false, rounds = 24){
+        super();
+        this.pos = 0;
+        this.posOut = 0;
+        this.finished = false;
+        this.destroyed = false;
+        this.enableXOF = false;
+        this.blockLen = blockLen;
+        this.suffix = suffix;
+        this.outputLen = outputLen;
+        this.enableXOF = enableXOF;
+        this.rounds = rounds;
+        // Can be passed from user as dkLen
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["anumber"])(outputLen);
+        // 1600 = 5x5 matrix of 64bit.  1600 bits === 200 bytes
+        // 0 < blockLen < 200
+        if (!(0 < blockLen && blockLen < 200)) throw new Error('only keccak-f1600 function is supported');
+        this.state = new Uint8Array(200);
+        this.state32 = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"])(this.state);
+    }
+    clone() {
+        return this._cloneInto();
+    }
+    keccak() {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap32IfBE"])(this.state32);
+        keccakP(this.state32, this.rounds);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["swap32IfBE"])(this.state32);
+        this.posOut = 0;
+        this.pos = 0;
+    }
+    update(data) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aexists"])(this);
+        data = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toBytes"])(data);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["abytes"])(data);
+        const { blockLen, state } = this;
+        const len = data.length;
+        for(let pos = 0; pos < len;){
+            const take = Math.min(blockLen - this.pos, len - pos);
+            for(let i = 0; i < take; i++)state[this.pos++] ^= data[pos++];
+            if (this.pos === blockLen) this.keccak();
+        }
+        return this;
+    }
+    finish() {
+        if (this.finished) return;
+        this.finished = true;
+        const { state, suffix, pos, blockLen } = this;
+        // Do the padding
+        state[pos] ^= suffix;
+        if ((suffix & 0x80) !== 0 && pos === blockLen - 1) this.keccak();
+        state[blockLen - 1] ^= 0x80;
+        this.keccak();
+    }
+    writeInto(out) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aexists"])(this, false);
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["abytes"])(out);
+        this.finish();
+        const bufferOut = this.state;
+        const { blockLen } = this;
+        for(let pos = 0, len = out.length; pos < len;){
+            if (this.posOut >= blockLen) this.keccak();
+            const take = Math.min(blockLen - this.posOut, len - pos);
+            out.set(bufferOut.subarray(this.posOut, this.posOut + take), pos);
+            this.posOut += take;
+            pos += take;
+        }
+        return out;
+    }
+    xofInto(out) {
+        // Sha3/Keccak usage with XOF is probably mistake, only SHAKE instances can do XOF
+        if (!this.enableXOF) throw new Error('XOF is not possible for this instance');
+        return this.writeInto(out);
+    }
+    xof(bytes) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["anumber"])(bytes);
+        return this.xofInto(new Uint8Array(bytes));
+    }
+    digestInto(out) {
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["aoutput"])(out, this);
+        if (this.finished) throw new Error('digest() was already called');
+        this.writeInto(out);
+        this.destroy();
+        return out;
+    }
+    digest() {
+        return this.digestInto(new Uint8Array(this.outputLen));
+    }
+    destroy() {
+        this.destroyed = true;
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clean"])(this.state);
+    }
+    _cloneInto(to) {
+        const { blockLen, suffix, outputLen, rounds, enableXOF } = this;
+        to || (to = new Keccak(blockLen, suffix, outputLen, enableXOF, rounds));
+        to.state32.set(this.state32);
+        to.pos = this.pos;
+        to.posOut = this.posOut;
+        to.finished = this.finished;
+        to.rounds = rounds;
+        // Suffix can change in cSHAKE
+        to.suffix = suffix;
+        to.outputLen = outputLen;
+        to.enableXOF = enableXOF;
+        to.destroyed = this.destroyed;
+        return to;
+    }
+}
+const gen = (suffix, blockLen, outputLen)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createHasher"])(()=>new Keccak(blockLen, suffix, outputLen));
+const sha3_224 = /* @__PURE__ */ (()=>gen(0x06, 144, 224 / 8))();
+const sha3_256 = /* @__PURE__ */ (()=>gen(0x06, 136, 256 / 8))();
+const sha3_384 = /* @__PURE__ */ (()=>gen(0x06, 104, 384 / 8))();
+const sha3_512 = /* @__PURE__ */ (()=>gen(0x06, 72, 512 / 8))();
+const keccak_224 = /* @__PURE__ */ (()=>gen(0x01, 144, 224 / 8))();
+const keccak_256 = /* @__PURE__ */ (()=>gen(0x01, 136, 256 / 8))();
+const keccak_384 = /* @__PURE__ */ (()=>gen(0x01, 104, 384 / 8))();
+const keccak_512 = /* @__PURE__ */ (()=>gen(0x01, 72, 512 / 8))();
+const genShake = (suffix, blockLen, outputLen)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$snarkjs$2f$node_modules$2f40$noble$2f$hashes$2f$esm$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createXOFer"])((opts = {})=>new Keccak(blockLen, suffix, opts.dkLen === undefined ? outputLen : opts.dkLen, true));
+const shake128 = /* @__PURE__ */ (()=>genShake(0x1f, 168, 128 / 8))();
+const shake256 = /* @__PURE__ */ (()=>genShake(0x1f, 136, 256 / 8))(); //# sourceMappingURL=sha3.js.map
+}),
+"[project]/node_modules/@swc/helpers/cjs/_interop_require_default.cjs [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+function _interop_require_default(obj) {
+    return obj && obj.__esModule ? obj : {
+        default: obj
+    };
+}
+exports._ = _interop_require_default;
+}),
+"[project]/node_modules/next/dist/shared/lib/lazy-dynamic/dynamic-bailout-to-csr.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "BailoutToCSR", {
+    enumerable: true,
+    get: function() {
+        return BailoutToCSR;
+    }
+});
+const _bailouttocsr = __turbopack_context__.r("[project]/node_modules/next/dist/shared/lib/lazy-dynamic/bailout-to-csr.js [app-ssr] (ecmascript)");
+function BailoutToCSR({ reason, children }) {
+    if ("TURBOPACK compile-time truthy", 1) {
+        throw Object.defineProperty(new _bailouttocsr.BailoutToCSRError(reason), "__NEXT_ERROR_CODE", {
+            value: "E394",
+            enumerable: false,
+            configurable: true
+        });
+    }
+    return children;
+} //# sourceMappingURL=dynamic-bailout-to-csr.js.map
+}),
+"[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-dom.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+module.exports = __turbopack_context__.r("[project]/node_modules/next/dist/server/route-modules/app-page/module.compiled.js [app-ssr] (ecmascript)").vendored['react-ssr'].ReactDOM; //# sourceMappingURL=react-dom.js.map
+}),
+"[project]/node_modules/next/dist/shared/lib/encode-uri-path.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "encodeURIPath", {
+    enumerable: true,
+    get: function() {
+        return encodeURIPath;
+    }
+});
+function encodeURIPath(file) {
+    return file.split('/').map((p)=>encodeURIComponent(p)).join('/');
+} //# sourceMappingURL=encode-uri-path.js.map
+}),
+"[project]/node_modules/next/dist/shared/lib/lazy-dynamic/preload-chunks.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "PreloadChunks", {
+    enumerable: true,
+    get: function() {
+        return PreloadChunks;
+    }
+});
+const _jsxruntime = __turbopack_context__.r("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-runtime.js [app-ssr] (ecmascript)");
+const _reactdom = __turbopack_context__.r("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-dom.js [app-ssr] (ecmascript)");
+const _workasyncstorageexternal = __turbopack_context__.r("[externals]/next/dist/server/app-render/work-async-storage.external.js [external] (next/dist/server/app-render/work-async-storage.external.js, cjs)");
+const _encodeuripath = __turbopack_context__.r("[project]/node_modules/next/dist/shared/lib/encode-uri-path.js [app-ssr] (ecmascript)");
+const _deploymentid = __turbopack_context__.r("[project]/node_modules/next/dist/shared/lib/deployment-id.js [app-ssr] (ecmascript)");
+function PreloadChunks({ moduleIds }) {
+    // Early return in client compilation and only load requestStore on server side
+    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    ;
+    const workStore = _workasyncstorageexternal.workAsyncStorage.getStore();
+    if (workStore === undefined) {
+        return null;
+    }
+    const allFiles = [];
+    // Search the current dynamic call unique key id in react loadable manifest,
+    // and find the corresponding CSS files to preload
+    if (workStore.reactLoadableManifest && moduleIds) {
+        const manifest = workStore.reactLoadableManifest;
+        for (const key of moduleIds){
+            if (!manifest[key]) continue;
+            const chunks = manifest[key].files;
+            allFiles.push(...chunks);
+        }
+    }
+    if (allFiles.length === 0) {
+        return null;
+    }
+    const dplId = (0, _deploymentid.getDeploymentIdQueryOrEmptyString)();
+    return /*#__PURE__*/ (0, _jsxruntime.jsx)(_jsxruntime.Fragment, {
+        children: allFiles.map((chunk)=>{
+            const href = `${workStore.assetPrefix}/_next/${(0, _encodeuripath.encodeURIPath)(chunk)}${dplId}`;
+            const isCss = chunk.endsWith('.css');
+            // If it's stylesheet we use `precedence` o help hoist with React Float.
+            // For stylesheets we actually need to render the CSS because nothing else is going to do it so it needs to be part of the component tree.
+            // The `preload` for stylesheet is not optional.
+            if (isCss) {
+                return /*#__PURE__*/ (0, _jsxruntime.jsx)("link", {
+                    // @ts-ignore
+                    precedence: "dynamic",
+                    href: href,
+                    rel: "stylesheet",
+                    as: "style",
+                    nonce: workStore.nonce
+                }, chunk);
+            } else {
+                // If it's script we use ReactDOM.preload to preload the resources
+                (0, _reactdom.preload)(href, {
+                    as: 'script',
+                    fetchPriority: 'low',
+                    nonce: workStore.nonce
+                });
+                return null;
+            }
+        })
+    });
+} //# sourceMappingURL=preload-chunks.js.map
+}),
+"[project]/node_modules/next/dist/shared/lib/lazy-dynamic/loadable.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "default", {
+    enumerable: true,
+    get: function() {
+        return _default;
+    }
+});
+const _jsxruntime = __turbopack_context__.r("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-runtime.js [app-ssr] (ecmascript)");
+const _react = __turbopack_context__.r("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
+const _dynamicbailouttocsr = __turbopack_context__.r("[project]/node_modules/next/dist/shared/lib/lazy-dynamic/dynamic-bailout-to-csr.js [app-ssr] (ecmascript)");
+const _preloadchunks = __turbopack_context__.r("[project]/node_modules/next/dist/shared/lib/lazy-dynamic/preload-chunks.js [app-ssr] (ecmascript)");
+// Normalize loader to return the module as form { default: Component } for `React.lazy`.
+// Also for backward compatible since next/dynamic allows to resolve a component directly with loader
+// Client component reference proxy need to be converted to a module.
+function convertModule(mod) {
+    // Check "default" prop before accessing it, as it could be client reference proxy that could break it reference.
+    // Cases:
+    // mod: { default: Component }
+    // mod: Component
+    // mod: { default: proxy(Component) }
+    // mod: proxy(Component)
+    const hasDefault = mod && 'default' in mod;
+    return {
+        default: hasDefault ? mod.default : mod
+    };
+}
+const defaultOptions = {
+    loader: ()=>Promise.resolve(convertModule(()=>null)),
+    loading: null,
+    ssr: true
+};
+function Loadable(options) {
+    const opts = {
+        ...defaultOptions,
+        ...options
+    };
+    const Lazy = /*#__PURE__*/ (0, _react.lazy)(()=>opts.loader().then(convertModule));
+    const Loading = opts.loading;
+    function LoadableComponent(props) {
+        const fallbackElement = Loading ? /*#__PURE__*/ (0, _jsxruntime.jsx)(Loading, {
+            isLoading: true,
+            pastDelay: true,
+            error: null
+        }) : null;
+        // If it's non-SSR or provided a loading component, wrap it in a suspense boundary
+        const hasSuspenseBoundary = !opts.ssr || !!opts.loading;
+        const Wrap = hasSuspenseBoundary ? _react.Suspense : _react.Fragment;
+        const wrapProps = hasSuspenseBoundary ? {
+            fallback: fallbackElement
+        } : {};
+        const children = opts.ssr ? /*#__PURE__*/ (0, _jsxruntime.jsxs)(_jsxruntime.Fragment, {
+            children: [
+                ("TURBOPACK compile-time truthy", 1) ? /*#__PURE__*/ (0, _jsxruntime.jsx)(_preloadchunks.PreloadChunks, {
+                    moduleIds: opts.modules
+                }) : "TURBOPACK unreachable",
+                /*#__PURE__*/ (0, _jsxruntime.jsx)(Lazy, {
+                    ...props
+                })
+            ]
+        }) : /*#__PURE__*/ (0, _jsxruntime.jsx)(_dynamicbailouttocsr.BailoutToCSR, {
+            reason: "next/dynamic",
+            children: /*#__PURE__*/ (0, _jsxruntime.jsx)(Lazy, {
+                ...props
+            })
+        });
+        return /*#__PURE__*/ (0, _jsxruntime.jsx)(Wrap, {
+            ...wrapProps,
+            children: children
+        });
+    }
+    LoadableComponent.displayName = 'LoadableComponent';
+    return LoadableComponent;
+}
+const _default = Loadable; //# sourceMappingURL=loadable.js.map
+}),
+"[project]/node_modules/next/dist/shared/lib/app-dynamic.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "default", {
+    enumerable: true,
+    get: function() {
+        return dynamic;
+    }
+});
+const _interop_require_default = __turbopack_context__.r("[project]/node_modules/@swc/helpers/cjs/_interop_require_default.cjs [app-ssr] (ecmascript)");
+const _loadable = /*#__PURE__*/ _interop_require_default._(__turbopack_context__.r("[project]/node_modules/next/dist/shared/lib/lazy-dynamic/loadable.js [app-ssr] (ecmascript)"));
+function dynamic(dynamicOptions, options) {
+    const loadableOptions = {};
+    if (typeof dynamicOptions === 'function') {
+        loadableOptions.loader = dynamicOptions;
+    }
+    const mergedOptions = {
+        ...loadableOptions,
+        ...options
+    };
+    return (0, _loadable.default)({
+        ...mergedOptions,
+        modules: mergedOptions.loadableGenerated?.modules
+    });
+}
+if ((typeof exports.default === 'function' || typeof exports.default === 'object' && exports.default !== null) && typeof exports.default.__esModule === 'undefined') {
+    Object.defineProperty(exports.default, '__esModule', {
+        value: true
+    });
+    Object.assign(exports.default, exports);
+    module.exports = exports.default;
+} //# sourceMappingURL=app-dynamic.js.map
+}),
+"[project]/node_modules/web-worker/cjs/node.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+
+/**
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ const URL = __turbopack_context__.r("[externals]/url [external] (url, cjs)");
+const VM = __turbopack_context__.r("[externals]/vm [external] (vm, cjs)");
+const threads = __turbopack_context__.r("[externals]/worker_threads [external] (worker_threads, cjs)");
+const WORKER = Symbol.for('worker');
+const EVENTS = Symbol.for('events');
+class EventTarget {
+    constructor(){
+        Object.defineProperty(this, EVENTS, {
+            value: new Map()
+        });
+    }
+    dispatchEvent(event) {
+        event.target = event.currentTarget = this;
+        if (this['on' + event.type]) {
+            try {
+                this['on' + event.type](event);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        const list = this[EVENTS].get(event.type);
+        if (list == null) return;
+        list.forEach((handler)=>{
+            try {
+                handler.call(this, event);
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
+    addEventListener(type, fn) {
+        let events = this[EVENTS].get(type);
+        if (!events) this[EVENTS].set(type, events = []);
+        events.push(fn);
+    }
+    removeEventListener(type, fn) {
+        let events = this[EVENTS].get(type);
+        if (events) {
+            const index = events.indexOf(fn);
+            if (index !== -1) events.splice(index, 1);
+        }
+    }
+}
+function Event(type, target) {
+    this.type = type;
+    this.timeStamp = Date.now();
+    this.target = this.currentTarget = this.data = null;
+} // this module is used self-referentially on both sides of the
+// thread boundary, but behaves differently in each context.
+module.exports = threads.isMainThread ? mainThread() : workerThread();
+const baseUrl = URL.pathToFileURL(process.cwd() + '/');
+function mainThread() {
+    /**
+   * A web-compatible Worker implementation atop Node's worker_threads.
+   *  - uses DOM-style events (Event.data, Event.type, etc)
+   *  - supports event handler properties (worker.onmessage)
+   *  - Worker() constructor accepts a module URL
+   *  - accepts the {type:'module'} option
+   *  - emulates WorkerGlobalScope within the worker
+   * @param {string} url  The URL or module specifier to load
+   * @param {object} [options]  Worker construction options
+   * @param {string} [options.name]  Available as `self.name` within the Worker
+   * @param {string} [options.type="classic"]  Pass "module" to create a Module Worker.
+   */ class Worker extends EventTarget {
+        constructor(url, options){
+            super();
+            const { name, type } = options || {};
+            url += '';
+            let mod;
+            if (/^data:/.test(url)) {
+                mod = url;
+            } else {
+                mod = URL.fileURLToPath(new URL.URL(url, baseUrl));
+            }
+            const worker = new threads.Worker(("TURBOPACK compile-time value", "/ROOT/node_modules/web-worker/cjs/node.js"), {
+                workerData: {
+                    mod,
+                    name,
+                    type
+                }
+            });
+            Object.defineProperty(this, WORKER, {
+                value: worker
+            });
+            worker.on('message', (data)=>{
+                const event = new Event('message');
+                event.data = data;
+                this.dispatchEvent(event);
+            });
+            worker.on('error', (error)=>{
+                error.type = 'error';
+                this.dispatchEvent(error);
+            });
+            worker.on('exit', ()=>{
+                this.dispatchEvent(new Event('close'));
+            });
+        }
+        postMessage(data, transferList) {
+            this[WORKER].postMessage(data, transferList);
+        }
+        terminate() {
+            this[WORKER].terminate();
+        }
+    }
+    Worker.prototype.onmessage = Worker.prototype.onerror = Worker.prototype.onclose = null;
+    return Worker;
+}
+function workerThread() {
+    let { mod, name, type } = threads.workerData; // turn global into a mock WorkerGlobalScope
+    const self = /*TURBOPACK member replacement*/ __turbopack_context__.g.self = /*TURBOPACK member replacement*/ __turbopack_context__.g; // enqueue messages to dispatch after modules are loaded
+    let q = [];
+    function flush() {
+        const buffered = q;
+        q = null;
+        buffered.forEach((event)=>{
+            self.dispatchEvent(event);
+        });
+    }
+    threads.parentPort.on('message', (data)=>{
+        const event = new Event('message');
+        event.data = data;
+        if (q == null) self.dispatchEvent(event);
+        else q.push(event);
+    });
+    threads.parentPort.on('error', (err)=>{
+        err.type = 'Error';
+        self.dispatchEvent(err);
+    });
+    class WorkerGlobalScope extends EventTarget {
+        postMessage(data, transferList) {
+            threads.parentPort.postMessage(data, transferList);
+        }
+        close() {
+            process.exit();
+        }
+    }
+    let proto = Object.getPrototypeOf(/*TURBOPACK member replacement*/ __turbopack_context__.g);
+    delete proto.constructor;
+    Object.defineProperties(WorkerGlobalScope.prototype, proto);
+    proto = Object.setPrototypeOf(/*TURBOPACK member replacement*/ __turbopack_context__.g, new WorkerGlobalScope());
+    [
+        'postMessage',
+        'addEventListener',
+        'removeEventListener',
+        'dispatchEvent'
+    ].forEach((fn)=>{
+        proto[fn] = proto[fn].bind(/*TURBOPACK member replacement*/ __turbopack_context__.g);
+    });
+    /*TURBOPACK member replacement*/ __turbopack_context__.g.name = name;
+    const isDataUrl = /^data:/.test(mod);
+    if (type === 'module') {
+        Promise.resolve().then(()=>{
+            const e = new Error("Cannot find module as expression is too dynamic");
+            e.code = 'MODULE_NOT_FOUND';
+            throw e;
+        }).catch((err)=>{
+            if (isDataUrl && err.message === 'Not supported') {
+                console.warn('Worker(): Importing data: URLs requires Node 12.10+. Falling back to classic worker.');
+                return evaluateDataUrl(mod, name);
+            }
+            console.error(err);
+        }).then(flush);
+    } else {
+        try {
+            if (/^data:/.test(mod)) {
+                evaluateDataUrl(mod, name);
+            } else {
+                (()=>{
+                    const e = new Error("Cannot find module as expression is too dynamic");
+                    e.code = 'MODULE_NOT_FOUND';
+                    throw e;
+                })();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+        Promise.resolve().then(flush);
+    }
+}
+function evaluateDataUrl(url, name) {
+    const { data } = parseDataUrl(url);
+    return VM.runInThisContext(data, {
+        filename: 'worker.<' + (name || 'data:') + '>'
+    });
+}
+function parseDataUrl(url) {
+    let [m, type, encoding, data] = url.match(/^data: *([^;,]*)(?: *; *([^,]*))? *,(.*)$/) || [];
+    if (!m) throw Error('Invalid Data URL.');
+    if (encoding) switch(encoding.toLowerCase()){
+        case 'base64':
+            data = Buffer.from(data, 'base64').toString();
+            break;
+        default:
+            throw Error('Unknown Data URL encoding "' + encoding + '"');
+    }
+    return {
+        type,
+        data
+    };
+}
+}),
+"[project]/node_modules/wasmbuilder/src/utils.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of wasmbuilder
+
+    wasmbuilder is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    wasmbuilder is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with wasmbuilder. If not, see <https://www.gnu.org/licenses/>.
+*/ __turbopack_context__.s([
+    "bitLength",
+    ()=>bitLength,
+    "ident",
+    ()=>ident,
+    "isNegative",
+    ()=>isNegative,
+    "isZero",
+    ()=>isZero,
+    "string",
+    ()=>string,
+    "toHexString",
+    ()=>toHexString,
+    "toNumber",
+    ()=>toNumber,
+    "toUTF8Array",
+    ()=>toUTF8Array,
+    "u32",
+    ()=>u32,
+    "u64",
+    ()=>u64,
+    "varint",
+    ()=>varint,
+    "varint32",
+    ()=>varint32,
+    "varint64",
+    ()=>varint64,
+    "varuint",
+    ()=>varuint,
+    "varuint32",
+    ()=>varuint32,
+    "varuint64",
+    ()=>varuint64
+]);
+function toNumber(n) {
+    return BigInt(n);
+}
+function isNegative(n) {
+    return n < 0n;
+}
+function isZero(n) {
+    return n === 0n;
+}
+function bitLength(n) {
+    if (isNegative(n)) {
+        return n.toString(2).length - 1; // discard the - sign
+    } else {
+        return n.toString(2).length;
+    }
+}
+function u32(n) {
+    const b = [];
+    const v = toNumber(n);
+    b.push(Number(v & 0xFFn));
+    b.push(Number(v >> 8n & 0xFFn));
+    b.push(Number(v >> 16n & 0xFFn));
+    b.push(Number(v >> 24n & 0xFFn));
+    return b;
+}
+function u64(n) {
+    const b = [];
+    const v = toNumber(n);
+    b.push(Number(v & 0xFFn));
+    b.push(Number(v >> 8n & 0xFFn));
+    b.push(Number(v >> 16n & 0xFFn));
+    b.push(Number(v >> 24n & 0xFFn));
+    b.push(Number(v >> 32n & 0xFFn));
+    b.push(Number(v >> 40n & 0xFFn));
+    b.push(Number(v >> 48n & 0xFFn));
+    b.push(Number(v >> 56n & 0xFFn));
+    return b;
+}
+function toUTF8Array(str) {
+    var utf8 = [];
+    for(var i = 0; i < str.length; i++){
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+            utf8.push(0xc0 | charcode >> 6, 0x80 | charcode & 0x3f);
+        } else if (charcode < 0xd800 || charcode >= 0xe000) {
+            utf8.push(0xe0 | charcode >> 12, 0x80 | charcode >> 6 & 0x3f, 0x80 | charcode & 0x3f);
+        } else {
+            i++;
+            // UTF-16 encodes 0x10000-0x10FFFF by
+            // subtracting 0x10000 and splitting the
+            // 20 bits of 0x0-0xFFFFF into two halves
+            charcode = 0x10000 + ((charcode & 0x3ff) << 10 | str.charCodeAt(i) & 0x3ff);
+            utf8.push(0xf0 | charcode >> 18, 0x80 | charcode >> 12 & 0x3f, 0x80 | charcode >> 6 & 0x3f, 0x80 | charcode & 0x3f);
+        }
+    }
+    return utf8;
+}
+function string(str) {
+    const bytes = toUTF8Array(str);
+    return [
+        ...varuint32(bytes.length),
+        ...bytes
+    ];
+}
+function varuint(n) {
+    const code = [];
+    let v = toNumber(n);
+    if (isNegative(v)) throw new Error("Number cannot be negative");
+    while(!isZero(v)){
+        code.push(Number(v & 0x7Fn));
+        v = v >> 7n;
+    }
+    if (code.length == 0) code.push(0);
+    for(let i = 0; i < code.length - 1; i++){
+        code[i] = code[i] | 0x80;
+    }
+    return code;
+}
+function varint(_n) {
+    let n, sign;
+    const bits = bitLength(_n);
+    if (_n < 0) {
+        sign = true;
+        n = (1n << BigInt(bits)) + _n;
+    } else {
+        sign = false;
+        n = toNumber(_n);
+    }
+    const paddingBits = 7 - bits % 7;
+    const padding = (1n << BigInt(paddingBits)) - 1n << BigInt(bits);
+    const paddingMask = (1 << 7 - paddingBits) - 1 | 0x80;
+    const code = varuint(n + padding);
+    if (!sign) {
+        code[code.length - 1] = code[code.length - 1] & paddingMask;
+    }
+    return code;
+}
+function varint32(n) {
+    let v = toNumber(n);
+    if (v > 0xFFFFFFFFn) throw new Error("Number too big");
+    if (v > 0x7FFFFFFFn) v = v - 0x100000000n;
+    // bigInt("-80000000", 16) as base10
+    if (v < -2147483648n) throw new Error("Number too small");
+    return varint(v);
+}
+function varint64(n) {
+    let v = toNumber(n);
+    if (v > 0xFFFFFFFFFFFFFFFFn) throw new Error("Number too big");
+    if (v > 0x7FFFFFFFFFFFFFFFn) v = v - 0x10000000000000000n;
+    // bigInt("-8000000000000000", 16) as base10
+    if (v < -9223372036854775808n) throw new Error("Number too small");
+    return varint(v);
+}
+function varuint32(n) {
+    let v = toNumber(n);
+    if (v > 0xFFFFFFFFn) throw new Error("Number too big");
+    return varuint(v);
+}
+function varuint64(n) {
+    let v = toNumber(n);
+    if (v > 0xFFFFFFFFFFFFFFFFn) throw new Error("Number too big");
+    return varuint(v);
+}
+function toHexString(byteArray) {
+    return Array.from(byteArray, function(byte) {
+        return ("0" + (byte & 0xFF).toString(16)).slice(-2);
+    }).join("");
+}
+function ident(text) {
+    if (typeof text === "string") {
+        let lines = text.split("\n");
+        for(let i = 0; i < lines.length; i++){
+            if (lines[i]) lines[i] = "    " + lines[i];
+        }
+        return lines.join("\n");
+    } else if (Array.isArray(text)) {
+        for(let i = 0; i < text.length; i++){
+            text[i] = ident(text[i]);
+        }
+        return text;
+    }
+}
+}),
+"[project]/node_modules/wasmbuilder/src/codebuilder.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "CodeBuilder",
+    ()=>CodeBuilder
+]);
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of wasmbuilder
+
+    wasmbuilder is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    wasmbuilder is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with wasmbuilder. If not, see <https://www.gnu.org/licenses/>.
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/utils.js [app-ssr] (ecmascript)");
+;
+class CodeBuilder {
+    constructor(func){
+        this.func = func;
+        this.functionName = func.functionName;
+        this.module = func.module;
+    }
+    setLocal(localName, valCode) {
+        const idx = this.func.localIdxByName[localName];
+        if (idx === undefined) throw new Error(`Local Variable not defined: Function: ${this.functionName} local: ${localName} `);
+        return [
+            ...valCode,
+            0x21,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](idx)
+        ];
+    }
+    teeLocal(localName, valCode) {
+        const idx = this.func.localIdxByName[localName];
+        if (idx === undefined) throw new Error(`Local Variable not defined: Function: ${this.functionName} local: ${localName} `);
+        return [
+            ...valCode,
+            0x22,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](idx)
+        ];
+    }
+    getLocal(localName) {
+        const idx = this.func.localIdxByName[localName];
+        if (idx === undefined) throw new Error(`Local Variable not defined: Function: ${this.functionName} local: ${localName} `);
+        return [
+            0x20,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](idx)
+        ];
+    }
+    i64_load8_s(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 0 : _align; // 8 bits alignment by default
+        return [
+            ...idxCode,
+            0x30,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_load8_u(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 0 : _align; // 8 bits alignment by default
+        return [
+            ...idxCode,
+            0x31,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_load16_s(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 1 : _align; // 16 bits alignment by default
+        return [
+            ...idxCode,
+            0x32,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_load16_u(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 1 : _align; // 16 bits alignment by default
+        return [
+            ...idxCode,
+            0x33,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_load32_s(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 2 : _align; // 32 bits alignment by default
+        return [
+            ...idxCode,
+            0x34,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_load32_u(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 2 : _align; // 32 bits alignment by default
+        return [
+            ...idxCode,
+            0x35,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_load(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 3 : _align; // 64 bits alignment by default
+        return [
+            ...idxCode,
+            0x29,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_store(idxCode, _offset, _align, _codeVal) {
+        let offset, align, codeVal;
+        if (Array.isArray(_offset)) {
+            offset = 0;
+            align = 3;
+            codeVal = _offset;
+        } else if (Array.isArray(_align)) {
+            offset = _offset;
+            align = 3;
+            codeVal = _align;
+        } else if (Array.isArray(_codeVal)) {
+            offset = _offset;
+            align = _align;
+            codeVal = _codeVal;
+        }
+        return [
+            ...idxCode,
+            ...codeVal,
+            0x37,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_store32(idxCode, _offset, _align, _codeVal) {
+        let offset, align, codeVal;
+        if (Array.isArray(_offset)) {
+            offset = 0;
+            align = 2;
+            codeVal = _offset;
+        } else if (Array.isArray(_align)) {
+            offset = _offset;
+            align = 2;
+            codeVal = _align;
+        } else if (Array.isArray(_codeVal)) {
+            offset = _offset;
+            align = _align;
+            codeVal = _codeVal;
+        }
+        return [
+            ...idxCode,
+            ...codeVal,
+            0x3e,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_store16(idxCode, _offset, _align, _codeVal) {
+        let offset, align, codeVal;
+        if (Array.isArray(_offset)) {
+            offset = 0;
+            align = 1;
+            codeVal = _offset;
+        } else if (Array.isArray(_align)) {
+            offset = _offset;
+            align = 1;
+            codeVal = _align;
+        } else if (Array.isArray(_codeVal)) {
+            offset = _offset;
+            align = _align;
+            codeVal = _codeVal;
+        }
+        return [
+            ...idxCode,
+            ...codeVal,
+            0x3d,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i64_store8(idxCode, _offset, _align, _codeVal) {
+        let offset, align, codeVal;
+        if (Array.isArray(_offset)) {
+            offset = 0;
+            align = 0;
+            codeVal = _offset;
+        } else if (Array.isArray(_align)) {
+            offset = _offset;
+            align = 0;
+            codeVal = _align;
+        } else if (Array.isArray(_codeVal)) {
+            offset = _offset;
+            align = _align;
+            codeVal = _codeVal;
+        }
+        return [
+            ...idxCode,
+            ...codeVal,
+            0x3c,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i32_load8_s(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 0 : _align; // 32 bits alignment by default
+        return [
+            ...idxCode,
+            0x2c,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i32_load8_u(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 0 : _align; // 32 bits alignment by default
+        return [
+            ...idxCode,
+            0x2d,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i32_load16_s(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 1 : _align; // 32 bits alignment by default
+        return [
+            ...idxCode,
+            0x2e,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i32_load16_u(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 1 : _align; // 32 bits alignment by default
+        return [
+            ...idxCode,
+            0x2f,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i32_load(idxCode, _offset, _align) {
+        const offset = _offset || 0;
+        const align = _align === undefined ? 2 : _align; // 32 bits alignment by default
+        return [
+            ...idxCode,
+            0x28,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i32_store(idxCode, _offset, _align, _codeVal) {
+        let offset, align, codeVal;
+        if (Array.isArray(_offset)) {
+            offset = 0;
+            align = 2;
+            codeVal = _offset;
+        } else if (Array.isArray(_align)) {
+            offset = _offset;
+            align = 2;
+            codeVal = _align;
+        } else if (Array.isArray(_codeVal)) {
+            offset = _offset;
+            align = _align;
+            codeVal = _codeVal;
+        }
+        return [
+            ...idxCode,
+            ...codeVal,
+            0x36,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i32_store16(idxCode, _offset, _align, _codeVal) {
+        let offset, align, codeVal;
+        if (Array.isArray(_offset)) {
+            offset = 0;
+            align = 1;
+            codeVal = _offset;
+        } else if (Array.isArray(_align)) {
+            offset = _offset;
+            align = 1;
+            codeVal = _align;
+        } else if (Array.isArray(_codeVal)) {
+            offset = _offset;
+            align = _align;
+            codeVal = _codeVal;
+        }
+        return [
+            ...idxCode,
+            ...codeVal,
+            0x3b,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    i32_store8(idxCode, _offset, _align, _codeVal) {
+        let offset, align, codeVal;
+        if (Array.isArray(_offset)) {
+            offset = 0;
+            align = 0;
+            codeVal = _offset;
+        } else if (Array.isArray(_align)) {
+            offset = _offset;
+            align = 0;
+            codeVal = _align;
+        } else if (Array.isArray(_codeVal)) {
+            offset = _offset;
+            align = _align;
+            codeVal = _codeVal;
+        }
+        return [
+            ...idxCode,
+            ...codeVal,
+            0x3a,
+            align,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](offset)
+        ];
+    }
+    call(fnName, ...args) {
+        const idx = this.module.functionIdxByName[fnName];
+        if (idx === undefined) throw new Error(`Function not defined: Function: ${fnName}`);
+        return [
+            ...[].concat(...args),
+            0x10,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](idx)
+        ];
+    }
+    call_indirect(fnIdx, ...args) {
+        return [
+            ...[].concat(...args),
+            ...fnIdx,
+            0x11,
+            0,
+            0
+        ];
+    }
+    if(condCode, thenCode, elseCode) {
+        if (elseCode) {
+            return [
+                ...condCode,
+                0x04,
+                0x40,
+                ...thenCode,
+                0x05,
+                ...elseCode,
+                0x0b
+            ];
+        } else {
+            return [
+                ...condCode,
+                0x04,
+                0x40,
+                ...thenCode,
+                0x0b
+            ];
+        }
+    }
+    block(bCode) {
+        return [
+            0x02,
+            0x40,
+            ...bCode,
+            0x0b
+        ];
+    }
+    loop(...args) {
+        return [
+            0x03,
+            0x40,
+            ...[].concat(...[
+                ...args
+            ]),
+            0x0b
+        ];
+    }
+    br_if(relPath, condCode) {
+        return [
+            ...condCode,
+            0x0d,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](relPath)
+        ];
+    }
+    br(relPath) {
+        return [
+            0x0c,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](relPath)
+        ];
+    }
+    ret(rCode) {
+        return [
+            ...rCode,
+            0x0f
+        ];
+    }
+    drop(dCode) {
+        return [
+            ...dCode,
+            0x1a
+        ];
+    }
+    i64_const(num) {
+        return [
+            0x42,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varint64"](num)
+        ];
+    }
+    i32_const(num) {
+        return [
+            0x41,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varint32"](num)
+        ];
+    }
+    i64_eqz(opcode) {
+        return [
+            ...opcode,
+            0x50
+        ];
+    }
+    i64_eq(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x51
+        ];
+    }
+    i64_ne(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x52
+        ];
+    }
+    i64_lt_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x53
+        ];
+    }
+    i64_lt_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x54
+        ];
+    }
+    i64_gt_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x55
+        ];
+    }
+    i64_gt_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x56
+        ];
+    }
+    i64_le_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x57
+        ];
+    }
+    i64_le_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x58
+        ];
+    }
+    i64_ge_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x59
+        ];
+    }
+    i64_ge_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x5a
+        ];
+    }
+    i64_add(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x7c
+        ];
+    }
+    i64_sub(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x7d
+        ];
+    }
+    i64_mul(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x7e
+        ];
+    }
+    i64_div_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x7f
+        ];
+    }
+    i64_div_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x80
+        ];
+    }
+    i64_rem_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x81
+        ];
+    }
+    i64_rem_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x82
+        ];
+    }
+    i64_and(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x83
+        ];
+    }
+    i64_or(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x84
+        ];
+    }
+    i64_xor(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x85
+        ];
+    }
+    i64_shl(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x86
+        ];
+    }
+    i64_shr_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x87
+        ];
+    }
+    i64_shr_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x88
+        ];
+    }
+    i64_extend_i32_s(op1code) {
+        return [
+            ...op1code,
+            0xac
+        ];
+    }
+    i64_extend_i32_u(op1code) {
+        return [
+            ...op1code,
+            0xad
+        ];
+    }
+    i64_clz(op1code) {
+        return [
+            ...op1code,
+            0x79
+        ];
+    }
+    i64_ctz(op1code) {
+        return [
+            ...op1code,
+            0x7a
+        ];
+    }
+    i32_eqz(op1code) {
+        return [
+            ...op1code,
+            0x45
+        ];
+    }
+    i32_eq(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x46
+        ];
+    }
+    i32_ne(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x47
+        ];
+    }
+    i32_lt_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x48
+        ];
+    }
+    i32_lt_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x49
+        ];
+    }
+    i32_gt_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x4a
+        ];
+    }
+    i32_gt_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x4b
+        ];
+    }
+    i32_le_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x4c
+        ];
+    }
+    i32_le_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x4d
+        ];
+    }
+    i32_ge_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x4e
+        ];
+    }
+    i32_ge_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x4f
+        ];
+    }
+    i32_add(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x6a
+        ];
+    }
+    i32_sub(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x6b
+        ];
+    }
+    i32_mul(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x6c
+        ];
+    }
+    i32_div_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x6d
+        ];
+    }
+    i32_div_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x6e
+        ];
+    }
+    i32_rem_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x6f
+        ];
+    }
+    i32_rem_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x70
+        ];
+    }
+    i32_and(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x71
+        ];
+    }
+    i32_or(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x72
+        ];
+    }
+    i32_xor(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x73
+        ];
+    }
+    i32_shl(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x74
+        ];
+    }
+    i32_shr_s(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x75
+        ];
+    }
+    i32_shr_u(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x76
+        ];
+    }
+    i32_rotl(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x77
+        ];
+    }
+    i32_rotr(op1code, op2code) {
+        return [
+            ...op1code,
+            ...op2code,
+            0x78
+        ];
+    }
+    i32_wrap_i64(op1code) {
+        return [
+            ...op1code,
+            0xa7
+        ];
+    }
+    i32_clz(op1code) {
+        return [
+            ...op1code,
+            0x67
+        ];
+    }
+    i32_ctz(op1code) {
+        return [
+            ...op1code,
+            0x68
+        ];
+    }
+    unreachable() {
+        return [
+            0x0
+        ];
+    }
+    current_memory() {
+        return [
+            0x3f,
+            0
+        ];
+    }
+    comment() {
+        return [];
+    }
+}
+}),
+"[project]/node_modules/wasmbuilder/src/functionbuilder.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "FunctionBuilder",
+    ()=>FunctionBuilder
+]);
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of wasmbuilder
+
+    wasmbuilder is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    wasmbuilder is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with wasmbuilder. If not, see <https://www.gnu.org/licenses/>.
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$codebuilder$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/codebuilder.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/utils.js [app-ssr] (ecmascript)");
+;
+;
+const typeCodes = {
+    "i32": 0x7f,
+    "i64": 0x7e,
+    "f32": 0x7d,
+    "f64": 0x7c,
+    "anyfunc": 0x70,
+    "func": 0x60,
+    "emptyblock": 0x40
+};
+class FunctionBuilder {
+    constructor(module, fnName, fnType, moduleName, fieldName){
+        if (fnType == "import") {
+            this.fnType = "import";
+            this.moduleName = moduleName;
+            this.fieldName = fieldName;
+        } else if (fnType == "internal") {
+            this.fnType = "internal";
+        } else {
+            throw new Error("Invalid function fnType: " + fnType);
+        }
+        this.module = module;
+        this.fnName = fnName;
+        this.params = [];
+        this.locals = [];
+        this.localIdxByName = {};
+        this.code = [];
+        this.returnType = null;
+        this.nextLocal = 0;
+    }
+    addParam(paramName, paramType) {
+        if (this.localIdxByName[paramName]) throw new Error(`param already exists. Function: ${this.fnName}, Param: ${paramName} `);
+        const idx = this.nextLocal++;
+        this.localIdxByName[paramName] = idx;
+        this.params.push({
+            type: paramType
+        });
+    }
+    addLocal(localName, localType, _length) {
+        const length = _length || 1;
+        if (this.localIdxByName[localName]) throw new Error(`local already exists. Function: ${this.fnName}, Param: ${localName} `);
+        const idx = this.nextLocal++;
+        this.localIdxByName[localName] = idx;
+        this.locals.push({
+            type: localType,
+            length: length
+        });
+    }
+    setReturnType(returnType) {
+        if (this.returnType) throw new Error(`returnType already defined. Function: ${this.fnName}`);
+        this.returnType = returnType;
+    }
+    getSignature() {
+        const params = [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.params.length),
+            ...this.params.map((p)=>typeCodes[p.type])
+        ];
+        const returns = this.returnType ? [
+            0x01,
+            typeCodes[this.returnType]
+        ] : [
+            0
+        ];
+        return [
+            0x60,
+            ...params,
+            ...returns
+        ];
+    }
+    getBody() {
+        const locals = this.locals.map((l)=>[
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](l.length),
+                typeCodes[l.type]
+            ]);
+        const body = [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.locals.length),
+            ...[].concat(...locals),
+            ...this.code,
+            0x0b
+        ];
+        return [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](body.length),
+            ...body
+        ];
+    }
+    addCode(...code) {
+        this.code.push(...[].concat(...[
+            ...code
+        ]));
+    }
+    getCodeBuilder() {
+        return new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$codebuilder$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CodeBuilder"](this);
+    }
+}
+}),
+"[project]/node_modules/wasmbuilder/src/modulebuilder.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "ModuleBuilder",
+    ()=>ModuleBuilder
+]);
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of wasmbuilder
+
+    wasmbuilder is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    wasmbuilder is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with wasmbuilder. If not, see <https://www.gnu.org/licenses/>.
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$functionbuilder$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/functionbuilder.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/utils.js [app-ssr] (ecmascript)");
+;
+;
+class ModuleBuilder {
+    constructor(){
+        this.functions = [];
+        this.functionIdxByName = {};
+        this.nImportFunctions = 0;
+        this.nInternalFunctions = 0;
+        this.memory = {
+            pagesSize: 1,
+            moduleName: "env",
+            fieldName: "memory"
+        };
+        this.free = 8;
+        this.datas = [];
+        this.modules = {};
+        this.exports = [];
+        this.functionsTable = [];
+    }
+    build() {
+        this._setSignatures();
+        return new Uint8Array([
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"](0x6d736100),
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"](1),
+            ...this._buildType(),
+            ...this._buildImport(),
+            ...this._buildFunctionDeclarations(),
+            ...this._buildFunctionsTable(),
+            ...this._buildExports(),
+            ...this._buildElements(),
+            ...this._buildCode(),
+            ...this._buildData()
+        ]);
+    }
+    addFunction(fnName) {
+        if (typeof this.functionIdxByName[fnName] !== "undefined") throw new Error(`Function already defined: ${fnName}`);
+        const idx = this.functions.length;
+        this.functionIdxByName[fnName] = idx;
+        this.functions.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$functionbuilder$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FunctionBuilder"](this, fnName, "internal"));
+        this.nInternalFunctions++;
+        return this.functions[idx];
+    }
+    addIimportFunction(fnName, moduleName, _fieldName) {
+        if (typeof this.functionIdxByName[fnName] !== "undefined") throw new Error(`Function already defined: ${fnName}`);
+        if (this.functions.length > 0 && this.functions[this.functions.length - 1].type == "internal") throw new Error(`Import functions must be declared before internal: ${fnName}`);
+        let fieldName = _fieldName || fnName;
+        const idx = this.functions.length;
+        this.functionIdxByName[fnName] = idx;
+        this.functions.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$functionbuilder$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FunctionBuilder"](this, fnName, "import", moduleName, fieldName));
+        this.nImportFunctions++;
+        return this.functions[idx];
+    }
+    setMemory(pagesSize, moduleName, fieldName) {
+        this.memory = {
+            pagesSize: pagesSize,
+            moduleName: moduleName || "env",
+            fieldName: fieldName || "memory"
+        };
+    }
+    exportFunction(fnName, _exportName) {
+        const exportName = _exportName || fnName;
+        if (typeof this.functionIdxByName[fnName] === "undefined") throw new Error(`Function not defined: ${fnName}`);
+        const idx = this.functionIdxByName[fnName];
+        if (exportName != fnName) {
+            this.functionIdxByName[exportName] = idx;
+        }
+        this.exports.push({
+            exportName: exportName,
+            idx: idx
+        });
+    }
+    addFunctionToTable(fnName) {
+        const idx = this.functionIdxByName[fnName];
+        this.functionsTable.push(idx);
+    }
+    addData(offset, bytes) {
+        this.datas.push({
+            offset: offset,
+            bytes: bytes
+        });
+    }
+    alloc(a, b) {
+        let size;
+        let bytes;
+        if ((Array.isArray(a) || ArrayBuffer.isView(a)) && typeof b === "undefined") {
+            size = a.length;
+            bytes = a;
+        } else {
+            size = a;
+            bytes = b;
+        }
+        size = (size - 1 >> 3) + 1 << 3; // Align to 64 bits.
+        const p = this.free;
+        this.free += size;
+        if (bytes) {
+            this.addData(p, bytes);
+        }
+        return p;
+    }
+    allocString(s) {
+        const encoder = new globalThis.TextEncoder();
+        const uint8array = encoder.encode(s);
+        return this.alloc([
+            ...uint8array,
+            0
+        ]);
+    }
+    _setSignatures() {
+        this.signatures = [];
+        const signatureIdxByName = {};
+        if (this.functionsTable.length > 0) {
+            const signature = this.functions[this.functionsTable[0]].getSignature();
+            const signatureName = "s_" + __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toHexString"](signature);
+            signatureIdxByName[signatureName] = 0;
+            this.signatures.push(signature);
+        }
+        for(let i = 0; i < this.functions.length; i++){
+            const signature = this.functions[i].getSignature();
+            const signatureName = "s_" + __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toHexString"](signature);
+            if (typeof signatureIdxByName[signatureName] === "undefined") {
+                signatureIdxByName[signatureName] = this.signatures.length;
+                this.signatures.push(signature);
+            }
+            this.functions[i].signatureIdx = signatureIdxByName[signatureName];
+        }
+    }
+    _buildSection(sectionType, section) {
+        return [
+            sectionType,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](section.length),
+            ...section
+        ];
+    }
+    _buildType() {
+        return this._buildSection(0x01, [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.signatures.length),
+            ...[].concat(...this.signatures)
+        ]);
+    }
+    _buildImport() {
+        const entries = [];
+        entries.push([
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["string"](this.memory.moduleName),
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["string"](this.memory.fieldName),
+            0x02,
+            0x00,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.memory.pagesSize)
+        ]);
+        for(let i = 0; i < this.nImportFunctions; i++){
+            entries.push([
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["string"](this.functions[i].moduleName),
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["string"](this.functions[i].fieldName),
+                0x00,
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.functions[i].signatureIdx)
+            ]);
+        }
+        return this._buildSection(0x02, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](entries.length).concat(...entries));
+    }
+    _buildFunctionDeclarations() {
+        const entries = [];
+        for(let i = this.nImportFunctions; i < this.nImportFunctions + this.nInternalFunctions; i++){
+            entries.push(...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.functions[i].signatureIdx));
+        }
+        return this._buildSection(0x03, [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](entries.length),
+            ...[
+                ...entries
+            ]
+        ]);
+    }
+    _buildFunctionsTable() {
+        if (this.functionsTable.length == 0) return [];
+        return this._buildSection(0x04, [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](1),
+            0x70,
+            0,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.functionsTable.length)
+        ]);
+    }
+    _buildElements() {
+        if (this.functionsTable.length == 0) return [];
+        const entries = [];
+        for(let i = 0; i < this.functionsTable.length; i++){
+            entries.push(...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.functionsTable[i]));
+        }
+        return this._buildSection(0x09, [
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](1),
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](0),
+            0x41,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varint32"](0),
+            0x0b,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.functionsTable.length),
+            ...[
+                ...entries
+            ]
+        ]);
+    }
+    _buildExports() {
+        const entries = [];
+        for(let i = 0; i < this.exports.length; i++){
+            entries.push([
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["string"](this.exports[i].exportName),
+                0x00,
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.exports[i].idx)
+            ]);
+        }
+        return this._buildSection(0x07, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](entries.length).concat(...entries));
+    }
+    _buildCode() {
+        const entries = [];
+        for(let i = this.nImportFunctions; i < this.nImportFunctions + this.nInternalFunctions; i++){
+            entries.push(this.functions[i].getBody());
+        }
+        return this._buildSection(0x0a, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](entries.length).concat(...entries));
+    }
+    _buildData() {
+        const entries = [];
+        entries.push([
+            0x00,
+            0x41,
+            0x00,
+            0x0b,
+            0x04,
+            ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["u32"](this.free)
+        ]);
+        for(let i = 0; i < this.datas.length; i++){
+            entries.push([
+                0x00,
+                0x41,
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varint32"](this.datas[i].offset),
+                0x0b,
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](this.datas[i].bytes.length),
+                ...this.datas[i].bytes
+            ]);
+        }
+        return this._buildSection(0x0b, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["varuint32"](entries.length).concat(...entries));
+    }
+}
+}),
+"[project]/node_modules/wasmbuilder/src/codebuilder_wat.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "CodeBuilderWat",
+    ()=>CodeBuilderWat
+]);
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of wasmbuilder
+
+    wasmbuilder is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    wasmbuilder is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with wasmbuilder. If not, see <https://www.gnu.org/licenses/>.
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/utils.js [app-ssr] (ecmascript)");
+;
+class CodeBuilderWat {
+    constructor(func){
+        this.func = func;
+        this.functionName = func.functionName;
+        this.module = func.module;
+    }
+    setLocal(localName, valCode) {
+        const idx = this.func.localIdxByName[localName];
+        if (idx === undefined) throw new Error(`Local Variable not defined: Function: ${this.functionName} local: ${localName} `);
+        return [
+            valCode,
+            `set_local $${localName}`
+        ];
+    }
+    teeLocal(localName, valCode) {
+        const idx = this.func.localIdxByName[localName];
+        if (idx === undefined) throw new Error(`Local Variable not defined: Function: ${this.functionName} local: ${localName} `);
+        return [
+            valCode,
+            `tee_local $${localName}`
+        ];
+    }
+    getLocal(localName) {
+        const idx = this.func.localIdxByName[localName];
+        if (idx === undefined) throw new Error(`Local Variable not defined: Function: ${this.functionName} local: ${localName} `);
+        return `get_local $${localName}`;
+    }
+    genLoad(inst, def_align, idxCode, _offset, _align) {
+        let S = inst;
+        const offset = _offset || 0;
+        if (offset > 0) S += ` offset=${offset}`;
+        const align = _align === undefined ? def_align : _align; // 8 bits alignment by default
+        if (align != def_align) S += ` align=${1 << align}`;
+        return [
+            idxCode,
+            S
+        ];
+    }
+    genStore(inst, def_align, idxCode, _offset, _align, _codeVal) {
+        let offset, align, codeVal;
+        if (typeof _align === "undefined") {
+            offset = 0;
+            align = def_align;
+            codeVal = _offset;
+        } else if (typeof _codeVal === "undefined") {
+            offset = _offset;
+            align = def_align;
+            codeVal = _align;
+        } else {
+            offset = _offset;
+            align = _align;
+            codeVal = _codeVal;
+        }
+        let S = inst;
+        if (offset > 0) S += ` offset=${offset}`;
+        if (align != def_align) S += ` align=${1 << align}`;
+        return [
+            idxCode,
+            codeVal,
+            S
+        ];
+    }
+    i64_load8_s(idxCode, _offset, _align) {
+        return this.genLoad("i64.load8_s", 0, idxCode, _offset, _align);
+    }
+    i64_load8_u(idxCode, _offset, _align) {
+        return this.genLoad("i64.load8_u", 0, idxCode, _offset, _align);
+    }
+    i64_load16_s(idxCode, _offset, _align) {
+        return this.genLoad("i64.load16_s", 1, idxCode, _offset, _align);
+    }
+    i64_load16_u(idxCode, _offset, _align) {
+        return this.genLoad("i64.load16_u", 1, idxCode, _offset, _align);
+    }
+    i64_load32_s(idxCode, _offset, _align) {
+        return this.genLoad("i64.load32_s", 2, idxCode, _offset, _align);
+    }
+    i64_load32_u(idxCode, _offset, _align) {
+        return this.genLoad("i64.load32_u", 2, idxCode, _offset, _align);
+    }
+    i64_load(idxCode, _offset, _align) {
+        return this.genLoad("i64.load", 3, idxCode, _offset, _align);
+    }
+    i64_store(idxCode, _offset, _align, _codeVal) {
+        return this.genStore("i64.store", 3, idxCode, _offset, _align, _codeVal);
+    }
+    i64_store32(idxCode, _offset, _align, _codeVal) {
+        return this.genStore("i64.store32", 2, idxCode, _offset, _align, _codeVal);
+    }
+    i64_store16(idxCode, _offset, _align, _codeVal) {
+        return this.genStore("i64.store16", 1, idxCode, _offset, _align, _codeVal);
+    }
+    i64_store8(idxCode, _offset, _align, _codeVal) {
+        return this.genStore("i64.store8", 0, idxCode, _offset, _align, _codeVal);
+    }
+    i32_load8_s(idxCode, _offset, _align) {
+        return this.genLoad("i32.load8_s", 0, idxCode, _offset, _align);
+    }
+    i32_load8_u(idxCode, _offset, _align) {
+        return this.genLoad("i32.load8_u", 0, idxCode, _offset, _align);
+    }
+    i32_load16_s(idxCode, _offset, _align) {
+        return this.genLoad("i32.load16_s", 1, idxCode, _offset, _align);
+    }
+    i32_load16_u(idxCode, _offset, _align) {
+        return this.genLoad("i32.load16_u", 1, idxCode, _offset, _align);
+    }
+    i32_load(idxCode, _offset, _align) {
+        return this.genLoad("i32.load", 2, idxCode, _offset, _align);
+    }
+    i32_store(idxCode, _offset, _align, _codeVal) {
+        return this.genStore("i32.store", 2, idxCode, _offset, _align, _codeVal);
+    }
+    i32_store16(idxCode, _offset, _align, _codeVal) {
+        return this.genStore("i32.store16", 1, idxCode, _offset, _align, _codeVal);
+    }
+    i32_store8(idxCode, _offset, _align, _codeVal) {
+        return this.genStore("i32.store8", 0, idxCode, _offset, _align, _codeVal);
+    }
+    call(fnName, ...args) {
+        const idx = this.module.functionIdxByName[fnName];
+        if (idx === undefined) throw new Error(`Function not defined: Function: ${fnName}`);
+        return [
+            args,
+            `call $${fnName}`
+        ];
+    }
+    call_indirect(fnIdx, ...args) {
+        return [
+            args,
+            fnIdx,
+            "call_indirect (type 0)"
+        ];
+    }
+    if(condCode, thenCode, elseCode) {
+        if (elseCode) {
+            return [
+                condCode,
+                "if",
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ident"](thenCode),
+                "else",
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ident"](elseCode),
+                "end"
+            ];
+        } else {
+            return [
+                condCode,
+                "if",
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ident"](thenCode),
+                "end"
+            ];
+        }
+    }
+    block(bCode) {
+        return [
+            "block",
+            __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ident"](bCode),
+            "end"
+        ];
+    }
+    loop(...args) {
+        return [
+            "loop",
+            __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ident"](args),
+            "end"
+        ];
+    }
+    br_if(relPath, condCode) {
+        return [
+            condCode,
+            `br_if ${relPath}`
+        ];
+    }
+    br(relPath) {
+        return `br ${relPath}`;
+    }
+    ret(rCode) {
+        return [
+            rCode,
+            "return"
+        ];
+    }
+    drop(dCode) {
+        return [
+            dCode,
+            "drop"
+        ];
+    }
+    i64_const(num) {
+        return `i64.const ${num}`;
+    }
+    i32_const(num) {
+        return `i32.const ${num}`;
+    }
+    i64_eqz(opcode) {
+        return [
+            opcode,
+            "i64.eqz"
+        ];
+    }
+    i64_eq(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.eq"
+        ];
+    }
+    i64_ne(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.ne"
+        ];
+    }
+    i64_lt_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.lt_s"
+        ];
+    }
+    i64_lt_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.lt_u"
+        ];
+    }
+    i64_gt_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.gt_s"
+        ];
+    }
+    i64_gt_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.gt_u"
+        ];
+    }
+    i64_le_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.le_s"
+        ];
+    }
+    i64_le_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.le_u"
+        ];
+    }
+    i64_ge_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.ge_s"
+        ];
+    }
+    i64_ge_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.ge_u"
+        ];
+    }
+    i64_add(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.add"
+        ];
+    }
+    i64_sub(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.sub"
+        ];
+    }
+    i64_mul(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.mul"
+        ];
+    }
+    i64_div_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.div_s"
+        ];
+    }
+    i64_div_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.div_u"
+        ];
+    }
+    i64_rem_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.rem_s"
+        ];
+    }
+    i64_rem_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.rem_u"
+        ];
+    }
+    i64_and(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.and"
+        ];
+    }
+    i64_or(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.or"
+        ];
+    }
+    i64_xor(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.xor"
+        ];
+    }
+    i64_shl(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.shl"
+        ];
+    }
+    i64_shr_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.shr_s"
+        ];
+    }
+    i64_shr_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i64.shr_u"
+        ];
+    }
+    i64_extend_i32_s(op1code) {
+        return [
+            op1code,
+            "i64.extend_s/i32"
+        ];
+    }
+    i64_extend_i32_u(op1code) {
+        return [
+            op1code,
+            "i64.extend_u/i32"
+        ];
+    }
+    i32_eqz(op1code) {
+        return [
+            op1code,
+            "i32.eqz"
+        ];
+    }
+    i32_eq(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.eq"
+        ];
+    }
+    i32_ne(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.ne"
+        ];
+    }
+    i32_lt_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.lt_s"
+        ];
+    }
+    i32_lt_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.lt_u"
+        ];
+    }
+    i32_gt_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.gt_s"
+        ];
+    }
+    i32_gt_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.gt_u"
+        ];
+    }
+    i32_le_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.le_s"
+        ];
+    }
+    i32_le_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.le_u"
+        ];
+    }
+    i32_ge_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.ge_s"
+        ];
+    }
+    i32_ge_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.ge_u"
+        ];
+    }
+    i32_add(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.add"
+        ];
+    }
+    i32_sub(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.sub"
+        ];
+    }
+    i32_mul(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.mul"
+        ];
+    }
+    i32_div_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.div_s"
+        ];
+    }
+    i32_div_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.div_u"
+        ];
+    }
+    i32_rem_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.rem_s"
+        ];
+    }
+    i32_rem_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.rem_u"
+        ];
+    }
+    i32_and(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.and"
+        ];
+    }
+    i32_or(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.or"
+        ];
+    }
+    i32_xor(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.xor"
+        ];
+    }
+    i32_shl(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.shl"
+        ];
+    }
+    i32_shr_s(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.shr_s"
+        ];
+    }
+    i32_shr_u(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.shr_u"
+        ];
+    }
+    i32_rotl(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.rotl"
+        ];
+    }
+    i32_rotr(op1code, op2code) {
+        return [
+            op1code,
+            op2code,
+            "i32.rotr"
+        ];
+    }
+    i32_wrap_i64(op1code) {
+        return [
+            op1code,
+            "i32.wrap/i64"
+        ];
+    }
+    ureachable() {
+        return "unreachable";
+    }
+    current_memory() {
+        return "current_memory";
+    }
+    comment(c) {
+        return ";; " + c;
+    }
+}
+}),
+"[project]/node_modules/wasmbuilder/src/functionbuilder_wat.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "FunctionBuilderWat",
+    ()=>FunctionBuilderWat
+]);
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of wasmbuilder
+
+    wasmbuilder is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    wasmbuilder is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with wasmbuilder. If not, see <https://www.gnu.org/licenses/>.
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$codebuilder_wat$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/codebuilder_wat.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/utils.js [app-ssr] (ecmascript)");
+;
+;
+class FunctionBuilderWat {
+    constructor(module, fnName, fnType, moduleName, fieldName){
+        if (fnType == "import") {
+            this.fnType = "import";
+            this.moduleName = moduleName;
+            this.fieldName = fieldName;
+        } else if (fnType == "internal") {
+            this.fnType = "internal";
+            this.comment = moduleName;
+        } else {
+            throw new Error("Invalid function fnType: " + fnType);
+        }
+        this.module = module;
+        this.fnName = fnName;
+        this.params = [];
+        this.locals = [];
+        this.localIdxByName = {};
+        this.code = [];
+        this.returnType = null;
+        this.nextLocal = 0;
+    }
+    addParam(paramName, paramType) {
+        if (this.localIdxByName[paramName]) throw new Error(`param already exists. Function: ${this.fnName}, Param: ${paramName} `);
+        const idx = this.nextLocal++;
+        this.localIdxByName[paramName] = idx;
+        this.params.push({
+            type: paramType,
+            name: paramName
+        });
+    }
+    addLocal(localName, localType, _length) {
+        if (typeof _length != "undefined" && _length != 1) {
+            throw new Error("Locals greater than 1 not implemented");
+        }
+        if (this.localIdxByName[localName]) throw new Error(`local already exists. Function: ${this.fnName}, Param: ${localName} `);
+        const idx = this.nextLocal++;
+        this.localIdxByName[localName] = idx;
+        this.locals.push({
+            type: localType,
+            name: localName
+        });
+    }
+    setReturnType(returnType) {
+        if (this.returnType) throw new Error(`returnType already defined. Function: ${this.fnName}`);
+        this.returnType = returnType;
+    }
+    getSignature() {
+        let p = "";
+        for(let i = 0; i < this.params.length; i++){
+            if (i == 0) p += " (param";
+            p += " " + this.params[i].type;
+        }
+        if (p != "") p += ")";
+        let r = "";
+        if (this.returnType) {
+            r += ` (result ${this.returnType})`;
+        }
+        return `(type $${this.getSignatureName()} (func ${p}${r}))`;
+    }
+    getSignatureName() {
+        let s = "_sig_";
+        for(let i = 0; i < this.params.length; i++){
+            s += this.params[i].type;
+        }
+        if (this.returnType) {
+            s += "r" + this.returnType;
+        }
+        return s;
+    }
+    getBody() {
+        const src = [];
+        for(let i = 0; i < this.params.length; i++){
+            src.push(` (param $${this.params[i].name} ${this.params[i].type})`);
+        }
+        if (this.returnType) {
+            src.push(`(result ${this.returnType})`);
+        }
+        for(let i = 0; i < this.locals.length; i++){
+            src.push(` (local $${this.locals[i].name} ${this.locals[i].type})`);
+        }
+        src.push(this.code);
+        let Ss;
+        if (this.comment) {
+            Ss = this.comment.split("\n");
+            for(let i = 0; i < Ss.length; i++){
+                Ss[i] = ";; " + Ss[i];
+            }
+        } else {
+            Ss = [];
+        }
+        return [
+            ...Ss,
+            `(func $${this.fnName} (type $${this.getSignatureName()})`,
+            __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ident"](src),
+            ")"
+        ];
+    }
+    addCode(...code) {
+        this.code.push(code);
+    }
+    getCodeBuilder() {
+        return new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$codebuilder_wat$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CodeBuilderWat"](this);
+    }
+}
+}),
+"[project]/node_modules/wasmbuilder/src/modulebuilder_wat.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "ModuleBuilderWat",
+    ()=>ModuleBuilderWat
+]);
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of wasmbuilder
+
+    wasmbuilder is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    wasmbuilder is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with wasmbuilder. If not, see <https://www.gnu.org/licenses/>.
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$functionbuilder_wat$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/functionbuilder_wat.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/utils.js [app-ssr] (ecmascript)");
+;
+;
+class ModuleBuilderWat {
+    constructor(){
+        this.functions = [];
+        this.functionIdxByName = {};
+        this.nImportFunctions = 0;
+        this.nInternalFunctions = 0;
+        this.memory = {
+            pagesSize: 1,
+            moduleName: "env",
+            fieldName: "memory"
+        };
+        this.free = 8;
+        this.datas = [];
+        this.modules = {};
+        this.exports = [];
+        this.functionsTable = [];
+    }
+    build() {
+        const src = [];
+        this._setSignatures();
+        src.push(this._buildType());
+        src.push(this._buildImport());
+        if (this.functionsTable.length > 0) {
+            src.push(this._buildFunctionsTable());
+        }
+        if (this.exports.length > 0) {
+            src.push(this._buildExports());
+        }
+        if (this.functionsTable.length > 0) {
+            src.push(this._buildElements());
+        }
+        if (this.nInternalFunctions > 0) {
+            src.push(this._buildFunctions());
+        }
+        src.push(this._buildData());
+        return [
+            "(module",
+            __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ident"](src),
+            ")"
+        ];
+    }
+    addFunction(fnName, comment) {
+        if (typeof this.functionIdxByName[fnName] !== "undefined") throw new Error(`Function already defined: ${fnName}`);
+        const idx = this.functions.length;
+        this.functionIdxByName[fnName] = idx;
+        this.functions.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$functionbuilder_wat$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FunctionBuilderWat"](this, fnName, "internal", comment));
+        this.nInternalFunctions++;
+        return this.functions[idx];
+    }
+    addIimportFunction(fnName, moduleName, _fieldName) {
+        if (typeof this.functionIdxByName[fnName] !== "undefined") throw new Error(`Function already defined: ${fnName}`);
+        if (this.functions.length > 0 && this.functions[this.functions.length - 1].type == "internal") throw new Error(`Import functions must be declared before internal: ${fnName}`);
+        let fieldName = _fieldName || fnName;
+        const idx = this.functions.length;
+        this.functionIdxByName[fnName] = idx;
+        this.functions.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$functionbuilder_wat$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FunctionBuilderWat"](this, fnName, "import", moduleName, fieldName));
+        this.nImportFunctions++;
+        return this.functions[idx];
+    }
+    setMemory(pagesSize, moduleName, fieldName) {
+        this.memory = {
+            pagesSize: pagesSize,
+            moduleName: moduleName || "env",
+            fieldName: fieldName || "memory"
+        };
+    }
+    exportFunction(fnName, _exportName) {
+        const exportName = _exportName || fnName;
+        if (typeof this.functionIdxByName[fnName] === "undefined") throw new Error(`Function not defined: ${fnName}`);
+        const idx = this.functionIdxByName[fnName];
+        if (exportName != fnName) {
+            this.functionIdxByName[exportName] = idx;
+        }
+        this.exports.push({
+            exportName: exportName,
+            idx: idx
+        });
+    }
+    addFunctionToTable(fnName) {
+        const idx = this.functionIdxByName[fnName];
+        this.functionsTable.push(idx);
+    }
+    addData(offset, bytes) {
+        this.datas.push({
+            offset: offset,
+            bytes: bytes
+        });
+    }
+    alloc(a, b) {
+        let size;
+        let bytes;
+        if ((Array.isArray(a) || ArrayBuffer.isView(a)) && typeof b === "undefined") {
+            size = a.length;
+            bytes = a;
+        } else {
+            size = a;
+            bytes = b;
+        }
+        size = (size - 1 >> 3) + 1 << 3; // Align to 64 bits.
+        const p = this.free;
+        this.free += size;
+        if (bytes) {
+            this.addData(p, bytes);
+        }
+        return p;
+    }
+    allocString(s) {
+        const encoder = new TextEncoder();
+        const uint8array = encoder.encode(s);
+        return this.alloc([
+            ...uint8array,
+            0
+        ]);
+    }
+    _setSignatures() {
+        this.signatures = [];
+        const signatureIdxByName = {};
+        if (this.functionsTable.length > 0) {
+            const signature = this.functions[this.functionsTable[0]].getSignature();
+            const signatureName = this.functions[this.functionsTable[0]].getSignatureName();
+            signatureIdxByName[signatureName] = 0;
+            this.signatures.push(signature);
+        }
+        for(let i = 0; i < this.functions.length; i++){
+            const signature = this.functions[i].getSignature();
+            const signatureName = this.functions[i].getSignatureName();
+            if (typeof signatureIdxByName[signatureName] === "undefined") {
+                signatureIdxByName[signatureName] = this.signatures.length;
+                this.signatures.push(signature);
+            }
+            this.functions[i].signatureIdx = signatureIdxByName[signatureName];
+            this.functions[i].signatureName = signatureName;
+        }
+    }
+    _buildType() {
+        return this.signatures;
+    }
+    _buildImport() {
+        const src = [];
+        src.push(`(import "${this.memory.moduleName}" "${this.memory.fieldName}" (memory ${this.memory.pagesSize}))`);
+        for(let i = 0; i < this.nImportFunctions; i++){
+            src.push(`(import "${this.functions[i].moduleName}" "${this.functions[i].fieldName}" (func $${this.functions[i].fnName} (type $${this.functions[i].getSignatureName()})))`);
+        }
+        return src;
+    }
+    _buildFunctionsTable() {
+        return `(table ${this.functionsTable.length} anyfunc)`;
+    }
+    _buildElements() {
+        let funcs = "";
+        for(let i = 0; i < this.functionsTable.length; i++){
+            funcs += " $" + this.functions[this.functionsTable[i]].fnName;
+        }
+        return `(elem (i32.const 0) ${funcs})`;
+    }
+    _buildExports() {
+        const src = [];
+        for(let i = 0; i < this.exports.length; i++){
+            src.push(`(export "${this.exports[i].exportName}" (func $${this.functions[this.exports[i].idx].fnName}))`);
+        }
+        return src;
+    }
+    _buildFunctions() {
+        const src = [];
+        for(let i = this.nImportFunctions; i < this.nImportFunctions + this.nInternalFunctions; i++){
+            src.push(this.functions[i].getBody());
+        }
+        return src;
+    }
+    _buildData() {
+        const src = [];
+        const buf = Buffer.alloc(4);
+        buf.writeUInt32LE(this.free, 0);
+        src.push(`(data (i32.const 0) ${bytes2string(buf)})`);
+        for(let i = 0; i < this.datas.length; i++){
+            src.push(`(data (i32.const ${this.datas[i].offset}) ${bytes2string(this.datas[i].bytes)})`);
+        }
+        return src;
+        //TURBOPACK unreachable
+        ;
+        function bytes2string(b) {
+            let S = "\"";
+            for(let i = 0; i < b.length; i++){
+                if (b[i] < 32 || b[i] > 126 || b[i] == 34 || b[i] == 92) {
+                    let h = b[i].toString(16);
+                    while(h.length < 2)h = "0" + h;
+                    S += "\\" + h;
+                } else {
+                    S += String.fromCharCode(b[i]);
+                }
+            }
+            S += "\"";
+            return S;
+        }
+    }
+}
+}),
+"[project]/node_modules/wasmbuilder/src/protoboard.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "buildProtoboard",
+    ()=>buildProtoboard
+]);
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of websnark (Web Assembly zkSnark Prover).
+
+    websnark is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    websnark is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with websnark. If not, see <https://www.gnu.org/licenses/>.
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$modulebuilder$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/modulebuilder.js [app-ssr] (ecmascript)");
+;
+async function buildProtoboard(builder, defBytes, bitsPerBytes) {
+    const protoboard = new Protoboard();
+    protoboard.defBytes = defBytes;
+    protoboard.bitsPerBytes = bitsPerBytes || 32;
+    protoboard.memory = new WebAssembly.Memory({
+        initial: 20000
+    });
+    protoboard.i32 = new Uint32Array(protoboard.memory.buffer);
+    protoboard.i8 = new Uint8Array(protoboard.memory.buffer);
+    const moduleBuilder = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$modulebuilder$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ModuleBuilder"]();
+    const fLog32 = moduleBuilder.addIimportFunction("debug_log32", "debug", "log32");
+    fLog32.addParam("x", "i32");
+    const fLog64 = moduleBuilder.addIimportFunction("debug_log64", "debug", "log64");
+    fLog64.addParam("x", "i32");
+    fLog64.addParam("y", "i32");
+    buildLog32(moduleBuilder);
+    buildLog64(moduleBuilder);
+    builder(moduleBuilder, protoboard);
+    const code = moduleBuilder.build();
+    const wasmModule = await WebAssembly.compile(code);
+    protoboard.log = console.log;
+    protoboard.instance = await WebAssembly.instantiate(wasmModule, {
+        env: {
+            "memory": protoboard.memory
+        },
+        debug: {
+            log32: function(c1) {
+                if (c1 < 0) c1 = 0x100000000 + c1;
+                let s = c1.toString(16);
+                while(s.length < 8)s = "0" + s;
+                protoboard.log(s + ": " + c1.toString());
+            },
+            log64: function(c1, c2) {
+                if (c1 < 0) c1 = 0x100000000 + c1;
+                if (c2 < 0) c2 = 0x100000000 + c2;
+                const n = BigInt(c1) + (BigInt(c2) << 32n);
+                let s = n.toString(16);
+                while(s.length < 16)s = "0" + s;
+                protoboard.log(s + ": " + n.toString());
+            }
+        }
+    });
+    Object.assign(protoboard, protoboard.instance.exports);
+    Object.assign(protoboard, moduleBuilder.modules);
+    return protoboard;
+    //TURBOPACK unreachable
+    ;
+    function buildLog32(module) {
+        const f = module.addFunction("log32");
+        f.addParam("x", "i32");
+        const c = f.getCodeBuilder();
+        f.addCode(c.call("debug_log32", c.getLocal("x")));
+    }
+    function buildLog64(module) {
+        const f = module.addFunction("log64");
+        f.addParam("x", "i64");
+        const c = f.getCodeBuilder();
+        f.addCode(c.call("debug_log64", c.i32_wrap_i64(c.getLocal("x")), c.i32_wrap_i64(c.i64_shr_u(c.getLocal("x"), c.i64_const(32)))));
+    }
+}
+class Protoboard {
+    constructor(){}
+    alloc(length) {
+        if (typeof length === "undefined") {
+            length = this.defBytes;
+        }
+        length = (length - 1 >> 3) + 1 << 3; // Align to 64 bits.
+        const res = this.i32[0];
+        this.i32[0] += length;
+        return res;
+    }
+    set(pos, nums, nBytes) {
+        if (!Array.isArray(nums)) {
+            nums = [
+                nums
+            ];
+        }
+        if (typeof nBytes === "undefined") {
+            nBytes = this.defBytes;
+        }
+        const words = Math.floor((nBytes - 1) / 4) + 1;
+        let p = pos;
+        const CHUNK = 1n << BigInt(this.bitsPerBytes);
+        for(let i = 0; i < nums.length; i++){
+            let v = BigInt(nums[i]);
+            for(let j = 0; j < words; j++){
+                const quotient = v / CHUNK;
+                const remainder = v % CHUNK;
+                this.i32[p >> 2] = Number(remainder);
+                v = quotient;
+                p += 4;
+            }
+            if (v !== 0n) {
+                throw new Error("Expected v to be 0");
+            }
+        }
+        return pos;
+    }
+    get(pos, nElements, nBytes) {
+        if (typeof nBytes == "undefined") {
+            if (typeof nElements == "undefined") {
+                nElements = 1;
+                nBytes = this.defBytes;
+            } else {
+                nElements = nBytes;
+                nBytes = this.defBytes;
+            }
+        }
+        const words = Math.floor((nBytes - 1) / 4) + 1;
+        const CHUNK = 1n << BigInt(this.bitsPerBytes);
+        const nums = [];
+        for(let i = 0; i < nElements; i++){
+            let acc = 0n;
+            for(let j = words - 1; j >= 0; j--){
+                acc = acc * CHUNK;
+                let v = this.i32[(pos >> 2) + j];
+                if (this.bitsPerBytes < 32) {
+                    if (v & 0x80000000) v = v - 0x100000000;
+                }
+                acc = acc + BigInt(v);
+            }
+            nums.push(acc);
+            pos += words * 4;
+        }
+        if (nums.length == 1) return nums[0];
+        return nums;
+    }
+}
+}),
+"[project]/node_modules/wasmbuilder/main.js [app-ssr] (ecmascript) <locals>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([]);
+/*
+    Copyright 2019 0KIMS association.
+
+    This file is part of wasmbuilder
+
+    wasmbuilder is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    wasmbuilder is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with wasmbuilder. If not, see <https://www.gnu.org/licenses/>.
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$modulebuilder$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/modulebuilder.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$modulebuilder_wat$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/modulebuilder_wat.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wasmbuilder$2f$src$2f$protoboard$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/wasmbuilder/src/protoboard.js [app-ssr] (ecmascript)");
+;
+;
+;
+}),
+"[project]/node_modules/fastfile/src/osfile.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "open",
+    ()=>open
+]);
+var __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/fs [external] (fs, cjs)");
+;
+async function open(fileName, openFlags, cacheSize, pageSize) {
+    cacheSize = cacheSize || 4096 * 64;
+    if (typeof openFlags !== "number" && [
+        "w+",
+        "wx+",
+        "r",
+        "ax+",
+        "a+"
+    ].indexOf(openFlags) < 0) throw new Error("Invalid open option");
+    const fd = await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["default"].promises.open(fileName, openFlags);
+    const stats = await fd.stat();
+    return new FastFile(fd, stats, cacheSize, pageSize, fileName);
+}
+class FastFile {
+    constructor(fd, stats, cacheSize, pageSize, fileName){
+        this.fileName = fileName;
+        this.fd = fd;
+        this.pos = 0;
+        this.pageSize = pageSize || 1 << 8;
+        while(this.pageSize < stats.blksize){
+            this.pageSize *= 2;
+        }
+        this.totalSize = stats.size;
+        this.totalPages = Math.floor((stats.size - 1) / this.pageSize) + 1;
+        this.maxPagesLoaded = Math.floor(cacheSize / this.pageSize) + 1;
+        this.pages = {};
+        this.pendingLoads = [];
+        this.writing = false;
+        this.reading = false;
+        this.avBuffs = [];
+        this.history = {};
+    }
+    _loadPage(p) {
+        const self = this;
+        const P = new Promise((resolve, reject)=>{
+            self.pendingLoads.push({
+                page: p,
+                resolve: resolve,
+                reject: reject
+            });
+        });
+        self.__statusPage("After Load request: ", p);
+        return P;
+    }
+    __statusPage(s, p) {
+        const logEntry = [];
+        const self = this;
+        if (!self.logHistory) return;
+        logEntry.push("==" + s + " " + p);
+        let S = "";
+        for(let i = 0; i < self.pendingLoads.length; i++){
+            if (self.pendingLoads[i].page == p) S = S + " " + i;
+        }
+        if (S) logEntry.push("Pending loads:" + S);
+        if (typeof self.pages[p] != "undefined") {
+            const page = self.pages[p];
+            logEntry.push("Loaded");
+            logEntry.push("pendingOps: " + page.pendingOps);
+            if (page.loading) logEntry.push("loading: " + page.loading);
+            if (page.writing) logEntry.push("writing");
+            if (page.dirty) logEntry.push("dirty");
+        }
+        logEntry.push("==");
+        if (!self.history[p]) self.history[p] = [];
+        self.history[p].push(logEntry);
+    }
+    __printHistory(p) {
+        const self = this;
+        if (!self.history[p]) console.log("Empty History ", p);
+        console.log("History " + p);
+        for(let i = 0; i < self.history[p].length; i++){
+            for(let j = 0; j < self.history[p][i].length; j++){
+                console.log("-> " + self.history[p][i][j]);
+            }
+        }
+    }
+    _triggerLoad() {
+        const self = this;
+        if (self.reading) return;
+        if (self.pendingLoads.length == 0) return;
+        const pageIdxs = Object.keys(self.pages);
+        const deletablePages = [];
+        for(let i = 0; i < pageIdxs.length; i++){
+            const page = self.pages[parseInt(pageIdxs[i])];
+            if (page.dirty == false && page.pendingOps == 0 && !page.writing && !page.loading) deletablePages.push(parseInt(pageIdxs[i]));
+        }
+        let freePages = self.maxPagesLoaded - pageIdxs.length;
+        const ops = [];
+        // while pending loads and
+        //     the page is loaded or I can recover one.
+        while(self.pendingLoads.length > 0 && (typeof self.pages[self.pendingLoads[0].page] != "undefined" || freePages > 0 || deletablePages.length > 0)){
+            const load = self.pendingLoads.shift();
+            if (typeof self.pages[load.page] != "undefined") {
+                self.pages[load.page].pendingOps++;
+                const idx = deletablePages.indexOf(load.page);
+                if (idx >= 0) deletablePages.splice(idx, 1);
+                if (self.pages[load.page].loading) {
+                    self.pages[load.page].loading.push(load);
+                } else {
+                    load.resolve();
+                }
+                self.__statusPage("After Load (cached): ", load.page);
+            } else {
+                if (freePages) {
+                    freePages--;
+                } else {
+                    const fp = deletablePages.shift();
+                    self.__statusPage("Before Unload: ", fp);
+                    self.avBuffs.unshift(self.pages[fp]);
+                    delete self.pages[fp];
+                    self.__statusPage("After Unload: ", fp);
+                }
+                if (load.page >= self.totalPages) {
+                    self.pages[load.page] = getNewPage();
+                    load.resolve();
+                    self.__statusPage("After Load (new): ", load.page);
+                } else {
+                    self.reading = true;
+                    self.pages[load.page] = getNewPage();
+                    self.pages[load.page].loading = [
+                        load
+                    ];
+                    ops.push(self.fd.read(self.pages[load.page].buff, 0, self.pageSize, load.page * self.pageSize).then((res)=>{
+                        self.pages[load.page].size = res.bytesRead;
+                        const loading = self.pages[load.page].loading;
+                        delete self.pages[load.page].loading;
+                        for(let i = 0; i < loading.length; i++){
+                            loading[i].resolve();
+                        }
+                        self.__statusPage("After Load (loaded): ", load.page);
+                        return res;
+                    }, (err)=>{
+                        load.reject(err);
+                    }));
+                    self.__statusPage("After Load (loading): ", load.page);
+                }
+            }
+        }
+        // if (ops.length>1) console.log(ops.length);
+        Promise.all(ops).then(()=>{
+            self.reading = false;
+            if (self.pendingLoads.length > 0) setImmediate(self._triggerLoad.bind(self));
+            self._tryClose();
+        });
+        function getNewPage() {
+            if (self.avBuffs.length > 0) {
+                const p = self.avBuffs.shift();
+                p.dirty = false;
+                p.pendingOps = 1;
+                p.size = 0;
+                return p;
+            } else {
+                return {
+                    dirty: false,
+                    buff: new Uint8Array(self.pageSize),
+                    pendingOps: 1,
+                    size: 0
+                };
+            }
+        }
+    }
+    _triggerWrite() {
+        const self = this;
+        if (self.writing) return;
+        const pageIdxs = Object.keys(self.pages);
+        const ops = [];
+        for(let i = 0; i < pageIdxs.length; i++){
+            const page = self.pages[parseInt(pageIdxs[i])];
+            if (page.dirty) {
+                page.dirty = false;
+                page.writing = true;
+                self.writing = true;
+                ops.push(self.fd.write(page.buff, 0, page.size, parseInt(pageIdxs[i]) * self.pageSize).then(()=>{
+                    page.writing = false;
+                    return;
+                }, (err)=>{
+                    console.log("ERROR Writing: " + err);
+                    self.error = err;
+                    self._tryClose();
+                }));
+            }
+        }
+        if (self.writing) {
+            Promise.all(ops).then(()=>{
+                self.writing = false;
+                setImmediate(self._triggerWrite.bind(self));
+                self._tryClose();
+                if (self.pendingLoads.length > 0) setImmediate(self._triggerLoad.bind(self));
+            });
+        }
+    }
+    _getDirtyPage() {
+        for(let p in this.pages){
+            if (this.pages[p].dirty) return p;
+        }
+        return -1;
+    }
+    async write(buff, pos) {
+        if (buff.byteLength == 0) return;
+        const self = this;
+        /*
+        if (buff.byteLength > self.pageSize*self.maxPagesLoaded*0.8) {
+            const cacheSize = Math.floor(buff.byteLength * 1.1);
+            this.maxPagesLoaded = Math.floor( cacheSize / self.pageSize)+1;
+        }
+*/ if (typeof pos == "undefined") pos = self.pos;
+        self.pos = pos + buff.byteLength;
+        if (self.totalSize < pos + buff.byteLength) self.totalSize = pos + buff.byteLength;
+        if (self.pendingClose) throw new Error("Writing a closing file");
+        const firstPage = Math.floor(pos / self.pageSize);
+        const lastPage = Math.floor((pos + buff.byteLength - 1) / self.pageSize);
+        const pagePromises = [];
+        for(let i = firstPage; i <= lastPage; i++)pagePromises.push(self._loadPage(i));
+        self._triggerLoad();
+        let p = firstPage;
+        let o = pos % self.pageSize;
+        let r = buff.byteLength;
+        while(r > 0){
+            await pagePromises[p - firstPage];
+            const l = o + r > self.pageSize ? self.pageSize - o : r;
+            const srcView = buff.slice(buff.byteLength - r, buff.byteLength - r + l);
+            const dstView = new Uint8Array(self.pages[p].buff.buffer, o, l);
+            dstView.set(srcView);
+            self.pages[p].dirty = true;
+            self.pages[p].pendingOps--;
+            self.pages[p].size = Math.max(o + l, self.pages[p].size);
+            if (p >= self.totalPages) {
+                self.totalPages = p + 1;
+            }
+            r = r - l;
+            p++;
+            o = 0;
+            if (!self.writing) setImmediate(self._triggerWrite.bind(self));
+        }
+    }
+    async read(len, pos) {
+        const self = this;
+        let buff = new Uint8Array(len);
+        await self.readToBuffer(buff, 0, len, pos);
+        return buff;
+    }
+    async readToBuffer(buffDst, offset, len, pos) {
+        if (len == 0) {
+            return;
+        }
+        const self = this;
+        if (len > self.pageSize * self.maxPagesLoaded * 0.8) {
+            const cacheSize = Math.floor(len * 1.1);
+            this.maxPagesLoaded = Math.floor(cacheSize / self.pageSize) + 1;
+        }
+        if (typeof pos == "undefined") pos = self.pos;
+        self.pos = pos + len;
+        if (self.pendingClose) throw new Error("Reading a closing file");
+        const firstPage = Math.floor(pos / self.pageSize);
+        const lastPage = Math.floor((pos + len - 1) / self.pageSize);
+        const pagePromises = [];
+        for(let i = firstPage; i <= lastPage; i++)pagePromises.push(self._loadPage(i));
+        self._triggerLoad();
+        let p = firstPage;
+        let o = pos % self.pageSize;
+        // Remaining bytes to read
+        let r = pos + len > self.totalSize ? len - (pos + len - self.totalSize) : len;
+        while(r > 0){
+            await pagePromises[p - firstPage];
+            self.__statusPage("After Await (read): ", p);
+            // bytes to copy from this page
+            const l = o + r > self.pageSize ? self.pageSize - o : r;
+            const srcView = new Uint8Array(self.pages[p].buff.buffer, self.pages[p].buff.byteOffset + o, l);
+            buffDst.set(srcView, offset + len - r);
+            self.pages[p].pendingOps--;
+            self.__statusPage("After Op done: ", p);
+            r = r - l;
+            p++;
+            o = 0;
+            if (self.pendingLoads.length > 0) setImmediate(self._triggerLoad.bind(self));
+        }
+        this.pos = pos + len;
+    }
+    _tryClose() {
+        const self = this;
+        if (!self.pendingClose) return;
+        if (self.error) {
+            self.pendingCloseReject(self.error);
+        }
+        const p = self._getDirtyPage();
+        if (p >= 0 || self.writing || self.reading || self.pendingLoads.length > 0) return;
+        self.pendingClose();
+    }
+    close() {
+        const self = this;
+        if (self.pendingClose) throw new Error("Closing the file twice");
+        return new Promise((resolve, reject)=>{
+            self.pendingClose = resolve;
+            self.pendingCloseReject = reject;
+            self._tryClose();
+        }).then(()=>{
+            self.fd.close();
+        }, (err)=>{
+            self.fd.close();
+            throw err;
+        });
+    }
+    async discard() {
+        const self = this;
+        await self.close();
+        await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["default"].promises.unlink(this.fileName);
+    }
+    async writeULE32(v, pos) {
+        const self = this;
+        const tmpBuff32 = new Uint8Array(4);
+        const tmpBuff32v = new DataView(tmpBuff32.buffer);
+        tmpBuff32v.setUint32(0, v, true);
+        await self.write(tmpBuff32, pos);
+    }
+    async writeUBE32(v, pos) {
+        const self = this;
+        const tmpBuff32 = new Uint8Array(4);
+        const tmpBuff32v = new DataView(tmpBuff32.buffer);
+        tmpBuff32v.setUint32(0, v, false);
+        await self.write(tmpBuff32, pos);
+    }
+    async writeULE64(v, pos) {
+        const self = this;
+        const tmpBuff64 = new Uint8Array(8);
+        const tmpBuff64v = new DataView(tmpBuff64.buffer);
+        tmpBuff64v.setUint32(0, v & 0xFFFFFFFF, true);
+        tmpBuff64v.setUint32(4, Math.floor(v / 0x100000000), true);
+        await self.write(tmpBuff64, pos);
+    }
+    async readULE32(pos) {
+        const self = this;
+        const b = await self.read(4, pos);
+        const view = new Uint32Array(b.buffer);
+        return view[0];
+    }
+    async readUBE32(pos) {
+        const self = this;
+        const b = await self.read(4, pos);
+        const view = new DataView(b.buffer);
+        return view.getUint32(0, false);
+    }
+    async readULE64(pos) {
+        const self = this;
+        const b = await self.read(8, pos);
+        const view = new Uint32Array(b.buffer);
+        return view[1] * 0x100000000 + view[0];
+    }
+    async readString(pos) {
+        const self = this;
+        if (self.pendingClose) {
+            throw new Error("Reading a closing file");
+        }
+        let currentPosition = typeof pos == "undefined" ? self.pos : pos;
+        let currentPage = Math.floor(currentPosition / self.pageSize);
+        let endOfStringFound = false;
+        let str = "";
+        while(!endOfStringFound){
+            //Read page
+            let pagePromise = self._loadPage(currentPage);
+            self._triggerLoad();
+            await pagePromise;
+            self.__statusPage("After Await (read): ", currentPage);
+            let offsetOnPage = currentPosition % self.pageSize;
+            const dataArray = new Uint8Array(self.pages[currentPage].buff.buffer, self.pages[currentPage].buff.byteOffset + offsetOnPage, self.pageSize - offsetOnPage);
+            let indexEndOfString = dataArray.findIndex((element)=>element === 0);
+            endOfStringFound = indexEndOfString !== -1;
+            if (endOfStringFound) {
+                str += new TextDecoder().decode(dataArray.slice(0, indexEndOfString));
+                self.pos = currentPage * this.pageSize + offsetOnPage + indexEndOfString + 1;
+            } else {
+                str += new TextDecoder().decode(dataArray);
+                self.pos = currentPage * this.pageSize + offsetOnPage + dataArray.length;
+            }
+            self.pages[currentPage].pendingOps--;
+            self.__statusPage("After Op done: ", currentPage);
+            currentPosition = self.pos;
+            currentPage++;
+            if (self.pendingLoads.length > 0) setImmediate(self._triggerLoad.bind(self));
+        }
+        return str;
+    }
+}
+}),
+"[project]/node_modules/fastfile/src/memfile.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "createNew",
+    ()=>createNew,
+    "readExisting",
+    ()=>readExisting,
+    "readWriteExisting",
+    ()=>readWriteExisting
+]);
+function createNew(o) {
+    const initialSize = o.initialSize || 1 << 20;
+    const fd = new MemFile();
+    fd.o = o;
+    fd.o.data = new Uint8Array(initialSize);
+    fd.allocSize = initialSize;
+    fd.totalSize = 0;
+    fd.readOnly = false;
+    fd.pos = 0;
+    return fd;
+}
+function readExisting(o) {
+    const fd = new MemFile();
+    fd.o = o;
+    fd.allocSize = o.data.byteLength;
+    fd.totalSize = o.data.byteLength;
+    fd.readOnly = true;
+    fd.pos = 0;
+    return fd;
+}
+function readWriteExisting(o) {
+    const fd = new MemFile();
+    fd.o = o;
+    fd.allocSize = o.data.byteLength;
+    fd.totalSize = o.data.byteLength;
+    fd.readOnly = false;
+    fd.pos = 0;
+    return fd;
+}
+const tmpBuff32 = new Uint8Array(4);
+const tmpBuff32v = new DataView(tmpBuff32.buffer);
+const tmpBuff64 = new Uint8Array(8);
+const tmpBuff64v = new DataView(tmpBuff64.buffer);
+class MemFile {
+    constructor(){
+        this.pageSize = 1 << 14; // for compatibility
+    }
+    _resizeIfNeeded(newLen) {
+        if (newLen > this.allocSize) {
+            const newAllocSize = Math.max(this.allocSize + (1 << 20), Math.floor(this.allocSize * 1.1), newLen);
+            const newData = new Uint8Array(newAllocSize);
+            newData.set(this.o.data);
+            this.o.data = newData;
+            this.allocSize = newAllocSize;
+        }
+    }
+    async write(buff, pos) {
+        const self = this;
+        if (typeof pos == "undefined") pos = self.pos;
+        if (this.readOnly) throw new Error("Writing a read only file");
+        this._resizeIfNeeded(pos + buff.byteLength);
+        this.o.data.set(buff.slice(), pos);
+        if (pos + buff.byteLength > this.totalSize) this.totalSize = pos + buff.byteLength;
+        this.pos = pos + buff.byteLength;
+    }
+    async readToBuffer(buffDest, offset, len, pos) {
+        const self = this;
+        if (typeof pos == "undefined") pos = self.pos;
+        if (this.readOnly) {
+            if (pos + len > this.totalSize) throw new Error("Reading out of bounds");
+        }
+        this._resizeIfNeeded(pos + len);
+        const buffSrc = new Uint8Array(this.o.data.buffer, this.o.data.byteOffset + pos, len);
+        buffDest.set(buffSrc, offset);
+        this.pos = pos + len;
+    }
+    async read(len, pos) {
+        const self = this;
+        const buff = new Uint8Array(len);
+        await self.readToBuffer(buff, 0, len, pos);
+        return buff;
+    }
+    close() {
+        if (this.o.data.byteLength != this.totalSize) {
+            this.o.data = this.o.data.slice(0, this.totalSize);
+        }
+    }
+    async discard() {}
+    async writeULE32(v, pos) {
+        const self = this;
+        tmpBuff32v.setUint32(0, v, true);
+        await self.write(tmpBuff32, pos);
+    }
+    async writeUBE32(v, pos) {
+        const self = this;
+        tmpBuff32v.setUint32(0, v, false);
+        await self.write(tmpBuff32, pos);
+    }
+    async writeULE64(v, pos) {
+        const self = this;
+        tmpBuff64v.setUint32(0, v & 0xFFFFFFFF, true);
+        tmpBuff64v.setUint32(4, Math.floor(v / 0x100000000), true);
+        await self.write(tmpBuff64, pos);
+    }
+    async readULE32(pos) {
+        const self = this;
+        const b = await self.read(4, pos);
+        const view = new Uint32Array(b.buffer);
+        return view[0];
+    }
+    async readUBE32(pos) {
+        const self = this;
+        const b = await self.read(4, pos);
+        const view = new DataView(b.buffer);
+        return view.getUint32(0, false);
+    }
+    async readULE64(pos) {
+        const self = this;
+        const b = await self.read(8, pos);
+        const view = new Uint32Array(b.buffer);
+        return view[1] * 0x100000000 + view[0];
+    }
+    async readString(pos) {
+        const self = this;
+        let currentPosition = typeof pos == "undefined" ? self.pos : pos;
+        if (currentPosition > this.totalSize) {
+            if (this.readOnly) {
+                throw new Error("Reading out of bounds");
+            }
+            this._resizeIfNeeded(pos);
+        }
+        const dataArray = new Uint8Array(self.o.data.buffer, currentPosition, this.totalSize - currentPosition);
+        let indexEndOfString = dataArray.findIndex((element)=>element === 0);
+        let endOfStringFound = indexEndOfString !== -1;
+        let str = "";
+        if (endOfStringFound) {
+            str = new TextDecoder().decode(dataArray.slice(0, indexEndOfString));
+            self.pos = currentPosition + indexEndOfString + 1;
+        } else {
+            self.pos = currentPosition;
+        }
+        return str;
+    }
+}
+}),
+"[project]/node_modules/fastfile/src/bigmemfile.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "createNew",
+    ()=>createNew,
+    "readExisting",
+    ()=>readExisting,
+    "readWriteExisting",
+    ()=>readWriteExisting
+]);
+const PAGE_SIZE = 1 << 22;
+function createNew(o) {
+    const initialSize = o.initialSize || 0;
+    const fd = new BigMemFile();
+    fd.o = o;
+    const nPages = initialSize ? Math.floor((initialSize - 1) / PAGE_SIZE) + 1 : 0;
+    fd.o.data = [];
+    for(let i = 0; i < nPages - 1; i++){
+        fd.o.data.push(new Uint8Array(PAGE_SIZE));
+    }
+    if (nPages) fd.o.data.push(new Uint8Array(initialSize - PAGE_SIZE * (nPages - 1)));
+    fd.totalSize = 0;
+    fd.readOnly = false;
+    fd.pos = 0;
+    return fd;
+}
+function readExisting(o) {
+    const fd = new BigMemFile();
+    fd.o = o;
+    fd.totalSize = (o.data.length - 1) * PAGE_SIZE + o.data[o.data.length - 1].byteLength;
+    fd.readOnly = true;
+    fd.pos = 0;
+    return fd;
+}
+function readWriteExisting(o) {
+    const fd = new BigMemFile();
+    fd.o = o;
+    fd.totalSize = (o.data.length - 1) * PAGE_SIZE + o.data[o.data.length - 1].byteLength;
+    fd.readOnly = false;
+    fd.pos = 0;
+    return fd;
+}
+const tmpBuff32 = new Uint8Array(4);
+const tmpBuff32v = new DataView(tmpBuff32.buffer);
+const tmpBuff64 = new Uint8Array(8);
+const tmpBuff64v = new DataView(tmpBuff64.buffer);
+class BigMemFile {
+    constructor(){
+        this.pageSize = 1 << 14; // for compatibility
+    }
+    _resizeIfNeeded(newLen) {
+        if (newLen <= this.totalSize) return;
+        if (this.readOnly) throw new Error("Reading out of file bounds");
+        const nPages = Math.floor((newLen - 1) / PAGE_SIZE) + 1;
+        for(let i = Math.max(this.o.data.length - 1, 0); i < nPages; i++){
+            const newSize = i < nPages - 1 ? PAGE_SIZE : newLen - (nPages - 1) * PAGE_SIZE;
+            const p = new Uint8Array(newSize);
+            if (i == this.o.data.length - 1) p.set(this.o.data[i]);
+            this.o.data[i] = p;
+        }
+        this.totalSize = newLen;
+    }
+    async write(buff, pos) {
+        const self = this;
+        if (typeof pos == "undefined") pos = self.pos;
+        if (this.readOnly) throw new Error("Writing a read only file");
+        this._resizeIfNeeded(pos + buff.byteLength);
+        const firstPage = Math.floor(pos / PAGE_SIZE);
+        let p = firstPage;
+        let o = pos % PAGE_SIZE;
+        let r = buff.byteLength;
+        while(r > 0){
+            const l = o + r > PAGE_SIZE ? PAGE_SIZE - o : r;
+            const srcView = buff.slice(buff.byteLength - r, buff.byteLength - r + l);
+            const dstView = new Uint8Array(self.o.data[p].buffer, o, l);
+            dstView.set(srcView);
+            r = r - l;
+            p++;
+            o = 0;
+        }
+        this.pos = pos + buff.byteLength;
+    }
+    async readToBuffer(buffDst, offset, len, pos) {
+        const self = this;
+        if (typeof pos == "undefined") pos = self.pos;
+        if (this.readOnly) {
+            if (pos + len > this.totalSize) throw new Error("Reading out of bounds");
+        }
+        this._resizeIfNeeded(pos + len);
+        const firstPage = Math.floor(pos / PAGE_SIZE);
+        let p = firstPage;
+        let o = pos % PAGE_SIZE;
+        // Remaining bytes to read
+        let r = len;
+        while(r > 0){
+            // bytes to copy from this page
+            const l = o + r > PAGE_SIZE ? PAGE_SIZE - o : r;
+            const srcView = new Uint8Array(self.o.data[p].buffer, o, l);
+            buffDst.set(srcView, offset + len - r);
+            r = r - l;
+            p++;
+            o = 0;
+        }
+        this.pos = pos + len;
+    }
+    async read(len, pos) {
+        const self = this;
+        const buff = new Uint8Array(len);
+        await self.readToBuffer(buff, 0, len, pos);
+        return buff;
+    }
+    close() {}
+    async discard() {}
+    async writeULE32(v, pos) {
+        const self = this;
+        tmpBuff32v.setUint32(0, v, true);
+        await self.write(tmpBuff32, pos);
+    }
+    async writeUBE32(v, pos) {
+        const self = this;
+        tmpBuff32v.setUint32(0, v, false);
+        await self.write(tmpBuff32, pos);
+    }
+    async writeULE64(v, pos) {
+        const self = this;
+        tmpBuff64v.setUint32(0, v & 0xFFFFFFFF, true);
+        tmpBuff64v.setUint32(4, Math.floor(v / 0x100000000), true);
+        await self.write(tmpBuff64, pos);
+    }
+    async readULE32(pos) {
+        const self = this;
+        const b = await self.read(4, pos);
+        const view = new Uint32Array(b.buffer);
+        return view[0];
+    }
+    async readUBE32(pos) {
+        const self = this;
+        const b = await self.read(4, pos);
+        const view = new DataView(b.buffer);
+        return view.getUint32(0, false);
+    }
+    async readULE64(pos) {
+        const self = this;
+        const b = await self.read(8, pos);
+        const view = new Uint32Array(b.buffer);
+        return view[1] * 0x100000000 + view[0];
+    }
+    async readString(pos) {
+        const self = this;
+        const fixedSize = 2048;
+        let currentPosition = typeof pos == "undefined" ? self.pos : pos;
+        if (currentPosition > this.totalSize) {
+            if (this.readOnly) {
+                throw new Error("Reading out of bounds");
+            }
+            this._resizeIfNeeded(pos);
+        }
+        let endOfStringFound = false;
+        let str = "";
+        while(!endOfStringFound){
+            let currentPage = Math.floor(currentPosition / PAGE_SIZE);
+            let offsetOnPage = currentPosition % PAGE_SIZE;
+            if (self.o.data[currentPage] === undefined) {
+                throw new Error("ERROR");
+            }
+            let readLength = Math.min(fixedSize, self.o.data[currentPage].length - offsetOnPage);
+            const dataArray = new Uint8Array(self.o.data[currentPage].buffer, offsetOnPage, readLength);
+            let indexEndOfString = dataArray.findIndex((element)=>element === 0);
+            endOfStringFound = indexEndOfString !== -1;
+            if (endOfStringFound) {
+                str += new TextDecoder().decode(dataArray.slice(0, indexEndOfString));
+                self.pos = currentPage * PAGE_SIZE + offsetOnPage + indexEndOfString + 1;
+            } else {
+                str += new TextDecoder().decode(dataArray);
+                self.pos = currentPage * PAGE_SIZE + offsetOnPage + dataArray.length;
+            }
+            currentPosition = self.pos;
+        }
+        return str;
+    }
+}
+}),
+"[project]/node_modules/fastfile/src/fastfile.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "createNoOverride",
+    ()=>createNoOverride,
+    "createOverride",
+    ()=>createOverride,
+    "readExisting",
+    ()=>readExisting,
+    "readWriteExisting",
+    ()=>readWriteExisting,
+    "readWriteExistingOrCreate",
+    ()=>readWriteExistingOrCreate
+]);
+/* global fetch */ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$osfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/fastfile/src/osfile.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$memfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/fastfile/src/memfile.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$bigmemfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/fastfile/src/bigmemfile.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/constants [external] (constants, cjs)");
+;
+;
+;
+;
+const DEFAULT_CACHE_SIZE = 1 << 16;
+const DEFAULT_PAGE_SIZE = 1 << 13;
+async function createOverride(o, b, c) {
+    if (typeof o === "string") {
+        o = {
+            type: "file",
+            fileName: o,
+            cacheSize: b || DEFAULT_CACHE_SIZE,
+            pageSize: c || DEFAULT_PAGE_SIZE
+        };
+    }
+    if (o.type == "file") {
+        return await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$osfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["open"])(o.fileName, __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_TRUNC"] | __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_CREAT"] | __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_RDWR"], o.cacheSize, o.pageSize);
+    } else if (o.type == "mem") {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$memfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createNew"](o);
+    } else if (o.type == "bigMem") {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$bigmemfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createNew"](o);
+    } else {
+        throw new Error("Invalid FastFile type: " + o.type);
+    }
+}
+function createNoOverride(o, b, c) {
+    if (typeof o === "string") {
+        o = {
+            type: "file",
+            fileName: o,
+            cacheSize: b || DEFAULT_CACHE_SIZE,
+            pageSize: c || DEFAULT_PAGE_SIZE
+        };
+    }
+    if (o.type == "file") {
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$osfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["open"])(o.fileName, __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_TRUNC"] | __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_CREAT"] | __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_RDWR"] | __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_EXCL"], o.cacheSize, o.pageSize);
+    } else if (o.type == "mem") {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$memfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createNew"](o);
+    } else if (o.type == "bigMem") {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$bigmemfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createNew"](o);
+    } else {
+        throw new Error("Invalid FastFile type: " + o.type);
+    }
+}
+async function readExisting(o, b, c) {
+    if (o instanceof Uint8Array) {
+        o = {
+            type: "mem",
+            data: o
+        };
+    }
+    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    ;
+    else {
+        if (typeof o === "string") {
+            o = {
+                type: "file",
+                fileName: o,
+                cacheSize: b || DEFAULT_CACHE_SIZE,
+                pageSize: c || DEFAULT_PAGE_SIZE
+            };
+        }
+    }
+    if (o.type == "file") {
+        return await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$osfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["open"])(o.fileName, __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_RDONLY"], o.cacheSize, o.pageSize);
+    } else if (o.type == "mem") {
+        return await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$memfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readExisting"](o);
+    } else if (o.type == "bigMem") {
+        return await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$bigmemfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readExisting"](o);
+    } else {
+        throw new Error("Invalid FastFile type: " + o.type);
+    }
+}
+function readWriteExisting(o, b, c) {
+    if (typeof o === "string") {
+        o = {
+            type: "file",
+            fileName: o,
+            cacheSize: b || DEFAULT_CACHE_SIZE,
+            pageSize: c || DEFAULT_PAGE_SIZE
+        };
+    }
+    if (o.type == "file") {
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$osfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["open"])(o.fileName, __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_CREAT"] | __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_RDWR"], o.cacheSize, o.pageSize);
+    } else if (o.type == "mem") {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$memfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readWriteExisting"](o);
+    } else if (o.type == "bigMem") {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$bigmemfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readWriteExisting"](o);
+    } else {
+        throw new Error("Invalid FastFile type: " + o.type);
+    }
+}
+function readWriteExistingOrCreate(o, b, c) {
+    if (typeof o === "string") {
+        o = {
+            type: "file",
+            fileName: o,
+            cacheSize: b || DEFAULT_CACHE_SIZE,
+            pageSize: c || DEFAULT_PAGE_SIZE
+        };
+    }
+    if (o.type == "file") {
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$osfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["open"])(o.fileName, __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_CREAT"] | __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_RDWR"] | __TURBOPACK__imported__module__$5b$externals$5d2f$constants__$5b$external$5d$__$28$constants$2c$__cjs$29$__["O_EXCL"], o.cacheSize);
+    } else if (o.type == "mem") {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$memfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readWriteExisting"](o);
+    } else if (o.type == "bigMem") {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$bigmemfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readWriteExisting"](o);
+    } else {
+        throw new Error("Invalid FastFile type: " + o.type);
+    }
+}
+}),
+"[project]/node_modules/@iden3/binfileutils/src/binfileutils.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "copySection",
+    ()=>copySection,
+    "createBinFile",
+    ()=>createBinFile,
+    "endReadSection",
+    ()=>endReadSection,
+    "endWriteSection",
+    ()=>endWriteSection,
+    "readBigInt",
+    ()=>readBigInt,
+    "readBinFile",
+    ()=>readBinFile,
+    "readSection",
+    ()=>readSection,
+    "sectionIsEqual",
+    ()=>sectionIsEqual,
+    "startReadUniqueSection",
+    ()=>startReadUniqueSection,
+    "startWriteSection",
+    ()=>startWriteSection,
+    "writeBigInt",
+    ()=>writeBigInt
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/ffjavascript/main.js [app-ssr] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$src$2f$bigbuffer$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__BigBuffer$3e$__ = __turbopack_context__.i("[project]/node_modules/ffjavascript/src/bigbuffer.js [app-ssr] (ecmascript) <export default as BigBuffer>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$fastfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/fastfile/src/fastfile.js [app-ssr] (ecmascript)");
+;
+;
+async function readBinFile(fileName, type, maxVersion, cacheSize, pageSize) {
+    const fd = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$fastfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readExisting"](fileName, cacheSize, pageSize);
+    const b = await fd.read(4);
+    let readedType = "";
+    for(let i = 0; i < 4; i++)readedType += String.fromCharCode(b[i]);
+    if (readedType != type) throw new Error(fileName + ": Invalid File format");
+    let v = await fd.readULE32();
+    if (v > maxVersion) throw new Error("Version not supported");
+    const nSections = await fd.readULE32();
+    // Scan sections
+    let sections = [];
+    for(let i = 0; i < nSections; i++){
+        let ht = await fd.readULE32();
+        let hl = await fd.readULE64();
+        if (typeof sections[ht] == "undefined") sections[ht] = [];
+        sections[ht].push({
+            p: fd.pos,
+            size: hl
+        });
+        fd.pos += hl;
+    }
+    return {
+        fd,
+        sections
+    };
+}
+async function createBinFile(fileName, type, version, nSections, cacheSize, pageSize) {
+    const fd = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$fastfile$2f$src$2f$fastfile$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createOverride"](fileName, cacheSize, pageSize);
+    const buff = new Uint8Array(4);
+    for(let i = 0; i < 4; i++)buff[i] = type.charCodeAt(i);
+    await fd.write(buff, 0); // Magic "r1cs"
+    await fd.writeULE32(version); // Version
+    await fd.writeULE32(nSections); // Number of Sections
+    return fd;
+}
+async function startWriteSection(fd, idSection) {
+    if (typeof fd.writingSection !== "undefined") throw new Error("Already writing a section");
+    await fd.writeULE32(idSection); // Header type
+    fd.writingSection = {
+        pSectionSize: fd.pos
+    };
+    await fd.writeULE64(0); // Temporally set to 0 length
+}
+async function endWriteSection(fd) {
+    if (typeof fd.writingSection === "undefined") throw new Error("Not writing a section");
+    const sectionSize = fd.pos - fd.writingSection.pSectionSize - 8;
+    const oldPos = fd.pos;
+    fd.pos = fd.writingSection.pSectionSize;
+    await fd.writeULE64(sectionSize);
+    fd.pos = oldPos;
+    delete fd.writingSection;
+}
+async function startReadUniqueSection(fd, sections, idSection) {
+    if (typeof fd.readingSection !== "undefined") throw new Error("Already reading a section");
+    if (!sections[idSection]) throw new Error(fd.fileName + ": Missing section " + idSection);
+    if (sections[idSection].length > 1) throw new Error(fd.fileName + ": Section Duplicated " + idSection);
+    fd.pos = sections[idSection][0].p;
+    fd.readingSection = sections[idSection][0];
+}
+async function endReadSection(fd, noCheck) {
+    if (typeof fd.readingSection === "undefined") throw new Error("Not reading a section");
+    if (!noCheck) {
+        if (fd.pos - fd.readingSection.p != fd.readingSection.size) throw new Error("Invalid section size reading");
+    }
+    delete fd.readingSection;
+}
+async function writeBigInt(fd, n, n8, pos) {
+    const buff = new Uint8Array(n8);
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].toRprLE(buff, 0, n, n8);
+    await fd.write(buff, pos);
+}
+async function readBigInt(fd, n8, pos) {
+    const buff = await fd.read(n8, pos);
+    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].fromRprLE(buff, 0, n8);
+}
+async function copySection(fdFrom, sections, fdTo, sectionId, size) {
+    if (typeof size === "undefined") {
+        size = sections[sectionId][0].size;
+    }
+    const chunkSize = fdFrom.pageSize;
+    await startReadUniqueSection(fdFrom, sections, sectionId);
+    await startWriteSection(fdTo, sectionId);
+    for(let p = 0; p < size; p += chunkSize){
+        const l = Math.min(size - p, chunkSize);
+        const buff = await fdFrom.read(l);
+        await fdTo.write(buff);
+    }
+    await endWriteSection(fdTo);
+    await endReadSection(fdFrom, size != sections[sectionId][0].size);
+}
+async function readSection(fd, sections, idSection, offset, length) {
+    offset = typeof offset === "undefined" ? 0 : offset;
+    length = typeof length === "undefined" ? sections[idSection][0].size - offset : length;
+    if (offset + length > sections[idSection][0].size) {
+        throw new Error("Reading out of the range of the section");
+    }
+    let buff;
+    if (length < 1 << 30) {
+        buff = new Uint8Array(length);
+    } else {
+        buff = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$src$2f$bigbuffer$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__BigBuffer$3e$__["BigBuffer"](length);
+    }
+    await fd.readToBuffer(buff, 0, length, sections[idSection][0].p + offset);
+    return buff;
+}
+async function sectionIsEqual(fd1, sections1, fd2, sections2, idSection) {
+    const MAX_BUFF_SIZE = fd1.pageSize * 16;
+    await startReadUniqueSection(fd1, sections1, idSection);
+    await startReadUniqueSection(fd2, sections2, idSection);
+    if (sections1[idSection][0].size != sections2[idSection][0].size) return false;
+    const totalBytes = sections1[idSection][0].size;
+    for(let i = 0; i < totalBytes; i += MAX_BUFF_SIZE){
+        const n = Math.min(totalBytes - i, MAX_BUFF_SIZE);
+        const buff1 = await fd1.read(n);
+        const buff2 = await fd2.read(n);
+        for(let j = 0; j < n; j++)if (buff1[j] != buff2[j]) return false;
+    }
+    await endReadSection(fd1);
+    await endReadSection(fd2);
+    return true;
+}
+}),
+"[project]/node_modules/circom_runtime/js/utils.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+/*
+
+Copyright 2020 0KIMS association.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+*/ __turbopack_context__.s([
+    "flatArray",
+    ()=>flatArray,
+    "fnvHash",
+    ()=>fnvHash,
+    "normalize",
+    ()=>normalize,
+    "toArray32",
+    ()=>toArray32
+]);
+function flatArray(a) {
+    let res = [];
+    fillArray(res, a);
+    return res;
+    //TURBOPACK unreachable
+    ;
+    function fillArray(res, a) {
+        if (Array.isArray(a)) {
+            for(let i = 0; i < a.length; i++){
+                fillArray(res, a[i]);
+            }
+        } else {
+            res.push(a);
+        }
+    }
+}
+function normalize(n, prime) {
+    let res = BigInt(n) % prime;
+    if (res < 0) res += prime;
+    return res;
+}
+function fnvHash(str) {
+    const uint64_max = BigInt(2) ** BigInt(64);
+    let hash = BigInt("0xCBF29CE484222325");
+    for(let i = 0; i < str.length; i++){
+        hash ^= BigInt(str[i].charCodeAt(0));
+        hash *= BigInt(0x100000001B3);
+        hash %= uint64_max;
+    }
+    let shash = hash.toString(16);
+    let n = 16 - shash.length;
+    shash = "0".repeat(n).concat(shash);
+    return shash;
+}
+function toArray32(s, size) {
+    const res = []; //new Uint32Array(size); //has no unshift
+    let rem = BigInt(s);
+    const radix = BigInt(0x100000000);
+    while(rem){
+        res.unshift(Number(rem % radix));
+        rem = rem / radix;
+    }
+    if (size) {
+        let i = size - res.length;
+        while(i > 0){
+            res.unshift(0);
+            i--;
+        }
+    }
+    return res;
+}
+}),
+"[project]/node_modules/circom_runtime/js/witness_calculator.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>builder
+]);
+/* globals WebAssembly */ /*
+
+Copyright 2020 0KIMS association.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+*/ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/circom_runtime/js/utils.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/ffjavascript/main.js [app-ssr] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$src$2f$f1field$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__F1Field$3e$__ = __turbopack_context__.i("[project]/node_modules/ffjavascript/src/f1field.js [app-ssr] (ecmascript) <export default as F1Field>");
+;
+;
+async function builder(code, options) {
+    let instance;
+    let wc;
+    let memory;
+    options = options || {};
+    // Only circom 2 implements version lookup through exports in the WASM
+    // We default to `1` and update if we see the `getVersion` export (major version)
+    // These are updated after the instance is instantiated, assuming the functions are available
+    let majorVersion = 1;
+    // After Circom 2.0.7, Blaine added exported functions for getting minor and patch versions
+    let minorVersion = 0;
+    // If we can't look up the patch version, assume the lowest
+    let patchVersion = 0;
+    let codeIsWebAssemblyInstance = false;
+    // If code is already prepared WebAssembly.Instance, we use it directly
+    if (code instanceof WebAssembly.Instance) {
+        instance = code;
+        codeIsWebAssemblyInstance = true;
+    } else {
+        let memorySize = 32767;
+        if (options.memorySize) {
+            // make sure we have int
+            memorySize = parseInt(options.memorySize);
+            if (memorySize < 0) {
+                throw new Error("Invalid memory size");
+            }
+        }
+        let memoryAllocated = false;
+        while(!memoryAllocated){
+            try {
+                memory = new WebAssembly.Memory({
+                    initial: memorySize
+                });
+                memoryAllocated = true;
+            } catch (err) {
+                if (memorySize <= 1) {
+                    throw err;
+                }
+                console.warn("Could not allocate " + memorySize * 1024 * 64 + " bytes. This may cause severe instability. Trying with " + memorySize * 1024 * 64 / 2 + " bytes");
+                memorySize = Math.floor(memorySize / 2);
+            }
+        }
+        const wasmModule = await WebAssembly.compile(code);
+        let errStr = "";
+        let msgStr = "";
+        instance = await WebAssembly.instantiate(wasmModule, {
+            env: {
+                "memory": memory
+            },
+            runtime: {
+                printDebug: function(value) {
+                    console.log("printDebug:", value);
+                },
+                exceptionHandler: function(code) {
+                    let err;
+                    if (code === 1) {
+                        err = "Signal not found. ";
+                    } else if (code === 2) {
+                        err = "Too many signals set. ";
+                    } else if (code === 3) {
+                        err = "Signal already set. ";
+                    } else if (code === 4) {
+                        err = "Assert Failed. ";
+                    } else if (code === 5) {
+                        err = "Not enough memory. ";
+                    } else if (code === 6) {
+                        err = "Input signal array access exceeds the size. ";
+                    } else {
+                        err = "Unknown error. ";
+                    }
+                    console.error("ERROR: ", code, errStr);
+                    throw new Error(err + errStr);
+                },
+                // A new way of logging messages was added in Circom 2.0.7 that requires 2 new imports
+                // `printErrorMessage` and `writeBufferMessage`.
+                printErrorMessage: function() {
+                    errStr += getMessage() + "\n";
+                },
+                writeBufferMessage: function() {
+                    const msg = getMessage();
+                    // Any calls to `log()` will always end with a `\n`, so that's when we print and reset
+                    if (msg === "\n") {
+                        console.log(msgStr);
+                        msgStr = "";
+                    } else {
+                        // If we've buffered other content, put a space in between the items
+                        if (msgStr !== "") {
+                            msgStr += " ";
+                        }
+                        // Then append the message to the message we are creating
+                        msgStr += msg;
+                    }
+                },
+                showSharedRWMemory: function() {
+                    const shared_rw_memory_size = instance.exports.getFieldNumLen32();
+                    const arr = new Uint32Array(shared_rw_memory_size);
+                    for(let j = 0; j < shared_rw_memory_size; j++){
+                        arr[shared_rw_memory_size - 1 - j] = instance.exports.readSharedRWMemory(j);
+                    }
+                    // In circom 2.0.7, they changed the log() function to allow strings and changed the
+                    // output API. This smoothes over the breaking change.
+                    if (majorVersion >= 2 && (minorVersion >= 1 || patchVersion >= 7)) {
+                        // If we've buffered other content, put a space in between the items
+                        if (msgStr !== "") {
+                            msgStr += " ";
+                        }
+                        // Then append the value to the message we are creating
+                        const msg = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].fromArray(arr, 0x100000000).toString();
+                        msgStr += msg;
+                    } else {
+                        console.log(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].fromArray(arr, 0x100000000));
+                    }
+                },
+                error: function(code, pstr, a, b, c, d) {
+                    let errStr;
+                    if (code === 7) {
+                        errStr = p2str(pstr) + " " + wc.getFr(b).toString() + " != " + wc.getFr(c).toString() + " " + p2str(d);
+                    } else if (code === 9) {
+                        errStr = p2str(pstr) + " " + wc.getFr(b).toString() + " " + p2str(c);
+                    } else if (code === 5 && options.sym) {
+                        errStr = p2str(pstr) + " " + options.sym.labelIdx2Name[c];
+                    } else {
+                        errStr = p2str(pstr) + " " + a + " " + b + " " + c + " " + d;
+                    }
+                    console.log("ERROR: ", code, errStr);
+                    throw new Error(errStr);
+                },
+                log: function(a) {
+                    console.log(wc.getFr(a).toString());
+                },
+                logGetSignal: function(signal, pVal) {
+                    if (options.logGetSignal) {
+                        options.logGetSignal(signal, wc.getFr(pVal));
+                    }
+                },
+                logSetSignal: function(signal, pVal) {
+                    if (options.logSetSignal) {
+                        options.logSetSignal(signal, wc.getFr(pVal));
+                    }
+                },
+                logStartComponent: function(cIdx) {
+                    if (options.logStartComponent) {
+                        options.logStartComponent(cIdx);
+                    }
+                },
+                logFinishComponent: function(cIdx) {
+                    if (options.logFinishComponent) {
+                        options.logFinishComponent(cIdx);
+                    }
+                }
+            }
+        });
+    }
+    if (typeof instance.exports.getVersion == "function") {
+        majorVersion = instance.exports.getVersion();
+    }
+    if (typeof instance.exports.getMinorVersion == "function") {
+        minorVersion = instance.exports.getMinorVersion();
+    }
+    if (typeof instance.exports.getPatchVersion == "function") {
+        patchVersion = instance.exports.getPatchVersion();
+    }
+    const sanityCheck = options && (options.sanityCheck || options.logGetSignal || options.logSetSignal || options.logStartComponent || options.logFinishComponent);
+    // We explicitly check for major version 2 in case there's a circom v3 in the future
+    if (majorVersion === 2) {
+        wc = new WitnessCalculatorCircom2(instance, sanityCheck);
+    } else if (majorVersion === 1) {
+        if (codeIsWebAssemblyInstance) {
+            throw new Error('Loading code from WebAssembly instance is not supported for circom version 1');
+        }
+        wc = new WitnessCalculatorCircom1(memory, instance, sanityCheck);
+    } else {
+        throw new Error(`Unsupported circom version: ${majorVersion}`);
+    }
+    return wc;
+    //TURBOPACK unreachable
+    ;
+    function getMessage() {
+        let message = "";
+        let c = instance.exports.getMessageChar();
+        while(c !== 0){
+            message += String.fromCharCode(c);
+            c = instance.exports.getMessageChar();
+        }
+        return message;
+    }
+    function p2str(p) {
+        const i8 = new Uint8Array(memory.buffer);
+        const bytes = [];
+        for(let i = 0; i8[p + i] > 0; i++)bytes.push(i8[p + i]);
+        return String.fromCharCode.apply(null, bytes);
+    }
+}
+class WitnessCalculatorCircom1 {
+    constructor(memory, instance, sanityCheck){
+        this.memory = memory;
+        this.i32 = new Uint32Array(memory.buffer);
+        this.instance = instance;
+        this.n32 = (this.instance.exports.getFrLen() >> 2) - 2;
+        const pRawPrime = this.instance.exports.getPRawPrime();
+        const arr = new Array(this.n32);
+        for(let i = 0; i < this.n32; i++){
+            arr[this.n32 - 1 - i] = this.i32[(pRawPrime >> 2) + i];
+        }
+        this.prime = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].fromArray(arr, 0x100000000);
+        this.Fr = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$src$2f$f1field$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__F1Field$3e$__["F1Field"](this.prime);
+        this.mask32 = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].fromString("FFFFFFFF", 16);
+        this.NVars = this.instance.exports.getNVars();
+        this.n64 = Math.floor((this.Fr.bitLength - 1) / 64) + 1;
+        this.R = this.Fr.e(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].shiftLeft(1, this.n64 * 64));
+        this.RInv = this.Fr.inv(this.R);
+        this.sanityCheck = sanityCheck;
+    }
+    circom_version() {
+        return 1;
+    }
+    async _doCalculateWitness(input, sanityCheck) {
+        this.instance.exports.init(this.sanityCheck || sanityCheck ? 1 : 0);
+        const pSigOffset = this.allocInt();
+        const pFr = this.allocFr();
+        const keys = Object.keys(input);
+        keys.forEach((k)=>{
+            const h = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fnvHash"])(k);
+            const hMSB = parseInt(h.slice(0, 8), 16);
+            const hLSB = parseInt(h.slice(8, 16), 16);
+            try {
+                this.instance.exports.getSignalOffset32(pSigOffset, 0, hMSB, hLSB);
+            } catch (err) {
+                throw new Error(`Signal ${k} is not an input of the circuit.`);
+            }
+            const sigOffset = this.getInt(pSigOffset);
+            const fArr = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["flatArray"])(input[k]);
+            for(let i = 0; i < fArr.length; i++){
+                this.setFr(pFr, fArr[i]);
+                this.instance.exports.setSignal(0, 0, sigOffset + i, pFr);
+            }
+        });
+    }
+    async calculateWitness(input, sanityCheck) {
+        const self = this;
+        const old0 = self.i32[0];
+        const w = [];
+        await self._doCalculateWitness(input, sanityCheck);
+        for(let i = 0; i < self.NVars; i++){
+            const pWitness = self.instance.exports.getPWitness(i);
+            w.push(self.getFr(pWitness));
+        }
+        self.i32[0] = old0;
+        return w;
+    }
+    async calculateBinWitness(input, sanityCheck) {
+        const self = this;
+        const old0 = self.i32[0];
+        await self._doCalculateWitness(input, sanityCheck);
+        const pWitnessBuffer = self.instance.exports.getWitnessBuffer();
+        self.i32[0] = old0;
+        const buff = self.memory.buffer.slice(pWitnessBuffer, pWitnessBuffer + self.NVars * self.n64 * 8);
+        return new Uint8Array(buff);
+    }
+    allocInt() {
+        const p = this.i32[0];
+        this.i32[0] = p + 8;
+        return p;
+    }
+    allocFr() {
+        const p = this.i32[0];
+        this.i32[0] = p + this.n32 * 4 + 8;
+        return p;
+    }
+    getInt(p) {
+        return this.i32[p >> 2];
+    }
+    setInt(p, v) {
+        this.i32[p >> 2] = v;
+    }
+    getFr(p) {
+        const self = this;
+        const idx = p >> 2;
+        if (self.i32[idx + 1] & 0x80000000) {
+            const arr = new Array(self.n32);
+            for(let i = 0; i < self.n32; i++){
+                arr[self.n32 - 1 - i] = self.i32[idx + 2 + i];
+            }
+            const res = self.Fr.e(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].fromArray(arr, 0x100000000));
+            if (self.i32[idx + 1] & 0x40000000) {
+                return fromMontgomery(res);
+            } else {
+                return res;
+            }
+        } else {
+            if (self.i32[idx] & 0x80000000) {
+                return self.Fr.e(self.i32[idx] - 0x100000000);
+            } else {
+                return self.Fr.e(self.i32[idx]);
+            }
+        }
+        function fromMontgomery(n) {
+            return self.Fr.mul(self.RInv, n);
+        }
+    }
+    setFr(p, v) {
+        const self = this;
+        v = self.Fr.e(v);
+        const minShort = self.Fr.neg(self.Fr.e("80000000", 16));
+        const maxShort = self.Fr.e("7FFFFFFF", 16);
+        if (self.Fr.geq(v, minShort) && self.Fr.leq(v, maxShort)) {
+            let a;
+            if (self.Fr.geq(v, self.Fr.zero)) {
+                a = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].toNumber(v);
+            } else {
+                a = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].toNumber(self.Fr.sub(v, minShort));
+                a = a - 0x80000000;
+                a = 0x100000000 + a;
+            }
+            self.i32[p >> 2] = a;
+            self.i32[(p >> 2) + 1] = 0;
+            return;
+        }
+        self.i32[p >> 2] = 0;
+        self.i32[(p >> 2) + 1] = 0x80000000;
+        const arr = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].toArray(v, 0x100000000);
+        for(let i = 0; i < self.n32; i++){
+            const idx = arr.length - 1 - i;
+            if (idx >= 0) {
+                self.i32[(p >> 2) + 2 + i] = arr[idx];
+            } else {
+                self.i32[(p >> 2) + 2 + i] = 0;
+            }
+        }
+    }
+}
+class WitnessCalculatorCircom2 {
+    constructor(instance, sanityCheck){
+        this.instance = instance;
+        this.version = this.instance.exports.getVersion();
+        this.n32 = this.instance.exports.getFieldNumLen32();
+        this.instance.exports.getRawPrime();
+        const arr = new Uint32Array(this.n32);
+        for(let i = 0; i < this.n32; i++){
+            arr[this.n32 - 1 - i] = this.instance.exports.readSharedRWMemory(i);
+        }
+        this.prime = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].fromArray(arr, 0x100000000);
+        this.witnessSize = this.instance.exports.getWitnessSize();
+        this.sanityCheck = sanityCheck;
+    }
+    circom_version() {
+        return this.instance.exports.getVersion();
+    }
+    async _doCalculateWitness(input, sanityCheck) {
+        //input is assumed to be a map from signals to arrays of bigints
+        this.instance.exports.init(this.sanityCheck || sanityCheck ? 1 : 0);
+        const keys = Object.keys(input);
+        let input_counter = 0;
+        keys.forEach((k)=>{
+            const h = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["fnvHash"])(k);
+            const hMSB = parseInt(h.slice(0, 8), 16);
+            const hLSB = parseInt(h.slice(8, 16), 16);
+            const fArr = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["flatArray"])(input[k]);
+            // Slight deviation from https://github.com/iden3/circom/blob/v2.1.6/code_producers/src/wasm_elements/common/witness_calculator.js
+            // because I don't know when this exported function was added
+            if (typeof this.instance.exports.getInputSignalSize === "function") {
+                let signalSize = this.instance.exports.getInputSignalSize(hMSB, hLSB);
+                if (signalSize < 0) {
+                    throw new Error(`Signal ${k} not found\n`);
+                }
+                if (fArr.length < signalSize) {
+                    throw new Error(`Not enough values for input signal ${k}\n`);
+                }
+                if (fArr.length > signalSize) {
+                    throw new Error(`Too many values for input signal ${k}\n`);
+                }
+            }
+            for(let i = 0; i < fArr.length; i++){
+                const arrFr = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toArray32"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$utils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["normalize"])(fArr[i], this.prime), this.n32);
+                for(let j = 0; j < this.n32; j++){
+                    this.instance.exports.writeSharedRWMemory(j, arrFr[this.n32 - 1 - j]);
+                }
+                try {
+                    this.instance.exports.setInputSignal(hMSB, hLSB, i);
+                    input_counter++;
+                } catch (err) {
+                    // console.log(`After adding signal ${i} of ${k}`)
+                    throw new Error(err);
+                }
+            }
+        });
+        if (input_counter < this.instance.exports.getInputSize()) {
+            throw new Error(`Not all inputs have been set. Only ${input_counter} out of ${this.instance.exports.getInputSize()}`);
+        }
+    }
+    async calculateWitness(input, sanityCheck) {
+        const w = [];
+        await this._doCalculateWitness(input, sanityCheck);
+        for(let i = 0; i < this.witnessSize; i++){
+            this.instance.exports.getWitness(i);
+            const arr = new Uint32Array(this.n32);
+            for(let j = 0; j < this.n32; j++){
+                arr[this.n32 - 1 - j] = this.instance.exports.readSharedRWMemory(j);
+            }
+            w.push(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Scalar"].fromArray(arr, 0x100000000));
+        }
+        return w;
+    }
+    async calculateWTNSBin(input, sanityCheck) {
+        const buff32 = new Uint32Array(this.witnessSize * this.n32 + this.n32 + 11);
+        const buff = new Uint8Array(buff32.buffer);
+        await this._doCalculateWitness(input, sanityCheck);
+        //"wtns"
+        buff[0] = "w".charCodeAt(0);
+        buff[1] = "t".charCodeAt(0);
+        buff[2] = "n".charCodeAt(0);
+        buff[3] = "s".charCodeAt(0);
+        //version 2
+        buff32[1] = 2;
+        //number of sections: 2
+        buff32[2] = 2;
+        //id section 1
+        buff32[3] = 1;
+        const n8 = this.n32 * 4;
+        //id section 1 length in 64bytes
+        const idSection1length = 8 + n8;
+        const idSection1lengthHex = idSection1length.toString(16);
+        buff32[4] = parseInt(idSection1lengthHex.slice(0, 8), 16);
+        buff32[5] = parseInt(idSection1lengthHex.slice(8, 16), 16);
+        //this.n32
+        buff32[6] = n8;
+        //prime number
+        this.instance.exports.getRawPrime();
+        let pos = 7;
+        for(let j = 0; j < this.n32; j++){
+            buff32[pos + j] = this.instance.exports.readSharedRWMemory(j);
+        }
+        pos += this.n32;
+        // witness size
+        buff32[pos] = this.witnessSize;
+        pos++;
+        //id section 2
+        buff32[pos] = 2;
+        pos++;
+        // section 2 length
+        const idSection2length = n8 * this.witnessSize;
+        const idSection2lengthHex = idSection2length.toString(16);
+        buff32[pos] = parseInt(idSection2lengthHex.slice(0, 8), 16);
+        buff32[pos + 1] = parseInt(idSection2lengthHex.slice(8, 16), 16);
+        pos += 2;
+        for(let i = 0; i < this.witnessSize; i++){
+            this.instance.exports.getWitness(i);
+            for(let j = 0; j < this.n32; j++){
+                buff32[pos + j] = this.instance.exports.readSharedRWMemory(j);
+            }
+            pos += this.n32;
+        }
+        return buff;
+    }
+}
+}),
+"[project]/node_modules/circom_runtime/main.js [app-ssr] (ecmascript) <locals>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$witness_calculator$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/circom_runtime/js/witness_calculator.js [app-ssr] (ecmascript)");
+;
+}),
+"[project]/node_modules/circom_runtime/js/witness_calculator.js [app-ssr] (ecmascript) <export default as WitnessCalculatorBuilder>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "WitnessCalculatorBuilder",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$witness_calculator$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"]
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$circom_runtime$2f$js$2f$witness_calculator$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/circom_runtime/js/witness_calculator.js [app-ssr] (ecmascript)");
+}),
+"[project]/node_modules/@iden3/bigarray/src/bigarray.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+const SUBARRAY_SIZE = 0x40000;
+const BigArrayHandler = {
+    get: function(obj, prop) {
+        if (!isNaN(prop)) {
+            return obj.getElement(prop);
+        } else return obj[prop];
+    },
+    set: function(obj, prop, value) {
+        if (!isNaN(prop)) {
+            return obj.setElement(prop, value);
+        } else {
+            obj[prop] = value;
+            return true;
+        }
+    }
+};
+class _BigArray {
+    constructor(initSize){
+        this.length = initSize || 0;
+        this.arr = new Array(SUBARRAY_SIZE);
+        for(let i = 0; i < initSize; i += SUBARRAY_SIZE){
+            this.arr[i / SUBARRAY_SIZE] = new Array(Math.min(SUBARRAY_SIZE, initSize - i));
+        }
+        return this;
+    }
+    push() {
+        for(let i = 0; i < arguments.length; i++){
+            this.setElement(this.length, arguments[i]);
+        }
+    }
+    slice(f, t) {
+        const arr = new Array(t - f);
+        for(let i = f; i < t; i++)arr[i - f] = this.getElement(i);
+        return arr;
+    }
+    getElement(idx) {
+        idx = parseInt(idx);
+        const idx1 = Math.floor(idx / SUBARRAY_SIZE);
+        const idx2 = idx % SUBARRAY_SIZE;
+        return this.arr[idx1] ? this.arr[idx1][idx2] : undefined;
+    }
+    setElement(idx, value) {
+        idx = parseInt(idx);
+        const idx1 = Math.floor(idx / SUBARRAY_SIZE);
+        if (!this.arr[idx1]) {
+            this.arr[idx1] = new Array(SUBARRAY_SIZE);
+        }
+        const idx2 = idx % SUBARRAY_SIZE;
+        this.arr[idx1][idx2] = value;
+        if (idx >= this.length) this.length = idx + 1;
+        return true;
+    }
+    getKeys() {
+        const newA = new BigArray();
+        for(let i = 0; i < this.arr.length; i++){
+            if (this.arr[i]) {
+                for(let j = 0; j < this.arr[i].length; j++){
+                    if (typeof this.arr[i][j] !== "undefined") {
+                        newA.push(i * SUBARRAY_SIZE + j);
+                    }
+                }
+            }
+        }
+        return newA;
+    }
+}
+class BigArray {
+    constructor(initSize){
+        const obj = new _BigArray(initSize);
+        const extObj = new Proxy(obj, BigArrayHandler);
+        return extObj;
+    }
+}
+const __TURBOPACK__default__export__ = BigArray;
+}),
+"[project]/node_modules/r1csfile/src/r1csfile.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "R1CS_FILE_CONSTRAINTS_SECTION",
+    ()=>R1CS_FILE_CONSTRAINTS_SECTION,
+    "R1CS_FILE_CUSTOM_GATES_LIST_SECTION",
+    ()=>R1CS_FILE_CUSTOM_GATES_LIST_SECTION,
+    "R1CS_FILE_CUSTOM_GATES_USES_SECTION",
+    ()=>R1CS_FILE_CUSTOM_GATES_USES_SECTION,
+    "R1CS_FILE_HEADER_SECTION",
+    ()=>R1CS_FILE_HEADER_SECTION,
+    "R1CS_FILE_WIRE2LABELID_SECTION",
+    ()=>R1CS_FILE_WIRE2LABELID_SECTION,
+    "readConstraints",
+    ()=>readConstraints,
+    "readCustomGatesListSection",
+    ()=>readCustomGatesListSection,
+    "readCustomGatesUsesSection",
+    ()=>readCustomGatesUsesSection,
+    "readMap",
+    ()=>readMap,
+    "readR1cs",
+    ()=>readR1cs,
+    "readR1csFd",
+    ()=>readR1csFd,
+    "readR1csHeader",
+    ()=>readR1csHeader,
+    "writeR1cs",
+    ()=>writeR1cs,
+    "writeR1csConstraints",
+    ()=>writeR1csConstraints,
+    "writeR1csHeader",
+    ()=>writeR1csHeader,
+    "writeR1csMap",
+    ()=>writeR1csMap
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$r1csfile$2f$node_modules$2f$ffjavascript$2f$main$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/r1csfile/node_modules/ffjavascript/main.js [app-ssr] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$r1csfile$2f$node_modules$2f$ffjavascript$2f$src$2f$f1field$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__F1Field$3e$__ = __turbopack_context__.i("[project]/node_modules/r1csfile/node_modules/ffjavascript/src/f1field.js [app-ssr] (ecmascript) <export default as F1Field>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$r1csfile$2f$node_modules$2f$ffjavascript$2f$src$2f$curves$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/r1csfile/node_modules/ffjavascript/src/curves.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$bigarray$2f$src$2f$bigarray$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@iden3/bigarray/src/bigarray.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@iden3/binfileutils/src/binfileutils.js [app-ssr] (ecmascript)");
+;
+;
+;
+const R1CS_FILE_HEADER_SECTION = 1;
+const R1CS_FILE_CONSTRAINTS_SECTION = 2;
+const R1CS_FILE_WIRE2LABELID_SECTION = 3;
+const R1CS_FILE_CUSTOM_GATES_LIST_SECTION = 4;
+const R1CS_FILE_CUSTOM_GATES_USES_SECTION = 5;
+async function readR1csHeader(fd, sections, singleThread) {
+    let options;
+    if (typeof singleThread === "object") {
+        options = singleThread;
+    } else if (typeof singleThread === "undefined") {
+        options = {
+            singleThread: false
+        };
+    } else {
+        options = {
+            singleThread: singleThread
+        };
+    }
+    const res = {};
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["startReadUniqueSection"](fd, sections, 1);
+    // Read Header
+    res.n8 = await fd.readULE32();
+    res.prime = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readBigInt"](fd, res.n8);
+    if (options.F) {
+        if (options.F.p != res.prime) throw new Error("Different Prime");
+        res.F = options.F;
+    } else if (options.getFieldFromPrime) {
+        res.F = await options.getFieldFromPrime(res.prime, options.singleThread);
+    } else if (options.getCurveFromPrime) {
+        res.curve = await options.getCurveFromPrime(res.prime, options.singleThread);
+        res.F = res.curve.Fr;
+    } else {
+        try {
+            res.curve = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$r1csfile$2f$node_modules$2f$ffjavascript$2f$src$2f$curves$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getCurveFromR"])(res.prime, options.singleThread);
+            res.F = res.curve.Fr;
+        } catch (err) {
+            res.F = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$r1csfile$2f$node_modules$2f$ffjavascript$2f$src$2f$f1field$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__F1Field$3e$__["F1Field"](res.prime);
+        }
+    }
+    res.nVars = await fd.readULE32();
+    res.nOutputs = await fd.readULE32();
+    res.nPubInputs = await fd.readULE32();
+    res.nPrvInputs = await fd.readULE32();
+    res.nLabels = await fd.readULE64();
+    res.nConstraints = await fd.readULE32();
+    res.useCustomGates = typeof sections[R1CS_FILE_CUSTOM_GATES_LIST_SECTION] !== "undefined" && sections[R1CS_FILE_CUSTOM_GATES_LIST_SECTION] !== null && typeof sections[R1CS_FILE_CUSTOM_GATES_USES_SECTION] !== "undefined" && sections[R1CS_FILE_CUSTOM_GATES_USES_SECTION] !== null;
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["endReadSection"](fd);
+    return res;
+}
+async function readConstraints(fd, sections, r1cs, logger, loggerCtx) {
+    let options;
+    if (typeof logger === "object") {
+        options = logger;
+    } else if (typeof logger === "undefined") {
+        options = {};
+    } else {
+        options = {
+            logger: logger,
+            loggerCtx: loggerCtx
+        };
+    }
+    const bR1cs = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readSection"](fd, sections, 2);
+    let bR1csPos = 0;
+    let constraints;
+    if (r1cs.nConstraints > 1 << 20) {
+        constraints = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$bigarray$2f$src$2f$bigarray$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"]();
+    } else {
+        constraints = [];
+    }
+    for(let i = 0; i < r1cs.nConstraints; i++){
+        if (options.logger && i % 100000 == 0) options.logger.info(`${options.loggerCtx}: Loading constraints: ${i}/${r1cs.nConstraints}`);
+        const c = readConstraint();
+        constraints.push(c);
+    }
+    return constraints;
+    //TURBOPACK unreachable
+    ;
+    function readConstraint() {
+        const c = [];
+        c[0] = readLC();
+        c[1] = readLC();
+        c[2] = readLC();
+        return c;
+    }
+    function readLC() {
+        const lc = {};
+        const buffUL32 = bR1cs.slice(bR1csPos, bR1csPos + 4);
+        bR1csPos += 4;
+        const buffUL32V = new DataView(buffUL32.buffer);
+        const nIdx = buffUL32V.getUint32(0, true);
+        const buff = bR1cs.slice(bR1csPos, bR1csPos + (4 + r1cs.n8) * nIdx);
+        bR1csPos += (4 + r1cs.n8) * nIdx;
+        const buffV = new DataView(buff.buffer);
+        for(let i = 0; i < nIdx; i++){
+            const idx = buffV.getUint32(i * (4 + r1cs.n8), true);
+            const val = r1cs.F.fromRprLE(buff, i * (4 + r1cs.n8) + 4);
+            lc[idx] = val;
+        }
+        return lc;
+    }
+}
+async function readMap(fd, sections, r1cs, logger, loggerCtx) {
+    let options;
+    if (typeof logger === "object") {
+        options = logger;
+    } else if (typeof logger === "undefined") {
+        options = {};
+    } else {
+        options = {
+            logger: logger,
+            loggerCtx: loggerCtx
+        };
+    }
+    const bMap = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readSection"](fd, sections, 3);
+    let bMapPos = 0;
+    let map;
+    if (r1cs.nVars > 1 << 20) {
+        map = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$bigarray$2f$src$2f$bigarray$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"]();
+    } else {
+        map = [];
+    }
+    for(let i = 0; i < r1cs.nVars; i++){
+        if (options.logger && i % 10000 == 0) options.logger.info(`${options.loggerCtx}: Loading map: ${i}/${r1cs.nVars}`);
+        const idx = readULE64();
+        map.push(idx);
+    }
+    return map;
+    //TURBOPACK unreachable
+    ;
+    function readULE64() {
+        const buffULE64 = bMap.slice(bMapPos, bMapPos + 8);
+        bMapPos += 8;
+        const buffULE64V = new DataView(buffULE64.buffer);
+        const LSB = buffULE64V.getUint32(0, true);
+        const MSB = buffULE64V.getUint32(4, true);
+        return MSB * 0x100000000 + LSB;
+    }
+}
+async function readR1csFd(fd, sections, options) {
+    /**
+     * Options properties:
+     *  loadConstraints: <bool> true by default
+     *  loadMap:         <bool> false by default
+     *  loadCustomGates: <bool> true by default
+     */ if (typeof options !== "object") {
+        throw new Error("readR1csFd: options must be an object");
+    }
+    options.loadConstraints = "loadConstraints" in options ? options.loadConstraints : true;
+    options.loadMap = "loadMap" in options ? options.loadMap : false;
+    options.loadCustomGates = "loadCustomGates" in options ? options.loadCustomGates : true;
+    const res = await readR1csHeader(fd, sections, options);
+    if (options.loadConstraints) {
+        res.constraints = await readConstraints(fd, sections, res, options);
+    }
+    // Read Labels
+    if (options.loadMap) {
+        res.map = await readMap(fd, sections, res, options);
+    }
+    if (options.loadCustomGates) {
+        if (res.useCustomGates) {
+            res.customGates = await readCustomGatesListSection(fd, sections, res);
+            res.customGatesUses = await readCustomGatesUsesSection(fd, sections, options);
+        } else {
+            res.customGates = [];
+            res.customGatesUses = [];
+        }
+    }
+    return res;
+}
+async function readR1cs(fileName, loadConstraints, loadMap, singleThread, logger, loggerCtx) {
+    let options;
+    if (typeof loadConstraints === "object") {
+        options = loadConstraints;
+    } else if (typeof loadConstraints === "undefined") {
+        options = {
+            loadConstraints: true,
+            loadMap: false,
+            loadCustomGates: true
+        };
+    } else {
+        options = {
+            loadConstraints: loadConstraints,
+            loadMap: loadMap,
+            singleThread: singleThread,
+            logger: logger,
+            loggerCtx: loggerCtx
+        };
+    }
+    const { fd, sections } = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readBinFile"](fileName, "r1cs", 1, 1 << 25, 1 << 22);
+    const res = await readR1csFd(fd, sections, options);
+    await fd.close();
+    return res;
+}
+async function readCustomGatesListSection(fd, sections, res) {
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["startReadUniqueSection"](fd, sections, R1CS_FILE_CUSTOM_GATES_LIST_SECTION);
+    let num = await fd.readULE32();
+    let customGates = [];
+    for(let i = 0; i < num; i++){
+        let customGate = {};
+        customGate.templateName = await fd.readString();
+        let numParameters = await fd.readULE32();
+        customGate.parameters = Array(numParameters);
+        let buff = await fd.read(res.n8 * numParameters);
+        for(let j = 0; j < numParameters; j++){
+            customGate.parameters[j] = res.F.fromRprLE(buff, j * res.n8, res.n8);
+            ;
+        }
+        customGates.push(customGate);
+    }
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["endReadSection"](fd);
+    return customGates;
+}
+async function readCustomGatesUsesSection(fd, sections, options) {
+    const bR1cs = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["readSection"](fd, sections, R1CS_FILE_CUSTOM_GATES_USES_SECTION);
+    const bR1cs32 = new Uint32Array(bR1cs.buffer, bR1cs.byteOffset, bR1cs.byteLength / 4);
+    const nCustomGateUses = bR1cs32[0];
+    let bR1csPos = 1;
+    let customGatesUses;
+    if (nCustomGateUses > 1 << 20) {
+        customGatesUses = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$bigarray$2f$src$2f$bigarray$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"]();
+    } else {
+        customGatesUses = [];
+    }
+    for(let i = 0; i < nCustomGateUses; i++){
+        if (options.logger && i % 100000 == 0) options.logger.info(`${options.loggerCtx}: Loading custom gate uses: ${i}/${nCustomGateUses}`);
+        let c = {};
+        c.id = bR1cs32[bR1csPos++];
+        let numSignals = bR1cs32[bR1csPos++];
+        c.signals = [];
+        for(let j = 0; j < numSignals; j++){
+            const LSB = bR1cs32[bR1csPos++];
+            const MSB = bR1cs32[bR1csPos++];
+            c.signals.push(MSB * 0x100000000 + LSB);
+        }
+        customGatesUses.push(c);
+    }
+    return customGatesUses;
+}
+async function writeR1csHeader(fd, cir) {
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["startWriteSection"](fd, 1);
+    await fd.writeULE32(cir.n8); // Temporally set to 0 length
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["writeBigInt"](fd, cir.prime, cir.n8);
+    await fd.writeULE32(cir.nVars);
+    await fd.writeULE32(cir.nOutputs);
+    await fd.writeULE32(cir.nPubInputs);
+    await fd.writeULE32(cir.nPrvInputs);
+    await fd.writeULE64(cir.nLabels);
+    await fd.writeULE32(cir.constraints.length);
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["endWriteSection"](fd);
+}
+async function writeR1csConstraints(fd, cir, logger, loggerCtx) {
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["startWriteSection"](fd, 2);
+    for(let i = 0; i < cir.constraints.length; i++){
+        if (logger && i % 10000 == 0) logger.info(`${loggerCtx}: writing constraint: ${i}/${cir.constraints.length}`);
+        await writeConstraint(cir.constraints[i]);
+    }
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["endWriteSection"](fd);
+    function writeConstraint(c) {
+        const n8 = cir.n8;
+        const F = cir.F || cir.curve.Fr;
+        const idxA = Object.keys(c[0]);
+        const idxB = Object.keys(c[1]);
+        const idxC = Object.keys(c[2]);
+        const buff = new Uint8Array((idxA.length + idxB.length + idxC.length) * (n8 + 4) + 12);
+        const buffV = new DataView(buff.buffer);
+        let o = 0;
+        buffV.setUint32(o, idxA.length, true);
+        o += 4;
+        for(let i = 0; i < idxA.length; i++){
+            const coef = idxA[i];
+            buffV.setUint32(o, coef, true);
+            o += 4;
+            F.toRprLE(buff, o, c[0][coef]);
+            o += n8;
+        }
+        buffV.setUint32(o, idxB.length, true);
+        o += 4;
+        for(let i = 0; i < idxB.length; i++){
+            const coef = idxB[i];
+            buffV.setUint32(o, coef, true);
+            o += 4;
+            F.toRprLE(buff, o, c[1][coef]);
+            o += n8;
+        }
+        buffV.setUint32(o, idxC.length, true);
+        o += 4;
+        for(let i = 0; i < idxC.length; i++){
+            const coef = idxC[i];
+            buffV.setUint32(o, coef, true);
+            o += 4;
+            F.toRprLE(buff, o, c[2][coef]);
+            o += n8;
+        }
+        return fd.write(buff);
+    }
+}
+async function writeR1csMap(fd, cir, logger, loggerCtx) {
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["startWriteSection"](fd, 3);
+    if (cir.map.length != cir.nVars) throw new Error("Invalid map size");
+    for(let i = 0; i < cir.nVars; i++){
+        if (logger && i % 10000 == 0) logger.info(`${loggerCtx}: writing map: ${i}/${cir.nVars}`);
+        await fd.writeULE64(cir.map[i]);
+    }
+    await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["endWriteSection"](fd);
+}
+async function writeR1cs(fileName, cir, logger, loggerCtx) {
+    const fd = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$iden3$2f$binfileutils$2f$src$2f$binfileutils$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createBinFile"](fileName, "r1cs", 1, 3, 1 << 25, 1 << 22);
+    await writeR1csHeader(fd, cir);
+    await writeR1csConstraints(fd, cir, logger, loggerCtx);
+    await writeR1csMap(fd, cir, logger, loggerCtx);
+    await fd.close();
+}
+}),
+"[project]/node_modules/ejs/lib/utils.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+ * EJS Embedded JavaScript templates
+ * Copyright 2112 Matthew Eernisse (mde@fleegix.org)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/ /**
+ * Private utility functions
+ * @module utils
+ * @private
+ */ var regExpChars = /[|\\{}()[\]^$+*?.]/g;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var hasOwn = function(obj, key) {
+    return hasOwnProperty.apply(obj, [
+        key
+    ]);
+};
+/**
+ * Escape characters reserved in regular expressions.
+ *
+ * If `string` is `undefined` or `null`, the empty string is returned.
+ *
+ * @param {String} string Input string
+ * @return {String} Escaped string
+ * @static
+ * @private
+ */ exports.escapeRegExpChars = function(string) {
+    // istanbul ignore if
+    if (!string) {
+        return '';
+    }
+    return String(string).replace(regExpChars, '\\$&');
+};
+var _ENCODE_HTML_RULES = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&#34;',
+    "'": '&#39;'
+};
+var _MATCH_HTML = /[&<>'"]/g;
+function encode_char(c) {
+    return _ENCODE_HTML_RULES[c] || c;
+}
+/**
+ * Stringified version of constants used by {@link module:utils.escapeXML}.
+ *
+ * It is used in the process of generating {@link ClientFunction}s.
+ *
+ * @readonly
+ * @type {String}
+ */ var escapeFuncStr = 'var _ENCODE_HTML_RULES = {\n' + '      "&": "&amp;"\n' + '    , "<": "&lt;"\n' + '    , ">": "&gt;"\n' + '    , \'"\': "&#34;"\n' + '    , "\'": "&#39;"\n' + '    }\n' + '  , _MATCH_HTML = /[&<>\'"]/g;\n' + 'function encode_char(c) {\n' + '  return _ENCODE_HTML_RULES[c] || c;\n' + '};\n';
+/**
+ * Escape characters reserved in XML.
+ *
+ * If `markup` is `undefined` or `null`, the empty string is returned.
+ *
+ * @implements {EscapeCallback}
+ * @param {String} markup Input string
+ * @return {String} Escaped string
+ * @static
+ * @private
+ */ exports.escapeXML = function(markup) {
+    return markup == undefined ? '' : String(markup).replace(_MATCH_HTML, encode_char);
+};
+function escapeXMLToString() {
+    return Function.prototype.toString.call(this) + ';\n' + escapeFuncStr;
+}
+try {
+    if (typeof Object.defineProperty === 'function') {
+        // If the Function prototype is frozen, the "toString" property is non-writable. This means that any objects which inherit this property
+        // cannot have the property changed using an assignment. If using strict mode, attempting that will cause an error. If not using strict
+        // mode, attempting that will be silently ignored.
+        // However, we can still explicitly shadow the prototype's "toString" property by defining a new "toString" property on this object.
+        Object.defineProperty(exports.escapeXML, 'toString', {
+            value: escapeXMLToString
+        });
+    } else {
+        // If Object.defineProperty() doesn't exist, attempt to shadow this property using the assignment operator.
+        exports.escapeXML.toString = escapeXMLToString;
+    }
+} catch (err) {
+    console.warn('Unable to set escapeXML.toString (is the Function prototype frozen?)');
+}
+/**
+ * Naive copy of properties from one object to another.
+ * Does not recurse into non-scalar properties
+ * Does not check to see if the property has a value before copying
+ *
+ * @param  {Object} to   Destination object
+ * @param  {Object} from Source object
+ * @return {Object}      Destination object
+ * @static
+ * @private
+ */ exports.shallowCopy = function(to, from) {
+    from = from || {};
+    if (to !== null && to !== undefined) {
+        for(var p in from){
+            if (!hasOwn(from, p)) {
+                continue;
+            }
+            if (p === '__proto__' || p === 'constructor') {
+                continue;
+            }
+            to[p] = from[p];
+        }
+    }
+    return to;
+};
+/**
+ * Naive copy of a list of key names, from one object to another.
+ * Only copies property if it is actually defined
+ * Does not recurse into non-scalar properties
+ *
+ * @param  {Object} to   Destination object
+ * @param  {Object} from Source object
+ * @param  {Array} list List of properties to copy
+ * @return {Object}      Destination object
+ * @static
+ * @private
+ */ exports.shallowCopyFromList = function(to, from, list) {
+    list = list || [];
+    from = from || {};
+    if (to !== null && to !== undefined) {
+        for(var i = 0; i < list.length; i++){
+            var p = list[i];
+            if (typeof from[p] != 'undefined') {
+                if (!hasOwn(from, p)) {
+                    continue;
+                }
+                if (p === '__proto__' || p === 'constructor') {
+                    continue;
+                }
+                to[p] = from[p];
+            }
+        }
+    }
+    return to;
+};
+/**
+ * Simple in-process cache implementation. Does not implement limits of any
+ * sort.
+ *
+ * @implements {Cache}
+ * @static
+ * @private
+ */ exports.cache = {
+    _data: {},
+    set: function(key, val) {
+        this._data[key] = val;
+    },
+    get: function(key) {
+        return this._data[key];
+    },
+    remove: function(key) {
+        delete this._data[key];
+    },
+    reset: function() {
+        this._data = {};
+    }
+};
+/**
+ * Transforms hyphen case variable into camel case.
+ *
+ * @param {String} string Hyphen case string
+ * @return {String} Camel case string
+ * @static
+ * @private
+ */ exports.hyphenToCamel = function(str) {
+    return str.replace(/-[a-z]/g, function(match) {
+        return match[1].toUpperCase();
+    });
+};
+/**
+ * Returns a null-prototype object in runtimes that support it
+ *
+ * @return {Object} Object, prototype will be set to null where possible
+ * @static
+ * @private
+ */ exports.createNullProtoObjWherePossible = function() {
+    if (typeof Object.create == 'function') {
+        return function() {
+            return Object.create(null);
+        };
+    }
+    if (!(({
+        __proto__: null
+    }) instanceof Object)) {
+        return function() {
+            return {
+                __proto__: null
+            };
+        };
+    }
+    // Not possible, just pass through
+    return function() {
+        return {};
+    };
+}();
+exports.hasOwnOnlyObject = function(obj) {
+    var o = exports.createNullProtoObjWherePossible();
+    for(var p in obj){
+        if (hasOwn(obj, p)) {
+            o[p] = obj[p];
+        }
+    }
+    return o;
+};
+}),
+"[project]/node_modules/ejs/package.json (json)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({"name":"ejs","description":"Embedded JavaScript templates","keywords":["template","engine","ejs"],"version":"3.1.10","author":"Matthew Eernisse <mde@fleegix.org> (http://fleegix.org)","license":"Apache-2.0","bin":{"ejs":"./bin/cli.js"},"main":"./lib/ejs.js","jsdelivr":"ejs.min.js","unpkg":"ejs.min.js","repository":{"type":"git","url":"git://github.com/mde/ejs.git"},"bugs":"https://github.com/mde/ejs/issues","homepage":"https://github.com/mde/ejs","dependencies":{"jake":"^10.8.5"},"devDependencies":{"browserify":"^16.5.1","eslint":"^6.8.0","git-directory-deploy":"^1.5.1","jsdoc":"^4.0.2","lru-cache":"^4.0.1","mocha":"^10.2.0","uglify-js":"^3.3.16"},"engines":{"node":">=0.10.0"},"scripts":{"test":"npx jake test"}});}),
+"[project]/node_modules/ejs/lib/ejs.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+ * EJS Embedded JavaScript templates
+ * Copyright 2112 Matthew Eernisse (mde@fleegix.org)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/ /**
+ * @file Embedded JavaScript templating engine. {@link http://ejs.co}
+ * @author Matthew Eernisse <mde@fleegix.org>
+ * @author Tiancheng "Timothy" Gu <timothygu99@gmail.com>
+ * @project EJS
+ * @license {@link http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0}
+ */ /**
+ * EJS internal functions.
+ *
+ * Technically this "module" lies in the same file as {@link module:ejs}, for
+ * the sake of organization all the private functions re grouped into this
+ * module.
+ *
+ * @module ejs-internal
+ * @private
+ */ /**
+ * Embedded JavaScript templating engine.
+ *
+ * @module ejs
+ * @public
+ */ var fs = __turbopack_context__.r("[externals]/fs [external] (fs, cjs)");
+var path = __turbopack_context__.r("[externals]/path [external] (path, cjs)");
+var utils = __turbopack_context__.r("[project]/node_modules/ejs/lib/utils.js [app-ssr] (ecmascript)");
+var scopeOptionWarned = false;
+/** @type {string} */ var _VERSION_STRING = __turbopack_context__.r("[project]/node_modules/ejs/package.json (json)").version;
+var _DEFAULT_OPEN_DELIMITER = '<';
+var _DEFAULT_CLOSE_DELIMITER = '>';
+var _DEFAULT_DELIMITER = '%';
+var _DEFAULT_LOCALS_NAME = 'locals';
+var _NAME = 'ejs';
+var _REGEX_STRING = '(<%%|%%>|<%=|<%-|<%_|<%#|<%|%>|-%>|_%>)';
+var _OPTS_PASSABLE_WITH_DATA = [
+    'delimiter',
+    'scope',
+    'context',
+    'debug',
+    'compileDebug',
+    'client',
+    '_with',
+    'rmWhitespace',
+    'strict',
+    'filename',
+    'async'
+];
+// We don't allow 'cache' option to be passed in the data obj for
+// the normal `render` call, but this is where Express 2 & 3 put it
+// so we make an exception for `renderFile`
+var _OPTS_PASSABLE_WITH_DATA_EXPRESS = _OPTS_PASSABLE_WITH_DATA.concat('cache');
+var _BOM = /^\uFEFF/;
+var _JS_IDENTIFIER = /^[a-zA-Z_$][0-9a-zA-Z_$]*$/;
+/**
+ * EJS template function cache. This can be a LRU object from lru-cache NPM
+ * module. By default, it is {@link module:utils.cache}, a simple in-process
+ * cache that grows continuously.
+ *
+ * @type {Cache}
+ */ exports.cache = utils.cache;
+/**
+ * Custom file loader. Useful for template preprocessing or restricting access
+ * to a certain part of the filesystem.
+ *
+ * @type {fileLoader}
+ */ exports.fileLoader = fs.readFileSync;
+/**
+ * Name of the object containing the locals.
+ *
+ * This variable is overridden by {@link Options}`.localsName` if it is not
+ * `undefined`.
+ *
+ * @type {String}
+ * @public
+ */ exports.localsName = _DEFAULT_LOCALS_NAME;
+/**
+ * Promise implementation -- defaults to the native implementation if available
+ * This is mostly just for testability
+ *
+ * @type {PromiseConstructorLike}
+ * @public
+ */ exports.promiseImpl = new Function('return this;')().Promise;
+/**
+ * Get the path to the included file from the parent file path and the
+ * specified path.
+ *
+ * @param {String}  name     specified path
+ * @param {String}  filename parent file path
+ * @param {Boolean} [isDir=false] whether the parent file path is a directory
+ * @return {String}
+ */ exports.resolveInclude = function(name, filename, isDir) {
+    var dirname = path.dirname;
+    var extname = path.extname;
+    var resolve = path.resolve;
+    var includePath = resolve(isDir ? filename : dirname(filename), name);
+    var ext = extname(name);
+    if (!ext) {
+        includePath += '.ejs';
+    }
+    return includePath;
+};
+/**
+ * Try to resolve file path on multiple directories
+ *
+ * @param  {String}        name  specified path
+ * @param  {Array<String>} paths list of possible parent directory paths
+ * @return {String}
+ */ function resolvePaths(name, paths) {
+    var filePath;
+    if (paths.some(function(v) {
+        filePath = exports.resolveInclude(name, v, true);
+        return fs.existsSync(filePath);
+    })) {
+        return filePath;
+    }
+}
+/**
+ * Get the path to the included file by Options
+ *
+ * @param  {String}  path    specified path
+ * @param  {Options} options compilation options
+ * @return {String}
+ */ function getIncludePath(path, options) {
+    var includePath;
+    var filePath;
+    var views = options.views;
+    var match = /^[A-Za-z]+:\\|^\//.exec(path);
+    // Abs path
+    if (match && match.length) {
+        path = path.replace(/^\/*/, '');
+        if (Array.isArray(options.root)) {
+            includePath = resolvePaths(path, options.root);
+        } else {
+            includePath = exports.resolveInclude(path, options.root || '/', true);
+        }
+    } else {
+        // Look relative to a passed filename first
+        if (options.filename) {
+            filePath = exports.resolveInclude(path, options.filename);
+            if (fs.existsSync(filePath)) {
+                includePath = filePath;
+            }
+        }
+        // Then look in any views directories
+        if (!includePath && Array.isArray(views)) {
+            includePath = resolvePaths(path, views);
+        }
+        if (!includePath && typeof options.includer !== 'function') {
+            throw new Error('Could not find the include file "' + options.escapeFunction(path) + '"');
+        }
+    }
+    return includePath;
+}
+/**
+ * Get the template from a string or a file, either compiled on-the-fly or
+ * read from cache (if enabled), and cache the template if needed.
+ *
+ * If `template` is not set, the file specified in `options.filename` will be
+ * read.
+ *
+ * If `options.cache` is true, this function reads the file from
+ * `options.filename` so it must be set prior to calling this function.
+ *
+ * @memberof module:ejs-internal
+ * @param {Options} options   compilation options
+ * @param {String} [template] template source
+ * @return {(TemplateFunction|ClientFunction)}
+ * Depending on the value of `options.client`, either type might be returned.
+ * @static
+ */ function handleCache(options, template) {
+    var func;
+    var filename = options.filename;
+    var hasTemplate = arguments.length > 1;
+    if (options.cache) {
+        if (!filename) {
+            throw new Error('cache option requires a filename');
+        }
+        func = exports.cache.get(filename);
+        if (func) {
+            return func;
+        }
+        if (!hasTemplate) {
+            template = fileLoader(filename).toString().replace(_BOM, '');
+        }
+    } else if (!hasTemplate) {
+        // istanbul ignore if: should not happen at all
+        if (!filename) {
+            throw new Error('Internal EJS error: no file name or template ' + 'provided');
+        }
+        template = fileLoader(filename).toString().replace(_BOM, '');
+    }
+    func = exports.compile(template, options);
+    if (options.cache) {
+        exports.cache.set(filename, func);
+    }
+    return func;
+}
+/**
+ * Try calling handleCache with the given options and data and call the
+ * callback with the result. If an error occurs, call the callback with
+ * the error. Used by renderFile().
+ *
+ * @memberof module:ejs-internal
+ * @param {Options} options    compilation options
+ * @param {Object} data        template data
+ * @param {RenderFileCallback} cb callback
+ * @static
+ */ function tryHandleCache(options, data, cb) {
+    var result;
+    if (!cb) {
+        if (typeof exports.promiseImpl == 'function') {
+            return new exports.promiseImpl(function(resolve, reject) {
+                try {
+                    result = handleCache(options)(data);
+                    resolve(result);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        } else {
+            throw new Error('Please provide a callback function');
+        }
+    } else {
+        try {
+            result = handleCache(options)(data);
+        } catch (err) {
+            return cb(err);
+        }
+        cb(null, result);
+    }
+}
+/**
+ * fileLoader is independent
+ *
+ * @param {String} filePath ejs file path.
+ * @return {String} The contents of the specified file.
+ * @static
+ */ function fileLoader(filePath) {
+    return exports.fileLoader(filePath);
+}
+/**
+ * Get the template function.
+ *
+ * If `options.cache` is `true`, then the template is cached.
+ *
+ * @memberof module:ejs-internal
+ * @param {String}  path    path for the specified file
+ * @param {Options} options compilation options
+ * @return {(TemplateFunction|ClientFunction)}
+ * Depending on the value of `options.client`, either type might be returned
+ * @static
+ */ function includeFile(path, options) {
+    var opts = utils.shallowCopy(utils.createNullProtoObjWherePossible(), options);
+    opts.filename = getIncludePath(path, opts);
+    if (typeof options.includer === 'function') {
+        var includerResult = options.includer(path, opts.filename);
+        if (includerResult) {
+            if (includerResult.filename) {
+                opts.filename = includerResult.filename;
+            }
+            if (includerResult.template) {
+                return handleCache(opts, includerResult.template);
+            }
+        }
+    }
+    return handleCache(opts);
+}
+/**
+ * Re-throw the given `err` in context to the `str` of ejs, `filename`, and
+ * `lineno`.
+ *
+ * @implements {RethrowCallback}
+ * @memberof module:ejs-internal
+ * @param {Error}  err      Error object
+ * @param {String} str      EJS source
+ * @param {String} flnm     file name of the EJS file
+ * @param {Number} lineno   line number of the error
+ * @param {EscapeCallback} esc
+ * @static
+ */ function rethrow(err, str, flnm, lineno, esc) {
+    var lines = str.split('\n');
+    var start = Math.max(lineno - 3, 0);
+    var end = Math.min(lines.length, lineno + 3);
+    var filename = esc(flnm);
+    // Error context
+    var context = lines.slice(start, end).map(function(line, i) {
+        var curr = i + start + 1;
+        return (curr == lineno ? ' >> ' : '    ') + curr + '| ' + line;
+    }).join('\n');
+    // Alter exception message
+    err.path = filename;
+    err.message = (filename || 'ejs') + ':' + lineno + '\n' + context + '\n\n' + err.message;
+    throw err;
+}
+function stripSemi(str) {
+    return str.replace(/;(\s*$)/, '$1');
+}
+/**
+ * Compile the given `str` of ejs into a template function.
+ *
+ * @param {String}  template EJS template
+ *
+ * @param {Options} [opts] compilation options
+ *
+ * @return {(TemplateFunction|ClientFunction)}
+ * Depending on the value of `opts.client`, either type might be returned.
+ * Note that the return type of the function also depends on the value of `opts.async`.
+ * @public
+ */ exports.compile = function compile(template, opts) {
+    var templ;
+    // v1 compat
+    // 'scope' is 'context'
+    // FIXME: Remove this in a future version
+    if (opts && opts.scope) {
+        if (!scopeOptionWarned) {
+            console.warn('`scope` option is deprecated and will be removed in EJS 3');
+            scopeOptionWarned = true;
+        }
+        if (!opts.context) {
+            opts.context = opts.scope;
+        }
+        delete opts.scope;
+    }
+    templ = new Template(template, opts);
+    return templ.compile();
+};
+/**
+ * Render the given `template` of ejs.
+ *
+ * If you would like to include options but not data, you need to explicitly
+ * call this function with `data` being an empty object or `null`.
+ *
+ * @param {String}   template EJS template
+ * @param {Object}  [data={}] template data
+ * @param {Options} [opts={}] compilation and rendering options
+ * @return {(String|Promise<String>)}
+ * Return value type depends on `opts.async`.
+ * @public
+ */ exports.render = function(template, d, o) {
+    var data = d || utils.createNullProtoObjWherePossible();
+    var opts = o || utils.createNullProtoObjWherePossible();
+    // No options object -- if there are optiony names
+    // in the data, copy them to options
+    if (arguments.length == 2) {
+        utils.shallowCopyFromList(opts, data, _OPTS_PASSABLE_WITH_DATA);
+    }
+    return handleCache(opts, template)(data);
+};
+/**
+ * Render an EJS file at the given `path` and callback `cb(err, str)`.
+ *
+ * If you would like to include options but not data, you need to explicitly
+ * call this function with `data` being an empty object or `null`.
+ *
+ * @param {String}             path     path to the EJS file
+ * @param {Object}            [data={}] template data
+ * @param {Options}           [opts={}] compilation and rendering options
+ * @param {RenderFileCallback} cb callback
+ * @public
+ */ exports.renderFile = function() {
+    var args = Array.prototype.slice.call(arguments);
+    var filename = args.shift();
+    var cb;
+    var opts = {
+        filename: filename
+    };
+    var data;
+    var viewOpts;
+    // Do we have a callback?
+    if (typeof arguments[arguments.length - 1] == 'function') {
+        cb = args.pop();
+    }
+    // Do we have data/opts?
+    if (args.length) {
+        // Should always have data obj
+        data = args.shift();
+        // Normal passed opts (data obj + opts obj)
+        if (args.length) {
+            // Use shallowCopy so we don't pollute passed in opts obj with new vals
+            utils.shallowCopy(opts, args.pop());
+        } else {
+            // Express 3 and 4
+            if (data.settings) {
+                // Pull a few things from known locations
+                if (data.settings.views) {
+                    opts.views = data.settings.views;
+                }
+                if (data.settings['view cache']) {
+                    opts.cache = true;
+                }
+                // Undocumented after Express 2, but still usable, esp. for
+                // items that are unsafe to be passed along with data, like `root`
+                viewOpts = data.settings['view options'];
+                if (viewOpts) {
+                    utils.shallowCopy(opts, viewOpts);
+                }
+            }
+            // Express 2 and lower, values set in app.locals, or people who just
+            // want to pass options in their data. NOTE: These values will override
+            // anything previously set in settings  or settings['view options']
+            utils.shallowCopyFromList(opts, data, _OPTS_PASSABLE_WITH_DATA_EXPRESS);
+        }
+        opts.filename = filename;
+    } else {
+        data = utils.createNullProtoObjWherePossible();
+    }
+    return tryHandleCache(opts, data, cb);
+};
+/**
+ * Clear intermediate JavaScript cache. Calls {@link Cache#reset}.
+ * @public
+ */ /**
+ * EJS template class
+ * @public
+ */ exports.Template = Template;
+exports.clearCache = function() {
+    exports.cache.reset();
+};
+function Template(text, optsParam) {
+    var opts = utils.hasOwnOnlyObject(optsParam);
+    var options = utils.createNullProtoObjWherePossible();
+    this.templateText = text;
+    /** @type {string | null} */ this.mode = null;
+    this.truncate = false;
+    this.currentLine = 1;
+    this.source = '';
+    options.client = opts.client || false;
+    options.escapeFunction = opts.escape || opts.escapeFunction || utils.escapeXML;
+    options.compileDebug = opts.compileDebug !== false;
+    options.debug = !!opts.debug;
+    options.filename = opts.filename;
+    options.openDelimiter = opts.openDelimiter || exports.openDelimiter || _DEFAULT_OPEN_DELIMITER;
+    options.closeDelimiter = opts.closeDelimiter || exports.closeDelimiter || _DEFAULT_CLOSE_DELIMITER;
+    options.delimiter = opts.delimiter || exports.delimiter || _DEFAULT_DELIMITER;
+    options.strict = opts.strict || false;
+    options.context = opts.context;
+    options.cache = opts.cache || false;
+    options.rmWhitespace = opts.rmWhitespace;
+    options.root = opts.root;
+    options.includer = opts.includer;
+    options.outputFunctionName = opts.outputFunctionName;
+    options.localsName = opts.localsName || exports.localsName || _DEFAULT_LOCALS_NAME;
+    options.views = opts.views;
+    options.async = opts.async;
+    options.destructuredLocals = opts.destructuredLocals;
+    options.legacyInclude = typeof opts.legacyInclude != 'undefined' ? !!opts.legacyInclude : true;
+    if (options.strict) {
+        options._with = false;
+    } else {
+        options._with = typeof opts._with != 'undefined' ? opts._with : true;
+    }
+    this.opts = options;
+    this.regex = this.createRegex();
+}
+Template.modes = {
+    EVAL: 'eval',
+    ESCAPED: 'escaped',
+    RAW: 'raw',
+    COMMENT: 'comment',
+    LITERAL: 'literal'
+};
+Template.prototype = {
+    createRegex: function() {
+        var str = _REGEX_STRING;
+        var delim = utils.escapeRegExpChars(this.opts.delimiter);
+        var open = utils.escapeRegExpChars(this.opts.openDelimiter);
+        var close = utils.escapeRegExpChars(this.opts.closeDelimiter);
+        str = str.replace(/%/g, delim).replace(/</g, open).replace(/>/g, close);
+        return new RegExp(str);
+    },
+    compile: function() {
+        /** @type {string} */ var src;
+        /** @type {ClientFunction} */ var fn;
+        var opts = this.opts;
+        var prepended = '';
+        var appended = '';
+        /** @type {EscapeCallback} */ var escapeFn = opts.escapeFunction;
+        /** @type {FunctionConstructor} */ var ctor;
+        /** @type {string} */ var sanitizedFilename = opts.filename ? JSON.stringify(opts.filename) : 'undefined';
+        if (!this.source) {
+            this.generateSource();
+            prepended += '  var __output = "";\n' + '  function __append(s) { if (s !== undefined && s !== null) __output += s }\n';
+            if (opts.outputFunctionName) {
+                if (!_JS_IDENTIFIER.test(opts.outputFunctionName)) {
+                    throw new Error('outputFunctionName is not a valid JS identifier.');
+                }
+                prepended += '  var ' + opts.outputFunctionName + ' = __append;' + '\n';
+            }
+            if (opts.localsName && !_JS_IDENTIFIER.test(opts.localsName)) {
+                throw new Error('localsName is not a valid JS identifier.');
+            }
+            if (opts.destructuredLocals && opts.destructuredLocals.length) {
+                var destructuring = '  var __locals = (' + opts.localsName + ' || {}),\n';
+                for(var i = 0; i < opts.destructuredLocals.length; i++){
+                    var name = opts.destructuredLocals[i];
+                    if (!_JS_IDENTIFIER.test(name)) {
+                        throw new Error('destructuredLocals[' + i + '] is not a valid JS identifier.');
+                    }
+                    if (i > 0) {
+                        destructuring += ',\n  ';
+                    }
+                    destructuring += name + ' = __locals.' + name;
+                }
+                prepended += destructuring + ';\n';
+            }
+            if (opts._with !== false) {
+                prepended += '  with (' + opts.localsName + ' || {}) {' + '\n';
+                appended += '  }' + '\n';
+            }
+            appended += '  return __output;' + '\n';
+            this.source = prepended + this.source + appended;
+        }
+        if (opts.compileDebug) {
+            src = 'var __line = 1' + '\n' + '  , __lines = ' + JSON.stringify(this.templateText) + '\n' + '  , __filename = ' + sanitizedFilename + ';' + '\n' + 'try {' + '\n' + this.source + '} catch (e) {' + '\n' + '  rethrow(e, __lines, __filename, __line, escapeFn);' + '\n' + '}' + '\n';
+        } else {
+            src = this.source;
+        }
+        if (opts.client) {
+            src = 'escapeFn = escapeFn || ' + escapeFn.toString() + ';' + '\n' + src;
+            if (opts.compileDebug) {
+                src = 'rethrow = rethrow || ' + rethrow.toString() + ';' + '\n' + src;
+            }
+        }
+        if (opts.strict) {
+            src = '"use strict";\n' + src;
+        }
+        if (opts.debug) {
+            console.log(src);
+        }
+        if (opts.compileDebug && opts.filename) {
+            src = src + '\n' + '//# sourceURL=' + sanitizedFilename + '\n';
+        }
+        try {
+            if (opts.async) {
+                // Have to use generated function for this, since in envs without support,
+                // it breaks in parsing
+                try {
+                    ctor = new Function('return (async function(){}).constructor;')();
+                } catch (e) {
+                    if (e instanceof SyntaxError) {
+                        throw new Error('This environment does not support async/await');
+                    } else {
+                        throw e;
+                    }
+                }
+            } else {
+                ctor = Function;
+            }
+            fn = new ctor(opts.localsName + ', escapeFn, include, rethrow', src);
+        } catch (e) {
+            // istanbul ignore else
+            if (e instanceof SyntaxError) {
+                if (opts.filename) {
+                    e.message += ' in ' + opts.filename;
+                }
+                e.message += ' while compiling ejs\n\n';
+                e.message += 'If the above error is not helpful, you may want to try EJS-Lint:\n';
+                e.message += 'https://github.com/RyanZim/EJS-Lint';
+                if (!opts.async) {
+                    e.message += '\n';
+                    e.message += 'Or, if you meant to create an async function, pass `async: true` as an option.';
+                }
+            }
+            throw e;
+        }
+        // Return a callable function which will execute the function
+        // created by the source-code, with the passed data as locals
+        // Adds a local `include` function which allows full recursive include
+        var returnedFn = opts.client ? fn : function anonymous(data) {
+            var include = function(path, includeData) {
+                var d = utils.shallowCopy(utils.createNullProtoObjWherePossible(), data);
+                if (includeData) {
+                    d = utils.shallowCopy(d, includeData);
+                }
+                return includeFile(path, opts)(d);
+            };
+            return fn.apply(opts.context, [
+                data || utils.createNullProtoObjWherePossible(),
+                escapeFn,
+                include,
+                rethrow
+            ]);
+        };
+        if (opts.filename && typeof Object.defineProperty === 'function') {
+            var filename = opts.filename;
+            var basename = path.basename(filename, path.extname(filename));
+            try {
+                Object.defineProperty(returnedFn, 'name', {
+                    value: basename,
+                    writable: false,
+                    enumerable: false,
+                    configurable: true
+                });
+            } catch (e) {}
+        }
+        return returnedFn;
+    },
+    generateSource: function() {
+        var opts = this.opts;
+        if (opts.rmWhitespace) {
+            // Have to use two separate replace here as `^` and `$` operators don't
+            // work well with `\r` and empty lines don't work well with the `m` flag.
+            this.templateText = this.templateText.replace(/[\r\n]+/g, '\n').replace(/^\s+|\s+$/gm, '');
+        }
+        // Slurp spaces and tabs before <%_ and after _%>
+        this.templateText = this.templateText.replace(/[ \t]*<%_/gm, '<%_').replace(/_%>[ \t]*/gm, '_%>');
+        var self = this;
+        var matches = this.parseTemplateText();
+        var d = this.opts.delimiter;
+        var o = this.opts.openDelimiter;
+        var c = this.opts.closeDelimiter;
+        if (matches && matches.length) {
+            matches.forEach(function(line, index) {
+                var closing;
+                // If this is an opening tag, check for closing tags
+                // FIXME: May end up with some false positives here
+                // Better to store modes as k/v with openDelimiter + delimiter as key
+                // Then this can simply check against the map
+                if (line.indexOf(o + d) === 0 // If it is a tag
+                 && line.indexOf(o + d + d) !== 0) {
+                    closing = matches[index + 2];
+                    if (!(closing == d + c || closing == '-' + d + c || closing == '_' + d + c)) {
+                        throw new Error('Could not find matching close tag for "' + line + '".');
+                    }
+                }
+                self.scanLine(line);
+            });
+        }
+    },
+    parseTemplateText: function() {
+        var str = this.templateText;
+        var pat = this.regex;
+        var result = pat.exec(str);
+        var arr = [];
+        var firstPos;
+        while(result){
+            firstPos = result.index;
+            if (firstPos !== 0) {
+                arr.push(str.substring(0, firstPos));
+                str = str.slice(firstPos);
+            }
+            arr.push(result[0]);
+            str = str.slice(result[0].length);
+            result = pat.exec(str);
+        }
+        if (str) {
+            arr.push(str);
+        }
+        return arr;
+    },
+    _addOutput: function(line) {
+        if (this.truncate) {
+            // Only replace single leading linebreak in the line after
+            // -%> tag -- this is the single, trailing linebreak
+            // after the tag that the truncation mode replaces
+            // Handle Win / Unix / old Mac linebreaks -- do the \r\n
+            // combo first in the regex-or
+            line = line.replace(/^(?:\r\n|\r|\n)/, '');
+            this.truncate = false;
+        }
+        if (!line) {
+            return line;
+        }
+        // Preserve literal slashes
+        line = line.replace(/\\/g, '\\\\');
+        // Convert linebreaks
+        line = line.replace(/\n/g, '\\n');
+        line = line.replace(/\r/g, '\\r');
+        // Escape double-quotes
+        // - this will be the delimiter during execution
+        line = line.replace(/"/g, '\\"');
+        this.source += '    ; __append("' + line + '")' + '\n';
+    },
+    scanLine: function(line) {
+        var self = this;
+        var d = this.opts.delimiter;
+        var o = this.opts.openDelimiter;
+        var c = this.opts.closeDelimiter;
+        var newLineCount = 0;
+        newLineCount = line.split('\n').length - 1;
+        switch(line){
+            case o + d:
+            case o + d + '_':
+                this.mode = Template.modes.EVAL;
+                break;
+            case o + d + '=':
+                this.mode = Template.modes.ESCAPED;
+                break;
+            case o + d + '-':
+                this.mode = Template.modes.RAW;
+                break;
+            case o + d + '#':
+                this.mode = Template.modes.COMMENT;
+                break;
+            case o + d + d:
+                this.mode = Template.modes.LITERAL;
+                this.source += '    ; __append("' + line.replace(o + d + d, o + d) + '")' + '\n';
+                break;
+            case d + d + c:
+                this.mode = Template.modes.LITERAL;
+                this.source += '    ; __append("' + line.replace(d + d + c, d + c) + '")' + '\n';
+                break;
+            case d + c:
+            case '-' + d + c:
+            case '_' + d + c:
+                if (this.mode == Template.modes.LITERAL) {
+                    this._addOutput(line);
+                }
+                this.mode = null;
+                this.truncate = line.indexOf('-') === 0 || line.indexOf('_') === 0;
+                break;
+            default:
+                // In script mode, depends on type of tag
+                if (this.mode) {
+                    // If '//' is found without a line break, add a line break.
+                    switch(this.mode){
+                        case Template.modes.EVAL:
+                        case Template.modes.ESCAPED:
+                        case Template.modes.RAW:
+                            if (line.lastIndexOf('//') > line.lastIndexOf('\n')) {
+                                line += '\n';
+                            }
+                    }
+                    switch(this.mode){
+                        // Just executing code
+                        case Template.modes.EVAL:
+                            this.source += '    ; ' + line + '\n';
+                            break;
+                        // Exec, esc, and output
+                        case Template.modes.ESCAPED:
+                            this.source += '    ; __append(escapeFn(' + stripSemi(line) + '))' + '\n';
+                            break;
+                        // Exec and output
+                        case Template.modes.RAW:
+                            this.source += '    ; __append(' + stripSemi(line) + ')' + '\n';
+                            break;
+                        case Template.modes.COMMENT:
+                            break;
+                        // Literal <%% mode, append as raw output
+                        case Template.modes.LITERAL:
+                            this._addOutput(line);
+                            break;
+                    }
+                } else {
+                    this._addOutput(line);
+                }
+        }
+        if (self.opts.compileDebug && newLineCount) {
+            this.currentLine += newLineCount;
+            this.source += '    ; __line = ' + this.currentLine + '\n';
+        }
+    }
+};
+/**
+ * Escape characters reserved in XML.
+ *
+ * This is simply an export of {@link module:utils.escapeXML}.
+ *
+ * If `markup` is `undefined` or `null`, the empty string is returned.
+ *
+ * @param {String} markup Input string
+ * @return {String} Escaped string
+ * @public
+ * @func
+ * */ exports.escapeXML = utils.escapeXML;
+/**
+ * Express.js support.
+ *
+ * This is an alias for {@link module:ejs.renderFile}, in order to support
+ * Express.js out-of-the-box.
+ *
+ * @func
+ */ exports.__express = exports.renderFile;
+/**
+ * Version of EJS.
+ *
+ * @readonly
+ * @type {String}
+ * @public
+ */ exports.VERSION = _VERSION_STRING;
+/**
+ * Name for detection of EJS.
+ *
+ * @readonly
+ * @type {String}
+ * @public
+ */ exports.name = _NAME;
+/* istanbul ignore if */ if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+;
+}),
+];
+
+//# sourceMappingURL=_7466ab2f._.js.map

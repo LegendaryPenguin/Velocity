@@ -1,0 +1,15 @@
+{
+  "name": "og-trust-studio",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm --workspace @ogtrust/web run dev",
+    "build": "npm run -ws build",
+    "test": "npm --workspace @ogtrust/contracts run test",
+    "deploy:contracts": "npm --workspace @ogtrust/contracts run deploy:og",
+    "cli": "npm --workspace @ogtrust/cli run start --"
+  }
+}
