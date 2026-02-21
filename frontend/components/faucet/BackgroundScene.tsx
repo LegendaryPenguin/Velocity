@@ -1,22 +1,13 @@
 "use client";
 
-import Script from "next/script";
-
 export function BackgroundScene() {
   return (
     <div className="pointer-events-none fixed inset-0 z-[1] overflow-hidden">
-      <Script
-        type="module"
-        src="https://unpkg.com/@splinetool/viewer@1.12.58/build/spline-viewer.js"
-        strategy="afterInteractive"
-      />
-
-      <spline-viewer
-        url="https://prod.spline.design/mMEB6FJWdEa9lcn0/scene.splinecode"
+      <iframe
+        src="https://my.spline.design/particles-6f4e4b4f6dce6dcf6d7674e5fbe98cf2/"
+        title="Background scene"
+        className="h-full w-full border-0"
         style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
           filter: "blur(4px) brightness(0.82) saturate(1.05)",
           transform: "scale(1.03)",
         }}
