@@ -1,66 +1,53 @@
-## Foundry
+# Human Agent iNFT Contracts (Hardhat)
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This directory now includes a minimal Hardhat project for the faucet demo:
 
-Foundry consists of:
+- `contracts/MockOracle.sol`
+- `contracts/HumanAgentINFT.sol`
+- `scripts/deploy.ts`
+- `scripts/mint.ts`
+- `test/basic.test.ts`
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Setup
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```bash
+cd contracts
+npm install
 ```
 
-### Test
+Create `.env` in repo root (or export envs in shell):
 
-```shell
-$ forge test
+```bash
+PRIVATE_KEY=0x...
+OG_RPC_URL=https://evmrpc-testnet.0g.ai
 ```
 
-### Format
+## Test
 
-```shell
-$ forge fmt
+```bash
+npx hardhat test
 ```
 
-### Gas Snapshots
+## Deploy to 0G Testnet
 
-```shell
-$ forge snapshot
+```bash
+npx hardhat run scripts/deploy.ts --network og-testnet
 ```
 
-### Anvil
+The script prints:
 
-```shell
-$ anvil
+- `MockOracle` address
+- `HumanAgentINFT` address
+
+Use the `HumanAgentINFT` address as `NEXT_PUBLIC_INFT_ADDRESS` in the web app.
+
+## Mint manually
+
+```bash
+npx hardhat run scripts/mint.ts --network og-testnet -- --to 0xYourWallet
 ```
 
-### Deploy
+Optional flags:
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+- `--uri demo://...`
+- `--hash 0x...`
