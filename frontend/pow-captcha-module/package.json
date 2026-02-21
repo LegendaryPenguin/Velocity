@@ -1,0 +1,25 @@
+{
+  "name": "pow-captcha-module",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.tsx",
+  "exports": {
+    ".": "./index.tsx",
+    "./frontend/*": "./frontend/*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "snarkjs": "^0.7.0"
+  },
+  "scripts": {
+    "test:validator": "cd backend/zkProofValidator && npm install && node test.js",
+    "test:model": "cd frontend && npx --yes tsx test-captcha-model.ts",
+    "test:api": "node api/test-validate.mjs"
+  },
+  "devDependencies": {
+    "snarkjs": "^0.7.6",
+    "tsx": "^4.7.0"
+  }
+}

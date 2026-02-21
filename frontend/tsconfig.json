@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "zkpoh-module": ["../zkPoH-Module"]
     }
   },
   "include": [
@@ -28,7 +29,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "../zkPoH-Module/**/*.ts",
+    "../zkPoH-Module/**/*.tsx"
   ],
   "exclude": ["node_modules"]
 }

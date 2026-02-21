@@ -298,12 +298,14 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
         if (validation.ok && validation.verified) {
           setZkVerified(true);
           console.log("Proof verified by server. Unlocking faucet.");
-          onVerifiedHuman(toExportJson(model.score), model.score);
+          // Keep modal open briefly so user sees "Verified" message, then notify parent
+          setTimeout(() => {
+            onVerifiedHuman(toExportJson(model.score), model.score);
+          }, 1200);
         } else {
           setZkVerified(false);
           setZkError(validation.error ?? "Server rejected proof");
         }
-        onVerifiedHuman(toExportJson(model.score), model.score);
       }
       console.log("Verification complete. Features:", f, "Model:", model);
       setFeatures(f);
@@ -414,10 +416,11 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
   );
 
   const modalTone = useMemo(() => {
+    if (zkVerified) return "bg-emerald-600/90";
     if (incorrectTiles.size > 0 || missedTiles.size > 0) return "bg-red-500/80";
     if (verified && solved) return modelLabel === "HUMAN" ? "bg-emerald-500/80" : "bg-red-500/80";
     return "bg-purple-600/65";
-  }, [incorrectTiles, missedTiles, verified, solved, modelLabel]);
+  }, [zkVerified, incorrectTiles, missedTiles, verified, solved, modelLabel]);
 
   if (!isOpen) return null;
 
@@ -453,9 +456,14 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
 
         <div className={`px-5 pb-4 pt-5 transition-colors duration-300 ${modalTone}`}>
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/70">
-            Step 1: Prove humanity
+            {zkVerified ? "Verification complete" : "Step 1: Prove humanity"}
           </p>
-          {incorrectTiles.size > 0 || missedTiles.size > 0 ? (
+          {zkVerified ? (
+            <>
+              <h2 className="text-xl font-bold text-white">Verified</h2>
+              <p className="mt-1 text-[13px] text-white/90">Proof accepted. You’re in.</p>
+            </>
+          ) : incorrectTiles.size > 0 || missedTiles.size > 0 ? (
             <>
               <h2 className="text-xl font-bold text-white">Try Again</h2>
               <p className="mt-1 text-[13px] text-white/80">Adjust your selection and verify again.</p>
@@ -572,10 +580,10 @@ export function CaptchaModal({ isOpen, onClose, onVerifiedHuman }: Props) {
           <button
             type="button"
             onClick={handleVerify}
-            disabled={simulateBot || verifyLoading}
+            disabled={simulateBot || verifyLoading || zkVerified}
             className="btn-primary min-h-10 rounded-lg px-5 py-1.5 text-sm font-semibold"
           >
-            {verifyLoading ? "Verifying..." : "Verify Access"}
+            {zkVerified ? "Verified ✓" : verifyLoading ? "Verifying..." : "Verify Access"}
           </button>
         </div>
       </div>
