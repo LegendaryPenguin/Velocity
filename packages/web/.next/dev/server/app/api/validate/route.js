@@ -1,0 +1,10 @@
+var R=require("../../../chunks/[turbopack]_runtime.js")("server/app/api/validate/route.js")
+R.c("server/chunks/node_modules_next_c485b70b._.js")
+R.c("server/chunks/node_modules_b78287d2._.js")
+R.c("server/chunks/node_modules_wasmcurves_a495e836._.js")
+R.c("server/chunks/node_modules_snarkjs_6e7fd6f7._.js")
+R.c("server/chunks/node_modules_f0b54fb2._.js")
+R.c("server/chunks/[root-of-the-server]__30f7f6d7._.js")
+R.c("server/chunks/packages_web__next-internal_server_app_api_validate_route_actions_d3c0b960.js")
+R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/packages/web/app/api/validate/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/packages/web/app/api/validate/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports
