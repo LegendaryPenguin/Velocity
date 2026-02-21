@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "../demo0g/components/StepCard.tsx", "../demo0g/components/LedgerInfo.tsx"  ],
   "exclude": ["node_modules"]
 }
